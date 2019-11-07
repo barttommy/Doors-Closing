@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Chicago Train Tracker</string>
+    <string name="app_name">Train Tracker</string>
+    <string name="station_label">Station Label</string>
+    <string name="direction_label">Direction Label</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="time">Time</string>
 </resources>
