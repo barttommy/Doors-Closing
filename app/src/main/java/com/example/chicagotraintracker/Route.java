@@ -26,7 +26,7 @@ public class Route implements Comparable<Route> {
                 hexColor = "#b38054";
                 break;
             case ("P"):
-                hexColor = "#800080";
+                hexColor = "#a148e0";
                 break;
             case ("Red"):
                 hexColor = "#ed2b15";

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SwipeRefreshLayout swiper;
 
     private ArrayList<Route> routeList = new ArrayList<>();
-    private Station requestedStation;
+    private ArrayList<Station> requestedStations = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,31 +43,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-        requestedStation = new Station("40380", "Clark/Lake", "", "");
+        requestedStations.add(new Station("40380", "Clark/Lake", "", ""));
+//        requestedStations.add(new Station("41220", "Fullerton", "", ""));
+//        requestedStations.add(new Station("40660", "Armitage", "", ""));
 
-        generateBogusData();
-    }
+        // TODO update request, check for internet connection, location permission
 
-    private void generateBogusData() {
-        ArrayList<Train> trains = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            trains.add(new Train("Arriving at " + i, i+"", "", ""));
-        }
-        routeList.add(new Route("Brn", "40380", "Clark/Lake","Kimball", trains));
+        doRefresh();
     }
 
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
-        swiper.setRefreshing(false);
+        swiper.setRefreshing(true);
+        new AsyncArrivalsLoader(this, requestedStations).execute();
     }
 
     void acceptResults(ArrayList<Route> results) {
         routeList.clear();
         routeList.addAll(results);
+        Collections.sort(routeList);
+        routeAdapter.notifyDataSetChanged();
+        swiper.setRefreshing(false);
     }
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this, "Implement Map!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Implement Google Map Activity!", Toast.LENGTH_SHORT).show();
     }
 }
