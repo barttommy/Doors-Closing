@@ -8,28 +8,37 @@ public class Station {
     private String name;
     private String lat;
     private String lon;
+    private double distance;
 
-    public Station(String mapId, String name, String lat, String lon) {
+    Station(String mapId, String name, String lat, String lon) {
         this.mapId = mapId;
         this.name = name;
         this.lat = lat;
         this.lon = lon;
     }
 
-    public String getMapId() {
+    String getMapId() {
         return mapId;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getLat() {
+    String getLat() {
         return lat;
     }
 
-    public String getLon() {
+    String getLon() {
         return lon;
+    }
+
+    double getDistance() {
+        return distance;
+    }
+
+    void setDistance(double distance) {
+        this.distance = distance;
     }
 
     @Override

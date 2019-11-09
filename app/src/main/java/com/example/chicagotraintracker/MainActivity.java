@@ -30,6 +30,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /* TODO:
     Update request algorithm
+    Build nicer looking cells w/ padding & background
     Implement network check before async execute
     Clean CSV station names and repeated mapId's
     Implement manual station search / selection (No location required)
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setAdapter(routeAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        recyclerView.addItemDecoration(new MarginItemDecoration(24));
+
         swiper = findViewById(R.id.swiper);
         swiper.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -82,16 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         doRefresh();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PERMISSION_GRANTED) {
-                doRefresh();
-            }
-        }
-    }
-
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
         swiper.setRefreshing(true);
@@ -101,9 +94,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             String provider = locationManager.getBestProvider(criteria, true);
             Location currentLocation = locationManager.getLastKnownLocation(provider);
+
             getNearbyStations(currentLocation);
             Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
+
+            // size > 0, internet connection
             new AsyncArrivalsLoader(this, requestedStations).execute();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PERMISSION_GRANTED) {
+                doRefresh();
+            }
         }
     }
 
@@ -122,14 +128,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 double lat = Double.parseDouble(station.getLat());
                 double distance = distanceBetweenCoords(currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
                 if (distance <= 0.8) { // 0.8 km = approx 0.5 mile range
-                    if (!requestedStations.contains(station)) {
+                    if (!requestedStations.contains(station)) { //TODO Remove on csv update
+                        station.setDistance(distance);
                         requestedStations.add(station);
                     }
                 }
-                Log.d(TAG, "stationInRange: No station found");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d(TAG, "getNearbyStations: FAILED");
         }
     }
 
@@ -145,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (r * c);
     }
 
+    // TODO check network function
+
     private void loadStationData() {
         try {
             BufferedReader reader = new BufferedReader(
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DataParser data = new DataParser(reader);
             for (int i = 0; i < data.Map_ID.length; i++) {
                 Station s = new Station(data.Map_ID[i], data.Station_Name[i], data.Location_X[i], data.Location_Y[i]);
-                if (!stationList.contains(s)) {
+                if (!stationList.contains(s)) { //TODO Remove on csv update
                     stationList.add(s);
                 }
             }

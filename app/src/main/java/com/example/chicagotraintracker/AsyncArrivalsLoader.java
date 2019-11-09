@@ -24,14 +24,13 @@ import java.util.Locale;
 public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     private static final String TAG = "AsyncArrivalsLoader";
-
     private static final String API_BASE = "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?";
     private static final String API_KEY = "73436616b5af4465bc65790aa9d4886c";
 
     @SuppressLint("StaticFieldLeak")
     private MainActivity mainActivity;
-
     private ArrayList<Station> requestedStations;
+    
     private ArrayList<Route> resultList = new ArrayList<>();
 
     AsyncArrivalsLoader(MainActivity mainActivity, ArrayList<Station> requestedStations) {
@@ -42,13 +41,13 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         for (Station station: requestedStations) {
-            String stationData = getStationData(station.getMapId());
-            parseJSON(stationData);
+            String api_response = downloadData(station.getMapId());
+            parseJSON(api_response);
         }
         return null;
     }
 
-    private String getStationData(String mapId) {
+    private String downloadData(String mapId) {
         StringBuilder builder = new StringBuilder();
 
         Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
@@ -57,7 +56,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         buildURL.appendQueryParameter("", "40530");
         buildURL.appendQueryParameter("outputType", "JSON");
         String urlToUse = buildURL.build().toString();
-        Log.d(TAG, "getStationData: " + urlToUse);
+        Log.d(TAG, "downloadData: for API URL = " + urlToUse);
 
         try {
             URL url = new URL(urlToUse);
@@ -156,8 +155,10 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             String minutes = String.valueOf(c.get(Calendar.MINUTE));
             minutes = (minutes.length() == 2) ? minutes : "0" + minutes;
 
-            String timestamp = String.format("%s:%s", c.get(Calendar.HOUR), minutes);
+            int hour = c.get(Calendar.HOUR);
+            hour = (hour == 0) ? 12 : hour;
 
+            String timestamp = String.format("%s:%s", hour, minutes);
             result[0] = String.format("Arriving at %s %s", timestamp, meridiem);
             result[1] = (difference <= 1) ? "Due" : difference + " min";
 

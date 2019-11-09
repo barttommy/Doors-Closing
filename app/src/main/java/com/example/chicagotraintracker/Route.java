@@ -11,8 +11,13 @@ import java.util.ArrayList;
  */
 public class Route implements Comparable<Route> {
     private String line;
+
+    // TODO refactor with Station
+    // would need access to stationList in async task & use indexOf
+    // would need to refactor station names in csv too because that would be their source now.. or wait.. do we need those? yes
     private String stationId;
     private String stationName;
+
     private String destination;
     private String hexColor;
     private ArrayList<Train> trains;
@@ -29,7 +34,7 @@ public class Route implements Comparable<Route> {
                 hexColor = "#a148e0";
                 break;
             case ("Red"):
-                hexColor = "#ed2b15";
+                hexColor = "#e34242";
                 break;
             case ("Blue"):
                 hexColor = "#3E86F5";
