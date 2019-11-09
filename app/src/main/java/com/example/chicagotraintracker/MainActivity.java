@@ -1,6 +1,7 @@
 package com.example.chicagotraintracker;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,10 +11,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,11 +31,8 @@ import java.util.Collections;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-
 /* TODO:
     Update request algorithm
-    Build nicer looking cells w/ padding & background
-    Implement network check before async execute
     Clean CSV station names and repeated mapId's
     Implement manual station search / selection (No location required)
     Implement Google Maps Activity
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
         swiper.setRefreshing(true);
+        requestedStations.clear();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             swiper.setRefreshing(false);
@@ -98,8 +100,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getNearbyStations(currentLocation);
             Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
 
-            // size > 0, internet connection
-            new AsyncArrivalsLoader(this, requestedStations).execute();
+            if (connectedToNetwork()) {
+                new AsyncArrivalsLoader(this, requestedStations).execute();
+            } else {
+                swiper.setRefreshing(false);
+            }
         }
     }
 
@@ -123,14 +128,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void getNearbyStations(Location currentLocation) {
         try {
+            double minDistance = Integer.MAX_VALUE;
             for (Station station: stationList) {
                 double lon = Double.parseDouble(station.getLon());
                 double lat = Double.parseDouble(station.getLat());
                 double distance = distanceBetweenCoords(currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
                 if (distance <= 0.8) { // 0.8 km = approx 0.5 mile range
                     if (!requestedStations.contains(station)) { //TODO Remove on csv update
-                        station.setDistance(distance);
-                        requestedStations.add(station);
+                        if (minDistance > distance) {
+                            station.setDistance(distance);
+                            requestedStations.clear();
+                            requestedStations.add(station);
+                            minDistance = distance;
+                        }
                     }
                 }
             }
@@ -152,7 +162,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (r * c);
     }
 
-    // TODO check network function
+    private void showErrorDialog(String title, String subtitle) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                }
+        );
+
+        builder.setTitle(title);
+        builder.setMessage(subtitle);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    boolean connectedToNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    return true;
+                }
+            }
+        }
+        showErrorDialog("No Network Connection", "Train arrivals cannot be viewed without a network connection");
+        return false;
+    }
 
     private void loadStationData() {
         try {
