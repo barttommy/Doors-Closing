@@ -15,11 +15,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
@@ -91,11 +100,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             for (int i = 0; i < trainArrivals.length(); i++) {
                 JSONObject trainData = trainArrivals.getJSONObject(i);
 
-                String arrivalTime = trainData.getString("arrT");
-                Log.d(TAG, "onPostExecute: " + arrivalTime);
-
-                String[] timeData = parseArrivalTime(arrivalTime);
-
+                String expectedArrival = trainData.getString("arrT");
                 String latitude = trainData.getString("lat");
                 String longitude = trainData.getString("lon");
                 String color = trainData.getString("rt");
@@ -103,12 +108,14 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 String stationName = trainData.getString("staNm");
                 String destination = trainData.getString("destNm");
 
-                Train train = new Train(timeData[0], timeData[1], latitude, longitude);
+                String formattedArrival = formatArrivalTime(expectedArrival);
+                String timeRemaining = timeRemaining(expectedArrival);
+
+                Train train = new Train(formattedArrival, timeRemaining, latitude, longitude);
                 ArrayList<Train> trains = new ArrayList<>();
                 trains.add(train);
 
                 Route route = new Route(color, stationId, stationName, destination, trains);
-
                 if (!route.getDestination().equals("See train")) {
                     int index = resultList.indexOf(route);
                     if (index != -1) {
@@ -120,7 +127,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                     }
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(TAG, "parseJSON: FAILED");
@@ -132,39 +138,28 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         mainActivity.acceptResults(resultList);
     }
 
-    private String currentTime() {
-        DateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-        Date date = new Date();
-        return formatter.format(date);
+    private String formatArrivalTime(String expectedArrival) {
+        ZonedDateTime arrivalTime = LocalDateTime.parse(expectedArrival)
+                .atZone(ZoneId.of("America/Chicago"));
+
+        int hour = arrivalTime.getHour();
+        int minutes = arrivalTime.getMinute();
+
+        String meridiem = "am";
+        if (hour > 12) {
+            hour = hour - 12;
+            meridiem = "pm";
+        }
+
+        return String.format("Arriving at %s:%s %s", hour, minutes, meridiem);
     }
 
-    private String[] parseArrivalTime(String arrivalTime) {
-        String[] result = {"", ""};
-        try {
-            arrivalTime = arrivalTime.substring(11);
-
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-            Date current = format.parse(currentTime());
-            Date arrival = format.parse(arrivalTime);
-            long difference = (arrival.getTime() - current.getTime()) / 60000;
-
-            Calendar c = Calendar.getInstance();
-            c.setTime(arrival);
-            String meridiem = (c.get(Calendar.HOUR_OF_DAY) >= 12) ? "pm" : "am";
-
-            String minutes = String.valueOf(c.get(Calendar.MINUTE));
-            minutes = (minutes.length() == 2) ? minutes : "0" + minutes;
-
-            int hour = c.get(Calendar.HOUR);
-            hour = (hour == 0) ? 12 : hour;
-
-            String timestamp = String.format("%s:%s", hour, minutes);
-            result[0] = String.format("Arriving at %s %s", timestamp, meridiem);
-            result[1] = (difference <= 1) ? "Due" : difference + " min";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
+    private String timeRemaining(String expectedArrival) {
+        Instant arrivalTime = LocalDateTime.parse(expectedArrival)
+                .atZone(ZoneId.of("America/Chicago"))
+                .toInstant();
+        Instant chicagoTime = ZonedDateTime.now(ZoneId.of("CST")).toInstant();
+        long minutesToArrival = Duration.between(chicagoTime, arrivalTime).toMillis() / 60000;
+        return (minutesToArrival <= 1) ? "Due" : minutesToArrival + " min";
     }
 }

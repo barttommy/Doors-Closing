@@ -33,7 +33,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /* TODO:
     Update request algorithm
-    Clean CSV station names and repeated mapId's
+    ON PAUSE to ON RESUME - refresh
+    Clean CSV station names and repeated mapId's, use HashSet
     Implement manual station search / selection (No location required)
     Implement Google Maps Activity
     Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 double lat = Double.parseDouble(station.getLat());
                 double distance = distanceBetweenCoords(currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
                 if (distance <= 0.8) { // 0.8 km = approx 0.5 mile range
-                    if (!requestedStations.contains(station)) { //TODO Remove on csv update
+                    if (!requestedStations.contains(station)) { //TODO Remove on csv update, hashset
                         if (minDistance > distance) {
                             station.setDistance(distance);
                             requestedStations.clear();

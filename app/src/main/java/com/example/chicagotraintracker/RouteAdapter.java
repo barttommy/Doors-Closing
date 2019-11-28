@@ -1,5 +1,6 @@
 package com.example.chicagotraintracker;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -37,9 +39,11 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
         Route selection = routeList.get(position);
 
-        String color = selection.getHexColor();
-        holder.trainImage.setColorFilter(Color.parseColor(color));
+        String line = selection.getLine();
+        int color = getColor(line);
 
+        holder.trainImage.setColorFilter(color);
+        holder.directionText.setTextColor(color);
         Log.d(TAG, "onBindViewHolder: COLOR" + color);
 
         holder.stationText.setText(selection.getStationName());
@@ -57,7 +61,6 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
                 holder.timeText.append(selection.getTrains().get(i).getTimeRemaining() + "\n");
             }
         }
-        holder.directionText.setTextColor(Color.parseColor(color));
     }
 
     @Override
@@ -66,9 +69,26 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
         return routeList.size();
     }
 
-    public void clear() {
-        int size = routeList.size();
-        routeList.clear();
-        notifyItemRangeRemoved(0, size);
+    private int getColor(String line) {
+        switch(line) {
+            case ("Brn"):
+                return mainActivity.getResources().getColor(R.color.brownLine, null);
+            case ("P"):
+                return mainActivity.getResources().getColor(R.color.purpleLine, null);
+            case ("Red"):
+                return mainActivity.getResources().getColor(R.color.redLine, null);
+            case ("Blue"):
+                return mainActivity.getResources().getColor(R.color.blueLine, null);
+            case ("G"):
+                return mainActivity.getResources().getColor(R.color.greenLine, null);
+            case ("Org"):
+                return mainActivity.getResources().getColor(R.color.orangeLine, null);
+            case ("Pink"):
+                return mainActivity.getResources().getColor(R.color.pinkLine, null);
+            case ("Y"):
+                return mainActivity.getResources().getColor(R.color.yellowLine, null);
+            default:
+                return Color.WHITE;
+        }
     }
 }
