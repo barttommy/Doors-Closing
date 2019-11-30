@@ -12,7 +12,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,20 +20,19 @@ import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /* TODO:
-    Update request algorithm
-    ON PAUSE to ON RESUME - refresh
-    Clean CSV station names and repeated mapId's, use HashSet
+    Update currentLocation to be more accurate (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
     Implement manual station search / selection (No location required)
     Implement Google Maps Activity
     Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
@@ -42,17 +40,19 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
-
     private static final int LOCATION_REQUEST_CODE = 123;
+
     private LocationManager locationManager;
     private Criteria criteria;
+
+    private AsyncArrivalsLoader asyncTask;
 
     private RouteAdapter routeAdapter;
     private SwipeRefreshLayout swiper;
 
     private ArrayList<Route> routeList = new ArrayList<>();
-    private ArrayList<Station> stationList = new ArrayList<>();
-    private ArrayList<Station> requestedStations = new ArrayList<>();
+    static HashMap<String, Station> stationData = new HashMap<>();
+    private HashSet<Station> requestedStations = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +84,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         criteria.setSpeedRequired(false);
 
         loadStationData();
+    }
+
+    @Override
+    protected void onResume() {
         doRefresh();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        asyncTask.cancel(true);
+        super.onPause();
     }
 
     private void doRefresh() {
@@ -95,14 +106,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             swiper.setRefreshing(false);
         } else {
+
             String provider = locationManager.getBestProvider(criteria, true);
             Location currentLocation = locationManager.getLastKnownLocation(provider);
-
-            getNearbyStations(currentLocation);
             Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
 
+            requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
+
             if (connectedToNetwork()) {
-                new AsyncArrivalsLoader(this, requestedStations).execute();
+                asyncTask = new AsyncArrivalsLoader(this, requestedStations);
+                asyncTask.execute();
             } else {
                 swiper.setRefreshing(false);
             }
@@ -120,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void acceptResults(ArrayList<Route> results) {
+        requestedStations.clear();
         routeList.clear();
         routeList.addAll(results);
         Collections.sort(routeList);
@@ -127,40 +141,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swiper.setRefreshing(false);
     }
 
-    private void getNearbyStations(Location currentLocation) {
+    private void loadStationData() {
         try {
-            double minDistance = Integer.MAX_VALUE;
-            for (Station station: stationList) {
-                double lon = Double.parseDouble(station.getLon());
-                double lat = Double.parseDouble(station.getLat());
-                double distance = distanceBetweenCoords(currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
-                if (distance <= 0.8) { // 0.8 km = approx 0.5 mile range
-                    if (!requestedStations.contains(station)) { //TODO Remove on csv update, hashset
-                        if (minDistance > distance) {
-                            station.setDistance(distance);
-                            requestedStations.clear();
-                            requestedStations.add(station);
-                            minDistance = distance;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open("CTA_Train_Database.json")));
+            DatabaseParser data = new DatabaseParser(reader);
+            stationData = data.getStationData();
+        } catch(Exception e) {
             e.printStackTrace();
-            Log.d(TAG, "getNearbyStations: FAILED");
+            Log.d(TAG, "loadStationData: FATAL");
+            showErrorDialog("Unable to load stations", "Error occurred when parsing CTA station database");
         }
-    }
-
-    // Haversine formula to calculate distance between coordinates
-    private double distanceBetweenCoords(double lat1, double lat2, double lon1, double lon2) {
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double r = 6371;
-        return (r * c);
     }
 
     private void showErrorDialog(String title, String subtitle) {
@@ -193,22 +184,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         showErrorDialog("No Network Connection", "Train arrivals cannot be viewed without a network connection");
         return false;
-    }
-
-    private void loadStationData() {
-        try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("CTA_-_System_Information_-_List_of__L__Stops.csv")));
-            DataParser data = new DataParser(reader);
-            for (int i = 0; i < data.Map_ID.length; i++) {
-                Station s = new Station(data.Map_ID[i], data.Station_Name[i], data.Location_X[i], data.Location_Y[i]);
-                if (!stationList.contains(s)) { //TODO Remove on csv update
-                    stationList.add(s);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

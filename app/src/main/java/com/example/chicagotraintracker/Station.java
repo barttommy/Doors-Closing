@@ -2,17 +2,23 @@ package com.example.chicagotraintracker;
 
 import androidx.annotation.Nullable;
 
+import java.util.HashMap;
+
 public class Station {
 
     private String mapId;
     private String name;
     private String lat;
     private String lon;
+    private HashMap<String, Boolean> trainLines;
     private double distance;
 
-    Station(String mapId, String name, String lat, String lon) {
+    private int hashCode;
+
+    Station(String mapId, String name, HashMap<String, Boolean> trainLines, String lat, String lon) {
         this.mapId = mapId;
         this.name = name;
+        this.trainLines = trainLines;
         this.lat = lat;
         this.lon = lon;
     }
@@ -23,6 +29,10 @@ public class Station {
 
     String getName() {
         return name;
+    }
+
+    HashMap<String, Boolean> getTrainLines() {
+        return trainLines;
     }
 
     String getLat() {
@@ -49,6 +59,15 @@ public class Station {
             return false;
         }
         Station station = (Station) that;
-        return station.mapId.equals(mapId); // mapId is unique identifier
+        return station.mapId.equals(mapId);
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == 0) {
+            hashCode = 17;
+            hashCode = 37 * hashCode + mapId.hashCode();
+        }
+        return hashCode;
     }
 }

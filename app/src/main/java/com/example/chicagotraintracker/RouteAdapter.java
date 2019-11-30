@@ -51,21 +51,21 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
         holder.arrivalsText.setText("");
         holder.timeText.setText("");
-        int size = selection.getTrains().size();
+        ArrayList<Train> trains = selection.getTrains();
+        int size = trains.size();
         for (int i = 0; i < size; i++) {
-            if (i == (size - 1)){
-                holder.arrivalsText.append(selection.getTrains().get(i).getArrivalTime());
-                holder.timeText.append(selection.getTrains().get(i).getTimeRemaining());
+            if (i == (size - 1)) {
+                holder.arrivalsText.append(trains.get(i).getArrivalTime());
+                holder.timeText.append(trains.get(i).getTimeRemaining());
             } else {
-                holder.arrivalsText.append(selection.getTrains().get(i).getArrivalTime() + "\n");
-                holder.timeText.append(selection.getTrains().get(i).getTimeRemaining() + "\n");
+                holder.arrivalsText.append(trains.get(i).getArrivalTime() + "\n");
+                holder.timeText.append(trains.get(i).getTimeRemaining() + "\n");
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "getItemCount: " + routeList.size());
         return routeList.size();
     }
 

@@ -10,14 +10,10 @@ import java.util.ArrayList;
  * A Route stores a collection of incoming Trains that share the same line, stationId, and destination
  */
 public class Route implements Comparable<Route> {
-    private String line;
 
-    // TODO refactor with Station
-    // would need access to stationList in async task & use indexOf
-    // would need to refactor station names in csv too because that would be their source now.. or wait.. do we need those? yes
+    private String line;
     private String stationId;
     private String stationName;
-
     private String destination;
     private ArrayList<Train> trains;
     private int hashCode;
@@ -46,10 +42,6 @@ public class Route implements Comparable<Route> {
         return destination;
     }
 
-//    String getHexColor() {
-//        return hexColor;
-//    }
-
     ArrayList<Train> getTrains() {
         return trains;
     }
@@ -62,7 +54,6 @@ public class Route implements Comparable<Route> {
         return this.line.equals(route.getLine()) &&
                 this.stationId.equals(route.getStationId()) &&
                 this.destination.equals(route.getDestination());
-
     }
 
     @Override

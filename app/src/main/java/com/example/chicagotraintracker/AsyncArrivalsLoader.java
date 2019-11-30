@@ -12,23 +12,18 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.HashSet;
 
 public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
@@ -38,11 +33,10 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     @SuppressLint("StaticFieldLeak")
     private MainActivity mainActivity;
-    private ArrayList<Station> requestedStations;
-    
+    private HashSet<Station> requestedStations;
     private ArrayList<Route> resultList = new ArrayList<>();
 
-    AsyncArrivalsLoader(MainActivity mainActivity, ArrayList<Station> requestedStations) {
+    AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
         this.mainActivity = mainActivity;
         this.requestedStations = requestedStations;
     }
@@ -107,7 +101,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 String stationId = trainData.getString("staId");
                 String stationName = trainData.getString("staNm");
                 String destination = trainData.getString("destNm");
-
                 String formattedArrival = formatArrivalTime(expectedArrival);
                 String timeRemaining = timeRemaining(expectedArrival);
 
@@ -116,15 +109,13 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 trains.add(train);
 
                 Route route = new Route(color, stationId, stationName, destination, trains);
-                if (!route.getDestination().equals("See train")) {
+                if (!route.getDestination().equals("See train") && resultList.contains(route)) {
                     int index = resultList.indexOf(route);
-                    if (index != -1) {
-                        if (resultList.get(index).getTrains().size() < 4) {
-                            resultList.get(index).getTrains().add(train);
-                        }
-                    } else {
-                        resultList.add(route);
+                    if (resultList.get(index).getTrains().size() < 4) {
+                        resultList.get(index).getTrains().add(train);
                     }
+                } else {
+                    resultList.add(route);
                 }
             }
         } catch (JSONException e) {
@@ -149,9 +140,12 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         if (hour > 12) {
             hour = hour - 12;
             meridiem = "pm";
+        } else if (hour == 12) {
+            meridiem = "pm";
         }
 
-        return String.format("Arriving at %s:%s %s", hour, minutes, meridiem);
+        String minutesString = (minutes < 10) ? "0" + minutes : Integer.toString(minutes);
+        return String.format("Arriving at %s:%s %s", hour, minutesString, meridiem);
     }
 
     private String timeRemaining(String expectedArrival) {

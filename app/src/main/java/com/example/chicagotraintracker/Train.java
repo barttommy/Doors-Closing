@@ -1,6 +1,6 @@
 package com.example.chicagotraintracker;
 
-public class Train {
+class Train {
 
     private String arrivalTime;
     private String timeRemaining;
