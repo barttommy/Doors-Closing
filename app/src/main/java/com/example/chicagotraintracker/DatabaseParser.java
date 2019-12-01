@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
-import java.util.Map;
 
 /*
    Parses database json located in assets folder. Can be easily adapted to load from live json request,
@@ -71,8 +70,8 @@ class DatabaseParser {
                     try {
                         Station s1 = stationData.get(mapId);
                         HashMap<String, Boolean> map = s1.getTrainLines();
-                        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-                            map.put(entry.getKey(), entry.getValue() || trainLines.get(entry.getKey()));
+                        for (String key: map.keySet()) {
+                            map.put(key, map.get(key) || trainLines.get(key));
                         }
                     } catch (NullPointerException e) {
                         e.printStackTrace();

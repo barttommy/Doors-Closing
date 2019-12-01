@@ -36,6 +36,9 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     private HashSet<Station> requestedStations;
     private ArrayList<Route> resultList = new ArrayList<>();
 
+    private Instant start;
+    private Instant end;
+
     AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
         this.mainActivity = mainActivity;
         this.requestedStations = requestedStations;
@@ -43,6 +46,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
+        start = Instant.now();
         for (Station station: requestedStations) {
             String api_response = downloadData(station.getMapId());
             parseJSON(api_response);
@@ -111,7 +115,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 Route route = new Route(color, stationId, stationName, destination, trains);
                 if (!route.getDestination().equals("See train") && resultList.contains(route)) {
                     int index = resultList.indexOf(route);
-                    if (resultList.get(index).getTrains().size() < 4) {
+                    if (resultList.get(index).getTrains().size() < 3) {
                         resultList.get(index).getTrains().add(train);
                     }
                 } else {
@@ -126,6 +130,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        end = Instant.now();
+        Log.d(TAG, "onPostExecute: Loaded in " + Duration.between(start, end));
         mainActivity.acceptResults(resultList);
     }
 

@@ -67,6 +67,7 @@ class LocationHandler {
         }
     }
 
+    //TODO? better to insert and sort or sort afterwords
     private void insertByDistance(Station s) {
         stationsInRange.add(s);
         double distance = s.getDistance();

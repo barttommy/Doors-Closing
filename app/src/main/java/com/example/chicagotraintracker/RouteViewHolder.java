@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RouteViewHolder extends RecyclerView.ViewHolder {
+class RouteViewHolder extends RecyclerView.ViewHolder {
 
     TextView stationText;
     TextView directionText;

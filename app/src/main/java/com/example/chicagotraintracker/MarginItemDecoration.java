@@ -21,6 +21,5 @@ class MarginItemDecoration extends RecyclerView.ItemDecoration {
         outRect.bottom = space;
         outRect.left = space;
         outRect.right = space;
-
     }
 }

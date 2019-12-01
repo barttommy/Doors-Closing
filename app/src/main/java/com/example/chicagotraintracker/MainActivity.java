@@ -1,10 +1,13 @@
 package com.example.chicagotraintracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -12,6 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -19,15 +23,25 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
+
+import javax.xml.datatype.Duration;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -50,6 +64,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RouteAdapter routeAdapter;
     private SwipeRefreshLayout swiper;
 
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private String[] drawerItems;
+
     private ArrayList<Route> routeList = new ArrayList<>();
     static HashMap<String, Station> stationData = new HashMap<>();
     private HashSet<Station> requestedStations = new HashSet<>();
@@ -58,6 +77,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setTitle("Trains Near You"); //TODO Update title based on request (near you or specific station from manual selection)
+
+        // TODO - Bogus data for now
+        drawerItems = new String[5];
+        for (int i = 0; i < drawerItems.length; i++)
+            drawerItems[i] = "Drawer Item " + (i+1);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerList = findViewById(R.id.left_drawer);
+        drawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, drawerItems));
+        drawerList.setOnItemClickListener(
+                new ListView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        selectDrawerItem(position);
+                    }
+                }
+        );
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                R.string.drawer_open,
+                R.string.drawer_close);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
         RecyclerView recyclerView = findViewById(R.id.arrivalsRecycler);
         routeAdapter = new RouteAdapter(routeList, this);
@@ -87,15 +136,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
     protected void onResume() {
-        doRefresh();
         super.onResume();
+        doRefresh();
     }
 
     @Override
     protected void onPause() {
-        asyncTask.cancel(true);
         super.onPause();
+        asyncTask.cancel(true);
     }
 
     private void doRefresh() {
@@ -141,11 +196,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swiper.setRefreshing(false);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
+            return true;
+        }
+        switch(item.getItemId()) {
+            case R.id.search_menu_item:
+                Toast.makeText(this, "Search Pressed", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggls
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void selectDrawerItem(int position) {
+        Toast.makeText(this, String.format("Selected %s", drawerItems[position]), Toast.LENGTH_SHORT).show();
+        drawerLayout.closeDrawer(drawerList);
+    }
+
     private void loadStationData() {
         try {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(getAssets().open("CTA_Train_Database.json")));
+            Instant start = Instant.now();
             DatabaseParser data = new DatabaseParser(reader);
+            Instant end = Instant.now();
+            Log.d(TAG, "loadStationData: Loaded in " + java.time.Duration.between(start, end));
             stationData = data.getStationData();
         } catch(Exception e) {
             e.printStackTrace();

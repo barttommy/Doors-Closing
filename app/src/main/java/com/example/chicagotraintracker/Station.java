@@ -59,7 +59,9 @@ public class Station {
             return false;
         }
         Station station = (Station) that;
-        return station.mapId.equals(mapId);
+        return station.mapId.equals(mapId) &&
+                station.name.equals(name) &&
+                station.trainLines.equals(trainLines);
     }
 
     @Override
@@ -67,6 +69,8 @@ public class Station {
         if (hashCode == 0) {
             hashCode = 17;
             hashCode = 37 * hashCode + mapId.hashCode();
+            hashCode = 37 * hashCode + name.hashCode();
+            hashCode = 37 * hashCode + trainLines.hashCode();
         }
         return hashCode;
     }
