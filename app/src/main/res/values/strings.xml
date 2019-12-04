@@ -6,4 +6,6 @@
     <string name="direction_label">Direction Label</string>
     <string name="arrivals">Arrivals</string>
     <string name="time">Time</string>
+    <string name="action_search">Search</string>
+    <string name="search_hint">Enter station name</string>
 </resources>

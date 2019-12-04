@@ -2,8 +2,8 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/search_menu_item"
+        android:id="@+id/action_search"
         android:icon="@drawable/baseline_search_white_36"
-        android:title="Search"
+        android:title="@string/action_search"
         app:showAsAction="ifRoom" />
 </menu>

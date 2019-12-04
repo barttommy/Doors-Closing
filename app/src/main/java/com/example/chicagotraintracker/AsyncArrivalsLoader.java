@@ -47,19 +47,21 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         start = Instant.now();
-        for (Station station: requestedStations) {
-            String api_response = downloadData(station.getMapId());
-            parseJSON(api_response);
-        }
+
+        String api_response = downloadData();
+        parseJSON(api_response);
+
         return null;
     }
 
-    private String downloadData(String mapId) {
+    private String downloadData() {
         StringBuilder builder = new StringBuilder();
 
         Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
         buildURL.appendQueryParameter("key", API_KEY);
-        buildURL.appendQueryParameter("mapid", mapId);
+        for (Station station: requestedStations) {
+            buildURL.appendQueryParameter("mapid", station.getMapId());
+        }
         buildURL.appendQueryParameter("", "40530");
         buildURL.appendQueryParameter("outputType", "JSON");
         String urlToUse = buildURL.build().toString();

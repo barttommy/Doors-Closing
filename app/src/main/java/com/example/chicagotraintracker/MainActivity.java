@@ -7,12 +7,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -22,13 +25,21 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +47,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,15 +59,21 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /* TODO:
     Update currentLocation to be more accurate (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
-    Implement manual station search / selection (No location required)
-    Implement Google Maps Activity
+    Implement Google Maps Activity: Train locations & Station locations, show directions to station clicked on (would need more specific location)
     Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
+    Themes: Light and Dark theme & Update dialog themes
+    Drawer menu option: Light & Dark theme switcher
+    Drawer menu option: Switch back to current location request after a search
+    Drawer menu option: CTA Twitter button
+    Drawer menu option: About page
+    Drawer menu option: Bug reporting / submission? How does that work? - look into
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
     private static final int LOCATION_REQUEST_CODE = 123;
 
+    private boolean isLocationRequest = true;
     private LocationManager locationManager;
     private Criteria criteria;
 
@@ -133,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         criteria.setSpeedRequired(false);
 
         loadStationData();
+        findNearestTrains();
     }
 
     @Override
@@ -155,7 +174,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
+
+        //TODO: call findNearestTrains after x distance moved or time elapsed, not every time
+        if (isLocationRequest) {
+            findNearestTrains();
+        }
+
         swiper.setRefreshing(true);
+        if (connectedToNetwork()) {
+                asyncTask = new AsyncArrivalsLoader(this, requestedStations);
+                asyncTask.execute();
+        } else {
+            swiper.setRefreshing(false);
+        }
+    }
+
+    private void findNearestTrains() {
         requestedStations.clear();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
@@ -167,13 +201,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
 
             requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
-
-            if (connectedToNetwork()) {
-                asyncTask = new AsyncArrivalsLoader(this, requestedStations);
-                asyncTask.execute();
-            } else {
-                swiper.setRefreshing(false);
-            }
         }
     }
 
@@ -188,7 +215,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void acceptResults(ArrayList<Route> results) {
-        requestedStations.clear();
+        if (isLocationRequest) {
+            setTitle("Trains Near You");
+        } else {
+            setTitle(results.get(0).getStationName());
+        }
         routeList.clear();
         routeList.addAll(results);
         Collections.sort(routeList);
@@ -207,20 +238,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (drawerToggle.onOptionsItemSelected(item)) {
             Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
             return true;
+        } else if (item.getItemId() == R.id.action_search) {
+            showSearchDialog();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-        switch(item.getItemId()) {
-            case R.id.search_menu_item:
-                Toast.makeText(this, "Search Pressed", Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    }
+
+    public ArrayList<Station> search(String request) {
+        ArrayList<Station> searchResult = new ArrayList<>();
+        request = request.toLowerCase();
+        for (Station station: stationData.values()) {
+            if (station.getName().toLowerCase().contains(request)) {
+                searchResult.add(station);
+            }
         }
+        return searchResult;
+    }
+
+    public void loadSearchRequestStation(Station station) {
+        isLocationRequest = false;
+        requestedStations.clear();
+        requestedStations.add(station);
+        doRefresh();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
+        // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
@@ -257,6 +304,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         builder.setTitle(title);
         builder.setMessage(subtitle);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showSearchDialog() {
+        if (!connectedToNetwork()) { return; }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        final EditText input = new EditText(this);
+        input.setGravity(Gravity.CENTER_HORIZONTAL);
+        input.setHint("Clark/Lake");
+        builder.setView(input);
+
+        builder.setPositiveButton("Search",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        String request = input.getText().toString();
+                        ArrayList<Station> searchResult = search(request);
+                        if (!searchResult.isEmpty()) {
+                            if (searchResult.size() == 1) {
+                                loadSearchRequestStation(searchResult.get(0));
+                            } else {
+                                showSearchResultsDialog(searchResult);
+                            }
+                        } else {
+                            showErrorDialog("Station not found: " + request, "No station found with requested name");
+                        }
+                    }
+                }
+        );
+
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                }
+        );
+
+        builder.setTitle("Search");
+        builder.setMessage("Enter a station name:");
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showSearchResultsDialog(final ArrayList<Station> searchResult) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose a station");
+
+        Collections.sort(searchResult);
+        final String[] stationArray = new String[searchResult.size()];
+
+        for (int i = 0; i < searchResult.size(); i++) {
+            Station station = searchResult.get(i);
+            stationArray[i] = station.getDetailedName();
+        }
+
+        builder.setItems(stationArray,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadSearchRequestStation(searchResult.get(which));
+                    }
+                }
+        );
+
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                }
+        );
 
         AlertDialog dialog = builder.create();
         dialog.show();

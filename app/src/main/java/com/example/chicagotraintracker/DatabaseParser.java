@@ -48,6 +48,7 @@ class DatabaseParser {
                 JSONArray station = data.getJSONArray(i);
 
                 String stationName = station.getString(11);
+                String detailedName = station.getString(12);
                 String mapId = station.getString(13);
                 HashMap<String, Boolean> trainLines  = new HashMap<>();
 
@@ -64,7 +65,7 @@ class DatabaseParser {
                 String lat = location.getString(1);
                 String lon = location.getString(2);
 
-                Station st = new Station(mapId, stationName, trainLines, lat, lon);
+                Station st = new Station(mapId, stationName, detailedName, trainLines, lat, lon);
 
                 if (stationData.containsKey(mapId)) {
                     try {

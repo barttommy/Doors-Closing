@@ -15,9 +15,9 @@ class LocationHandler {
     private static final String[] lines = {"red", "blue", "green", "brown", "purple", "yellow", "pink", "orange"};
 
     private Location currentLocation;
-    private ArrayList<Station> stationsInRange = new ArrayList<>();
+    private ArrayList<Station> stationsInRange = new ArrayList<>(16);
     private HashMap<String, Boolean> linesInRange = newLinesInRange();
-    private HashSet<Station> requestedStations = new HashSet<>();
+    private HashSet<Station> requestedStations = new HashSet<>(); //TODO Linked list instead? Array List? Values should be unique already
 
     LocationHandler(Location currentLocation) {
         this.currentLocation = currentLocation;
@@ -86,7 +86,7 @@ class LocationHandler {
 
     private void updateLinesInRange(HashMap<String, Boolean> h1, HashMap<String, Boolean> h2) {
         try {
-            for (String key : h1.keySet()) {
+            for (String key: h1.keySet()) {
                 h1.put(key, h1.get(key) || h2.get(key));
             }
         } catch (NullPointerException e) {

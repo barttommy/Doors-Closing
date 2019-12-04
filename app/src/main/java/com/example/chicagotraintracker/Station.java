@@ -4,10 +4,11 @@ import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 
-public class Station {
+public class Station implements Comparable<Station> {
 
     private String mapId;
     private String name;
+    private String detailedName;
     private String lat;
     private String lon;
     private HashMap<String, Boolean> trainLines;
@@ -15,9 +16,10 @@ public class Station {
 
     private int hashCode;
 
-    Station(String mapId, String name, HashMap<String, Boolean> trainLines, String lat, String lon) {
+    Station(String mapId, String name, String detailedName, HashMap<String, Boolean> trainLines, String lat, String lon) {
         this.mapId = mapId;
         this.name = name;
+        this.detailedName = detailedName;
         this.trainLines = trainLines;
         this.lat = lat;
         this.lon = lon;
@@ -29,6 +31,10 @@ public class Station {
 
     String getName() {
         return name;
+    }
+
+    String getDetailedName() {
+        return detailedName;
     }
 
     HashMap<String, Boolean> getTrainLines() {
@@ -73,5 +79,13 @@ public class Station {
             hashCode = 37 * hashCode + trainLines.hashCode();
         }
         return hashCode;
+    }
+
+    @Override
+    public int compareTo(Station s) {
+        int cmp = this.name.compareTo(s.getName());
+        if (cmp == 0) cmp = this.detailedName.compareTo(s.getDetailedName());
+        if (cmp == 0) cmp = this.mapId.compareTo(s.getMapId());
+        return cmp;
     }
 }

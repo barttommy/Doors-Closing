@@ -27,7 +27,6 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     @NonNull
     @Override
     public RouteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder: CREATING ROW");
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row_item, parent, false);
         itemView.setOnClickListener(mainActivity);
         return new RouteViewHolder(itemView);
@@ -35,17 +34,12 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RouteViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: POPULATING DATA");
-
         Route selection = routeList.get(position);
 
         String line = selection.getLine();
         int color = getColor(line);
-
         holder.trainImage.setColorFilter(color);
         holder.directionText.setTextColor(color);
-        Log.d(TAG, "onBindViewHolder: COLOR" + color);
-
         holder.stationText.setText(selection.getStationName());
         holder.directionText.setText(selection.getDestination());
 
