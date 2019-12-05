@@ -4,6 +4,8 @@
     <color name="colorPrimary">#383838</color>
     <color name="colorPrimaryDark">#292929</color>
     <color name="colorAccent">#2196F3</color>
+    <color name="colorFont">#FFFFFF</color>
+    <color name="colorFontHint">#c4c4c4</color>
 
     <!-- Train Colors   -->
     <color name="brownLine">#b38054</color>
