@@ -37,7 +37,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     private ArrayList<Route> resultList = new ArrayList<>();
 
     private Instant start;
-    private Instant end;
 
     AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
         this.mainActivity = mainActivity;
@@ -132,7 +131,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        end = Instant.now();
+        Instant end = Instant.now();
         Log.d(TAG, "onPostExecute: Loaded in " + Duration.between(start, end));
         mainActivity.acceptResults(resultList);
     }

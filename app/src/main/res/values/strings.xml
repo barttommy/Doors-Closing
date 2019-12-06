@@ -19,11 +19,16 @@
     <string name="error_network_message">Train arrivals cannot be viewed without a network connection</string>
     <string name="error_search_title">Station not found</string>
     <string name="error_search_message">No station found with requested name</string>
+    <string name="error_location_title">No Location</string>
+    <string name="error_location_message">
+        Unable to access your current location. Ensure that device location is turned on.
+    </string>
 
     <!-- Layout Error Message -->
     <string name="error_no_trains_found_title">No Nearby Trains Found</string>
     <string name="error_no_trains_found_message">
-        Ensure you have location permissions enabled. You can also try searching for a station manually
+        Ensure that you have location permissions enabled. You can also try searching for a station manually
     </string>
+    <string name="drawer_icon">Drawer Icon</string>
 
 </resources>

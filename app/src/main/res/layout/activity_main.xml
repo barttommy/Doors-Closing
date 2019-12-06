@@ -71,7 +71,7 @@
 
     <ListView
         android:id="@+id/left_drawer"
-        android:layout_width="240dp"
+        android:layout_width="256dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="#FF333333"

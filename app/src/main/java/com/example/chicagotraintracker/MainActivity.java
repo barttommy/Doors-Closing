@@ -26,7 +26,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,13 +40,14 @@ import java.util.HashSet;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-/* TODO:
+/* TODO General:
     Update currentLocation to be more accurate (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
     Implement Google Maps Activity: Train locations & Station locations, show directions to station clicked on (would need more specific location)
     Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
     Themes: Light and Dark theme & Update dialogManager themes
-    Update location permission dialogManager to use MaterialDialog
+    Update size of dialogs, padding?
     Change top nav bar size? Home bar button colors?
+   TODO Drawer:
     Drawer menu option: Light & Dark theme switcher
     Drawer menu option: Switch back to current location request after a search
     Drawer menu option: CTA Twitter button
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MainActivity";
     private static final int LOCATION_REQUEST_CODE = 123;
+    private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
 
@@ -66,14 +67,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Criteria criteria;
 
     private AsyncArrivalsLoader asyncTask;
-
     private RouteAdapter routeAdapter;
     private SwipeRefreshLayout swiper;
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-    private String[] drawerItems;
 
     private ArrayList<Route> routeList = new ArrayList<>();
     static HashMap<String, Station> stationData = new HashMap<>();
@@ -89,14 +88,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setTitle("Trains Near You");
 
-        // TODO - Bogus data for now
-        drawerItems = new String[5];
-        for (int i = 0; i < drawerItems.length; i++) {
-            drawerItems[i] = "Drawer Item " + (i + 1);
-        }
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerList = findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, drawerItems));
+        drawerList.setAdapter(new DrawerAdapter(DRAWER_ITEMS, this));
         drawerList.setOnItemClickListener(
                 new ListView.OnItemClickListener() {
                     @Override
@@ -184,20 +178,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             errorTitleView.setVisibility(View.VISIBLE);
             errorMessageView.setVisibility(View.VISIBLE);
+            routeAdapter.notifyDataSetChanged();
             swiper.setRefreshing(false);
         }
     }
 
     private void findNearestTrains() {
+        setTitle("Trains Near You");
         requestedStations.clear();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
             swiper.setRefreshing(false);
         } else {
             String provider = locationManager.getBestProvider(criteria, true);
-            Location currentLocation = locationManager.getLastKnownLocation(provider);
-            Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
-            requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
+            Location currentLocation;
+            if (provider != null && (currentLocation = locationManager.getLastKnownLocation(provider)) != null) {
+                Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
+                requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
+            } else {
+                dialogManager.showErrorDialog(R.string.error_location_title, R.string.error_location_message);
+            }
         }
     }
 
@@ -212,11 +212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void acceptResults(ArrayList<Route> results) {
-        if (isLocationRequest) {
-            setTitle("Trains Near You");
-        } else {
-            setTitle(results.get(0).getStationName());
-        }
         routeList.clear();
         routeList.addAll(results);
         Collections.sort(routeList);
@@ -237,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void loadManualRequest(Station station) {
+        setTitle(station.getName());
         isLocationRequest = false;
         requestedStations.clear();
         requestedStations.add(station);
@@ -286,7 +282,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void selectDrawerItem(int position) {
-        Toast.makeText(this, String.format("Selected %s", drawerItems[position]), Toast.LENGTH_SHORT).show();
+        String selection = DRAWER_ITEMS[position];
+        switch (selection) {
+            case ("Nearby Trains"):
+                isLocationRequest = true;
+                doRefresh();
+                break;
+            case ("CTA Twitter"):
+                Toast.makeText(this, String.format("Selected %s", selection), Toast.LENGTH_SHORT).show();
+                break;
+            case ("About"):
+                Toast.makeText(this, String.format("Selected %s!", selection), Toast.LENGTH_SHORT).show(); break;
+        }
         drawerLayout.closeDrawer(drawerList);
     }
 

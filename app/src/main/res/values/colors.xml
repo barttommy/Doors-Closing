@@ -6,6 +6,7 @@
     <color name="colorAccent">#2196F3</color>
     <color name="colorFont">#FFFFFF</color>
     <color name="colorFontHint">#c4c4c4</color>
+    <color name="white">#FFFFFF</color>
 
     <!-- Train Colors   -->
     <color name="brownLine">#b38054</color>
