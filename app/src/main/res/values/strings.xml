@@ -27,7 +27,7 @@
     <!-- Layout Error Message -->
     <string name="error_no_trains_found_title">No Nearby Trains Found</string>
     <string name="error_no_trains_found_message">
-        Ensure that you have location permissions enabled. You can also try searching for a station manually
+        Ensure that you have location permissions enabled. You can also try searching for a station manually.
     </string>
     <string name="drawer_icon">Drawer Icon</string>
 

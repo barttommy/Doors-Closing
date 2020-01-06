@@ -149,6 +149,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             meridiem = "pm";
         } else if (hour == 12) {
             meridiem = "pm";
+        } else if (hour == 0) {
+            hour = 12;
         }
 
         String minutesString = (minutes < 10) ? "0" + minutes : Integer.toString(minutes);

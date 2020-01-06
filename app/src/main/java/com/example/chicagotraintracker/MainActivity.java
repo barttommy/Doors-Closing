@@ -14,12 +14,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -41,7 +43,7 @@ import java.util.HashSet;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /* TODO General:
-    Update currentLocation to be more accurate (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
+    Get location updates instead of last known (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
     Implement Google Maps Activity: Train locations & Station locations, show directions to station clicked on (would need more specific location)
     Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
     Themes: Light and Dark theme & Update dialogManager themes
@@ -49,25 +51,46 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
     Change top nav bar size? Home bar button colors?
    TODO Drawer:
     Drawer menu option: Light & Dark theme switcher
-    Drawer menu option: Switch back to current location request after a search
-    Drawer menu option: CTA Twitter button
-    Drawer menu option: About page
-    Drawer menu option: Bug reporting / submission? How does that work? - look into
+    Drawer menu option: Add the about page
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
+    private static final String CTA_TWITTER_NAME = "cta";
     private static final int LOCATION_REQUEST_CODE = 123;
+    private static final int LOCATION_MIN_TIME = 30000;
+    private static final int LOCATION_MIN_DIST = 0;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
-
     private boolean isLocationRequest = true;
     private LocationManager locationManager;
+
+    private LocationListener locationListener =  new LocationListener() {
+        public void onLocationChanged(Location location) {
+            Log.d(TAG, String.format("onLocationChanged: Updated Location: (%s, %s)",
+                    location.getLatitude(), location.getLongitude()));
+            requestedStations.clear();
+            requestedStations.addAll(new LocationHandler(location).getRequestedStations());
+            doRefresh();
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
+
     private Criteria criteria;
 
     private AsyncArrivalsLoader asyncTask;
     private RouteAdapter routeAdapter;
+    private RecyclerView arrivalsRecycler;
     private SwipeRefreshLayout swiper;
 
     private DrawerLayout drawerLayout;
@@ -77,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Route> routeList = new ArrayList<>();
     static HashMap<String, Station> stationData = new HashMap<>();
     private HashSet<Station> requestedStations = new HashSet<>();
-
-    private TextView errorTitleView;
-    private TextView errorMessageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,11 +130,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        RecyclerView recyclerView = findViewById(R.id.arrivalsRecycler);
+        arrivalsRecycler = findViewById(R.id.arrivalsRecycler);
         routeAdapter = new RouteAdapter(routeList, this);
-        recyclerView.setAdapter(routeAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new MarginItemDecoration(24));
+        arrivalsRecycler.setAdapter(routeAdapter);
+        arrivalsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        arrivalsRecycler.addItemDecoration(new MarginItemDecoration(24));
 
         swiper = findViewById(R.id.swiper);
         swiper.setOnRefreshListener(
@@ -125,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         criteria = new Criteria();
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
@@ -133,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         criteria.setBearingRequired(false);
         criteria.setSpeedRequired(false);
 
-        errorTitleView = findViewById(R.id.errorTitleView);
-        errorMessageView = findViewById(R.id.errorMessageView);
-
         dialogManager = new DialogManager(this);
+
+        // TODO
+        // locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         loadStationData();
         doRefresh();
@@ -162,32 +182,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (asyncTask != null) {
             asyncTask.cancel(true);
         }
+        //locationManager.removeUpdates(locationListener); //TODO
     }
 
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
         swiper.setRefreshing(true);
         if (isLocationRequest) {
+            setTitle("Trains Near You");
+            requestedStations.clear();
             findNearestTrains();
         }
         if (connectedToNetwork() && !requestedStations.isEmpty()) {
-            errorTitleView.setVisibility(View.GONE);
-            errorMessageView.setVisibility(View.GONE);
             asyncTask = new AsyncArrivalsLoader(this, requestedStations);
             asyncTask.execute();
         } else {
-            errorTitleView.setVisibility(View.VISIBLE);
-            errorMessageView.setVisibility(View.VISIBLE);
+            arrivalsRecycler.setVisibility(View.GONE);
             routeAdapter.notifyDataSetChanged();
             swiper.setRefreshing(false);
         }
     }
 
     private void findNearestTrains() {
-        setTitle("Trains Near You");
-        requestedStations.clear();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             swiper.setRefreshing(false);
         } else {
             String provider = locationManager.getBestProvider(criteria, true);
@@ -195,9 +213,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (provider != null && (currentLocation = locationManager.getLastKnownLocation(provider)) != null) {
                 Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
                 requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
-            } else {
-                dialogManager.showErrorDialog(R.string.error_location_title, R.string.error_location_message);
+
             }
+//            locationManager.requestLocationUpdates(
+//                    LocationManager.NETWORK_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
         }
     }
 
@@ -216,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         routeList.addAll(results);
         Collections.sort(routeList);
         routeAdapter.notifyDataSetChanged();
+        arrivalsRecycler.setVisibility(View.VISIBLE);
         swiper.setRefreshing(false);
     }
 
@@ -289,12 +309,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 doRefresh();
                 break;
             case ("CTA Twitter"):
-                Toast.makeText(this, String.format("Selected %s", selection), Toast.LENGTH_SHORT).show();
+                openTwitter();
                 break;
             case ("About"):
                 Toast.makeText(this, String.format("Selected %s!", selection), Toast.LENGTH_SHORT).show(); break;
         }
         drawerLayout.closeDrawer(drawerList);
+    }
+
+    public void openTwitter() {
+        Intent intent = null;
+        try {
+            getPackageManager().getPackageInfo("com.twitter.android", 0);
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?screen_name=" + CTA_TWITTER_NAME));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        } catch (Exception e) {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/" + CTA_TWITTER_NAME));
+        }
+        startActivity(intent);
     }
 
     boolean connectedToNetwork() {

@@ -1,6 +1,10 @@
 package com.example.chicagotraintracker;
 
+import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -12,12 +16,12 @@ class LocationHandler {
 
     private static final String TAG = "LocationHandler";
     private static final double LOCATION_REQUEST_RANGE_KM = 0.8;
-    private static final String[] lines = {"red", "blue", "green", "brown", "purple", "yellow", "pink", "orange"};
+    private static final String[] TRAIN_LINES = {"red", "blue", "green", "brown", "purple", "yellow", "pink", "orange"};
 
     private Location currentLocation;
     private ArrayList<Station> stationsInRange = new ArrayList<>(16);
     private HashMap<String, Boolean> linesInRange = newLinesInRange();
-    private HashSet<Station> requestedStations = new HashSet<>(); //TODO Linked list instead? Array List? Values should be unique already
+    private HashSet<Station> requestedStations = new HashSet<>();
 
     LocationHandler(Location currentLocation) {
         this.currentLocation = currentLocation;
@@ -78,7 +82,7 @@ class LocationHandler {
 
     private HashMap<String, Boolean> newLinesInRange() {
         HashMap<String, Boolean> map = new HashMap<>();
-        for (String line : lines) {
+        for (String line : TRAIN_LINES) {
             map.put(line, false);
         }
         return map;
