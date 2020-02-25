@@ -10,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.net.HttpURLConnection;
@@ -25,6 +24,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static java.net.HttpURLConnection.HTTP_OK;
+
 public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     private static final String TAG = "AsyncArrivalsLoader";
@@ -35,6 +36,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     private MainActivity mainActivity;
     private HashSet<Station> requestedStations;
     private ArrayList<Route> resultList = new ArrayList<>();
+    private boolean failed = true;
 
     private Instant start;
 
@@ -44,50 +46,17 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... strings) {
-        start = Instant.now();
-
-        String api_response = downloadData();
-        parseJSON(api_response);
-
-        return null;
-    }
-
-    private String downloadData() {
-        StringBuilder builder = new StringBuilder();
-
-        Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
-        buildURL.appendQueryParameter("key", API_KEY);
-        for (Station station: requestedStations) {
-            buildURL.appendQueryParameter("mapid", station.getMapId());
+    protected void onPostExecute(String s) {
+        if (s == null) {
+            Log.d(TAG, "onPostExecute: FAILED: NULL");
+        } else if (failed){
+            Log.d(TAG, "onPostExecute: FAILED: CONNECTION ERROR");
+        } else {
+            parseJSON(s);
+            mainActivity.acceptResults(resultList);
         }
-        buildURL.appendQueryParameter("", "40530");
-        buildURL.appendQueryParameter("outputType", "JSON");
-        String urlToUse = buildURL.build().toString();
-        Log.d(TAG, "downloadData: for API URL = " + urlToUse);
-
-        try {
-            URL url = new URL(urlToUse);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            connection.setRequestMethod("GET");
-            InputStream input = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line).append("\n");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return builder.toString();
+        Instant end = Instant.now();
+        Log.d(TAG, "onPostExecute: Loaded in " + Duration.between(start, end));
     }
 
     private void parseJSON(String s) {
@@ -125,15 +94,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d(TAG, "parseJSON: FAILED");
         }
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        Instant end = Instant.now();
-        Log.d(TAG, "onPostExecute: Loaded in " + Duration.between(start, end));
-        mainActivity.acceptResults(resultList);
     }
 
     private String formatArrivalTime(String expectedArrival) {
@@ -164,5 +125,65 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         Instant chicagoTime = ZonedDateTime.now(ZoneId.of("CST")).toInstant();
         long minutesToArrival = Duration.between(chicagoTime, arrivalTime).toMillis() / 60000;
         return (minutesToArrival <= 1) ? "Due" : minutesToArrival + " min";
+    }
+
+    @Override
+    protected String doInBackground(String... strings) {
+        start = Instant.now();
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+        try {
+            Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
+            buildURL.appendQueryParameter("key", API_KEY);
+            for (Station station: requestedStations) {
+                buildURL.appendQueryParameter("mapid", station.getMapId());
+            }
+            buildURL.appendQueryParameter("", "40530");
+            buildURL.appendQueryParameter("outputType", "JSON");
+            String urlToUse = buildURL.build().toString();
+            Log.d(TAG, "downloadData: for API URL = " + urlToUse);
+
+            URL url = new URL(urlToUse);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            int responseCode = connection.getResponseCode();
+            String responseText = connection.getResponseMessage();
+
+            Log.d(TAG, String.format("doInBackground: responseCode: %s responseText: %s", responseCode, responseText));
+
+            StringBuilder builder = new StringBuilder();
+            if (responseCode == HTTP_OK) {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                failed = false;
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                failed = true;
+            }
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append("\n");
+            }
+
+            return builder.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 }

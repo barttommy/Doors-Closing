@@ -15,10 +15,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -32,6 +31,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -42,51 +47,30 @@ import java.util.HashSet;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-/* TODO General:
-    Get location updates instead of last known (https://developer.android.com/guide/topics/location/strategies.html#BestEstimate)
-    Implement Google Maps Activity: Train locations & Station locations, show directions to station clicked on (would need more specific location)
-    Extract isDelayed from API and notify user, offer implied intent to CTA's twitter for updates
-    Themes: Light and Dark theme & Update dialogManager themes
-    Update size of dialogs, padding?
-    Change top nav bar size? Home bar button colors?
-   TODO Drawer:
-    Drawer menu option: Light & Dark theme switcher
-    Drawer menu option: Add the about page
+/* TODO:
+    Google maps
+    isDelayed snackbar
+    Light and dark theme
+    Update search bar, use search activity instead of dialog based search
+    Drawer options / settings
  */
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
     private static final String CTA_TWITTER_NAME = "cta";
     private static final int LOCATION_REQUEST_CODE = 123;
-    private static final int LOCATION_MIN_TIME = 30000;
-    private static final int LOCATION_MIN_DIST = 0;
+    private static final int LOCATION_MIN_TIME = 15 * 1000;
+    private static final int LOCATION_MIN_DIST = 300;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
+
     private boolean isLocationRequest = true;
     private LocationManager locationManager;
-
-    private LocationListener locationListener =  new LocationListener() {
-        public void onLocationChanged(Location location) {
-            Log.d(TAG, String.format("onLocationChanged: Updated Location: (%s, %s)",
-                    location.getLatitude(), location.getLongitude()));
-            requestedStations.clear();
-            requestedStations.addAll(new LocationHandler(location).getRequestedStations());
-            doRefresh();
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-
-        public void onProviderEnabled(String provider) {
-        }
-
-        public void onProviderDisabled(String provider) {
-        }
-    };
-
-
-    private Criteria criteria;
+    private MyLocationListener locationListener;
+    private LocationHandler locationHandler;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     private AsyncArrivalsLoader asyncTask;
     private RouteAdapter routeAdapter;
@@ -106,30 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle("Trains Near You");
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        drawerList = findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new DrawerAdapter(DRAWER_ITEMS, this));
-        drawerList.setOnItemClickListener(
-                new ListView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        selectDrawerItem(position);
-                    }
-                }
-        );
-        drawerToggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        }
-
         arrivalsRecycler = findViewById(R.id.arrivalsRecycler);
         routeAdapter = new RouteAdapter(routeList, this);
         arrivalsRecycler.setAdapter(routeAdapter);
@@ -145,21 +105,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setSpeedRequired(false);
-
+        locationHandler = new LocationHandler();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         dialogManager = new DialogManager(this);
 
-        // TODO
-        // locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
+        setupDrawer();
+        setTitle("Trains Near You");
+        setupLocationListener();
         loadStationData();
-        doRefresh();
+        getLastKnownLocation();
     }
 
     @Override
@@ -171,28 +125,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if (!requestedStations.isEmpty()) {
-            doRefresh();
+        doRefresh();
+        if (isLocationRequest
+                && checkPermission()
+                && locationManager != null
+                && locationListener != null) {
+            requestLocationUpdates();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+        }
         if (asyncTask != null) {
             asyncTask.cancel(true);
         }
-        //locationManager.removeUpdates(locationListener); //TODO
+    }
+
+    private void getLastKnownLocation() {
+        if (!checkPermission()) return;
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this,
+                new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                locationHandler.setLocation(location);
+                                requestedStations.clear();
+                                requestedStations.addAll(locationHandler.getRequestedStations());
+                                doRefresh();
+                            } else {
+                                Log.d(TAG, "onSuccess: Location is null");
+                            }
+                        }
+                    }
+                );
     }
 
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
         swiper.setRefreshing(true);
-        if (isLocationRequest) {
-            setTitle("Trains Near You");
-            requestedStations.clear();
-            findNearestTrains();
-        }
         if (connectedToNetwork() && !requestedStations.isEmpty()) {
             asyncTask = new AsyncArrivalsLoader(this, requestedStations);
             asyncTask.execute();
@@ -203,28 +177,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void findNearestTrains() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-            swiper.setRefreshing(false);
-        } else {
-            String provider = locationManager.getBestProvider(criteria, true);
-            Location currentLocation;
-            if (provider != null && (currentLocation = locationManager.getLastKnownLocation(provider)) != null) {
-                Log.d(TAG, String.format("Current location: %s %s", currentLocation.getLatitude(), currentLocation.getLongitude()));
-                requestedStations.addAll(new LocationHandler(currentLocation).getRequestedStations());
+    private void setupLocationListener() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener(this);
+        requestLocationUpdates();
+    }
 
-            }
-//            locationManager.requestLocationUpdates(
-//                    LocationManager.NETWORK_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
+    private void requestLocationUpdates() {
+        if (checkPermission() && locationManager != null) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
         }
     }
 
+    public void updateLocation(Location location) {
+        Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
+                location.getLatitude(), location.getLongitude()));
+        locationHandler.setLocation(location);
+        requestedStations.clear();
+        requestedStations.addAll(locationHandler.getRequestedStations());
+        doRefresh();
+    }
+
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]
+                    { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
+            return false;
+        }
+        return true;
+    }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult
+            (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_REQUEST_CODE) {
-            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PERMISSION_GRANTED) {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
+                    && grantResults[0] == PERMISSION_GRANTED) {
                 doRefresh();
             }
         }
@@ -254,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void loadManualRequest(Station station) {
         setTitle(station.getName());
         isLocationRequest = false;
+        locationManager.removeUpdates(locationListener);
         requestedStations.clear();
         requestedStations.add(station);
         doRefresh();
@@ -295,36 +287,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
     private void selectDrawerItem(int position) {
-        String selection = DRAWER_ITEMS[position];
-        switch (selection) {
-            case ("Nearby Trains"):
+        switch (position) {
+            case 0:
                 isLocationRequest = true;
-                doRefresh();
+                setTitle("Trains Near You");
+                requestLocationUpdates();
                 break;
-            case ("CTA Twitter"):
+            case 1:
                 openTwitter();
                 break;
-            case ("About"):
-                Toast.makeText(this, String.format("Selected %s!", selection), Toast.LENGTH_SHORT).show(); break;
+            case 2:
+                Toast.makeText(this, String.format("Selected %s!", DRAWER_ITEMS[position]),
+                        Toast.LENGTH_SHORT).show();
+                break;
         }
         drawerLayout.closeDrawer(drawerList);
     }
 
     public void openTwitter() {
-        Intent intent = null;
+        Intent intent;
         try {
             getPackageManager().getPackageInfo("com.twitter.android", 0);
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?screen_name=" + CTA_TWITTER_NAME));
+            intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("twitter://user?screen_name=" + CTA_TWITTER_NAME));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         } catch (Exception e) {
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/" + CTA_TWITTER_NAME));
+            intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://twitter.com/" + CTA_TWITTER_NAME));
         }
         startActivity(intent);
     }
@@ -340,12 +335,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
-        dialogManager.showErrorDialog(R.string.error_network_title, R.string.error_network_message);
+        dialogManager.showErrorDialog(
+                R.string.error_network_title,
+                R.string.error_network_message);
         return false;
+    }
+
+    private void setupDrawer() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerList = findViewById(R.id.left_drawer);
+        drawerList.setAdapter(new DrawerAdapter(DRAWER_ITEMS, this));
+        drawerList.setOnItemClickListener(
+                new ListView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        selectDrawerItem(position);
+                    }
+                }
+        );
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                R.string.drawer_open,
+                R.string.drawer_close);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
     }
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this, "Implement Google Map Activity!", Toast.LENGTH_SHORT).show();
+        // TODO
     }
 }

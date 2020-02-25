@@ -1,10 +1,6 @@
 package com.example.chicagotraintracker;
 
-import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -23,8 +19,11 @@ class LocationHandler {
     private HashMap<String, Boolean> linesInRange = newLinesInRange();
     private HashSet<Station> requestedStations = new HashSet<>();
 
-    LocationHandler(Location currentLocation) {
-        this.currentLocation = currentLocation;
+    void setLocation(Location location) {
+        currentLocation = location;
+        stationsInRange.clear();
+        linesInRange.clear();
+        requestedStations.clear();
         getNearbyStations();
         requestBestStations();
     }

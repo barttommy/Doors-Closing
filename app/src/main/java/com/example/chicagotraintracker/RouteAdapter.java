@@ -23,7 +23,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     @NonNull
     @Override
     public RouteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_row_item, parent, false);
         itemView.setOnClickListener(mainActivity);
         return new RouteViewHolder(itemView);
     }
