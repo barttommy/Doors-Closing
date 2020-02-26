@@ -1,14 +1,17 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.utils;
 
 import android.location.Location;
 import android.util.Log;
+
+import com.example.chicagotraintracker.models.Station;
+import com.example.chicagotraintracker.activities.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-class LocationHandler {
+public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
     private static final double LOCATION_REQUEST_RANGE_KM = 0.8;
@@ -19,7 +22,7 @@ class LocationHandler {
     private HashMap<String, Boolean> linesInRange = newLinesInRange();
     private HashSet<Station> requestedStations = new HashSet<>();
 
-    void setLocation(Location location) {
+    public void setLocation(Location location) {
         currentLocation = location;
         stationsInRange.clear();
         linesInRange.clear();
@@ -28,7 +31,7 @@ class LocationHandler {
         requestBestStations();
     }
 
-    HashSet<Station> getRequestedStations() {
+   public  HashSet<Station> getRequestedStations() {
         return requestedStations;
     }
 

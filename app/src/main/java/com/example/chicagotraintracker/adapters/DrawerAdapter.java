@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.chicagotraintracker.R;
+
 public class DrawerAdapter extends ArrayAdapter<String> {
 
     private String[] drawerItems;
@@ -20,7 +22,7 @@ public class DrawerAdapter extends ArrayAdapter<String> {
         TextView drawerText;
     }
 
-    DrawerAdapter(String[] drawerItems, Context context) {
+    public DrawerAdapter(String[] drawerItems, Context context) {
         super(context, R.layout.drawer_list_item, drawerItems);
         this.drawerItems = drawerItems;
     }

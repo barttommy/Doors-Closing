@@ -1,4 +1,6 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.utils;
+
+import com.example.chicagotraintracker.models.Station;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,16 +15,16 @@ import java.util.HashMap;
 
    Data source: https://data.cityofchicago.org/api/views/8pix-ypme/rows.json?accessType=DOWNLOAD
  */
-class DatabaseParser {
+public class DatabaseParser {
 
     private HashMap<String, Station> stationData = new HashMap<>();
 
-    DatabaseParser(BufferedReader reader) {
+    public DatabaseParser(BufferedReader reader) {
         String data = doRead(reader);
         parseJSON(data);
     }
 
-    HashMap<String, Station> getStationData() {
+    public HashMap<String, Station> getStationData() {
         return stationData;
     }
 
@@ -70,9 +72,11 @@ class DatabaseParser {
                 if (stationData.containsKey(mapId)) {
                     try {
                         Station s1 = stationData.get(mapId);
-                        HashMap<String, Boolean> map = s1.getTrainLines();
-                        for (String key: map.keySet()) {
-                            map.put(key, map.get(key) || trainLines.get(key));
+                        if (s1 != null) {
+                            HashMap<String, Boolean> map = s1.getTrainLines();
+                            for (String key: map.keySet()) {
+                                map.put(key, map.get(key) || trainLines.get(key)); // TODO unboxing warning
+                            }
                         }
                     } catch (NullPointerException e) {
                         e.printStackTrace();

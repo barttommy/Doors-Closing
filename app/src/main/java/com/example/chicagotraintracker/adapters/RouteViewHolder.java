@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.adapters;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.chicagotraintracker.R;
 
 class RouteViewHolder extends RecyclerView.ViewHolder {
 

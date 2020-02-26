@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.models;
 
 import androidx.annotation.Nullable;
 
@@ -18,7 +18,7 @@ public class Route implements Comparable<Route> {
     private ArrayList<Train> trains;
     private int hashCode;
 
-    Route (String line, String stationId, String stationName, String destination, ArrayList<Train> trains) {
+    public Route (String line, String stationId, String stationName, String destination, ArrayList<Train> trains) {
         this.line = line;
         this.stationId = stationId;
         this.stationName = stationName;
@@ -26,7 +26,7 @@ public class Route implements Comparable<Route> {
         this.trains = trains;
     }
 
-    String getLine() {
+    public String getLine() {
         return line;
     }
 
@@ -34,15 +34,15 @@ public class Route implements Comparable<Route> {
         return stationId;
     }
 
-    String getStationName() {
+    public String getStationName() {
         return stationName;
     }
 
-    String getDestination() {
+    public String getDestination() {
         return destination;
     }
 
-    ArrayList<Train> getTrains() {
+    public ArrayList<Train> getTrains() {
         return trains;
     }
 

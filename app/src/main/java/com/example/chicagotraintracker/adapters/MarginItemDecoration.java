@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.adapters;
 
 import android.graphics.Rect;
 import android.view.View;
@@ -6,10 +6,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-class MarginItemDecoration extends RecyclerView.ItemDecoration {
+public class MarginItemDecoration extends RecyclerView.ItemDecoration {
     private int space;
 
-    MarginItemDecoration(int space) {
+    public MarginItemDecoration(int space) {
         this.space = space;
     }
 

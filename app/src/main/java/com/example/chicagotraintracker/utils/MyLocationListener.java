@@ -1,16 +1,18 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.utils;
 
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.chicagotraintracker.activities.MainActivity;
+
 public class MyLocationListener implements LocationListener {
 
     private static final String TAG = "MyLocationListener";
     private MainActivity mainActivity;
 
-    MyLocationListener(MainActivity mainActivity) {
+    public MyLocationListener(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 

@@ -1,32 +1,32 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.models;
 
-class Train {
+public class Train {
 
     private String arrivalTime;
     private String timeRemaining;
     private String latitude;
     private String longitude;
 
-    Train(String arrivalTime, String timeRemaining, String latitude, String longitude) {
+    public Train(String arrivalTime, String timeRemaining, String latitude, String longitude) {
         this.arrivalTime = arrivalTime;
         this.timeRemaining = timeRemaining;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    String getArrivalTime() {
+    public String getArrivalTime() {
         return arrivalTime;
     }
 
-    String getTimeRemaining() {
+    public String getTimeRemaining() {
         return timeRemaining;
     }
 
-    String getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    String getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 }

@@ -1,9 +1,14 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.asyncs;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.example.chicagotraintracker.activities.MainActivity;
+import com.example.chicagotraintracker.models.Route;
+import com.example.chicagotraintracker.models.Station;
+import com.example.chicagotraintracker.models.Train;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +45,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     private Instant start;
 
-    AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
+    public AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
         this.mainActivity = mainActivity;
         this.requestedStations = requestedStations;
     }

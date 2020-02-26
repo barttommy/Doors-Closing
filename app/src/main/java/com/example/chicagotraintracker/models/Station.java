@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.models;
 
 import androidx.annotation.Nullable;
 
@@ -16,7 +16,8 @@ public class Station implements Comparable<Station> {
 
     private int hashCode;
 
-    Station(String mapId, String name, String detailedName, HashMap<String, Boolean> trainLines, String lat, String lon) {
+    public Station(String mapId, String name, String detailedName,
+                   HashMap<String, Boolean> trainLines, String lat, String lon) {
         this.mapId = mapId;
         this.name = name;
         this.detailedName = detailedName;
@@ -25,35 +26,35 @@ public class Station implements Comparable<Station> {
         this.lon = lon;
     }
 
-    String getMapId() {
+    public String getMapId() {
         return mapId;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    String getDetailedName() {
+    public String getDetailedName() {
         return detailedName;
     }
 
-    HashMap<String, Boolean> getTrainLines() {
+    public HashMap<String, Boolean> getTrainLines() {
         return trainLines;
     }
 
-    String getLat() {
+    public String getLat() {
         return lat;
     }
 
-    String getLon() {
+    public String getLon() {
         return lon;
     }
 
-    double getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    void setDistance(double distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 

@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.adapters;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -8,6 +8,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chicagotraintracker.R;
+import com.example.chicagotraintracker.models.Route;
+import com.example.chicagotraintracker.models.Train;
+import com.example.chicagotraintracker.activities.MainActivity;
+
 import java.util.ArrayList;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
@@ -15,7 +20,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     private ArrayList<Route> routeList;
     private MainActivity mainActivity;
 
-    RouteAdapter(ArrayList<Route> routeList, MainActivity mainActivity) {
+    public RouteAdapter(ArrayList<Route> routeList, MainActivity mainActivity) {
         this.routeList = routeList;
         this.mainActivity = mainActivity;
     }

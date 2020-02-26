@@ -1,4 +1,4 @@
-package com.example.chicagotraintracker;
+package com.example.chicagotraintracker.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +31,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.chicagotraintracker.utils.DatabaseParser;
+import com.example.chicagotraintracker.utils.DialogManager;
+import com.example.chicagotraintracker.adapters.DrawerAdapter;
+import com.example.chicagotraintracker.utils.LocationHandler;
+import com.example.chicagotraintracker.adapters.MarginItemDecoration;
+import com.example.chicagotraintracker.utils.MyLocationListener;
+import com.example.chicagotraintracker.R;
+import com.example.chicagotraintracker.adapters.RouteAdapter;
+import com.example.chicagotraintracker.models.Route;
+import com.example.chicagotraintracker.models.Station;
+import com.example.chicagotraintracker.asyncs.AsyncArrivalsLoader;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -82,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ActionBarDrawerToggle drawerToggle;
 
     private ArrayList<Route> routeList = new ArrayList<>();
-    static HashMap<String, Station> stationData = new HashMap<>();
+    public static HashMap<String, Station> stationData = new HashMap<>();
     private HashSet<Station> requestedStations = new HashSet<>();
 
     @Override
@@ -221,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void acceptResults(ArrayList<Route> results) {
+    public void acceptResults(ArrayList<Route> results) {
         routeList.clear();
         routeList.addAll(results);
         Collections.sort(routeList);
