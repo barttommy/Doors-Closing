@@ -30,7 +30,6 @@ public class DrawerAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        String item = drawerItems[position];
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -42,14 +41,16 @@ public class DrawerAdapter extends ArrayAdapter<String> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        switch(item) {
-            case ("Nearby Trains"):
-                viewHolder.drawerIcon.setImageResource(R.drawable.baseline_location_city_white_36); break;
-            case ("CTA Twitter"):
-                viewHolder.drawerIcon.setImageResource(R.drawable.twitter_logo); break;
-            case ("About"):
-                viewHolder.drawerIcon.setImageResource(R.drawable.baseline_info_white_36); break;
+
+        String item = drawerItems[position];
+        if (item.equals(drawerItems[0])) {
+            viewHolder.drawerIcon.setImageResource(R.drawable.baseline_location_city_white_36);
+        } else if (item.equals(drawerItems[1])) {
+            viewHolder.drawerIcon.setImageResource(R.drawable.twitter_logo);
+        } else if (item.equals(drawerItems[2])) {
+            viewHolder.drawerIcon.setImageResource(R.drawable.baseline_info_white_36);
         }
+
         viewHolder.drawerIcon.setColorFilter(Color.WHITE);
         viewHolder.drawerText.setText(item);
         return convertView;

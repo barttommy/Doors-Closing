@@ -42,7 +42,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     private HashSet<Station> requestedStations;
     private ArrayList<Route> resultList = new ArrayList<>();
     private boolean failed = true;
-
     private Instant start;
 
     public AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
@@ -88,9 +87,9 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 trains.add(train);
 
                 Route route = new Route(color, stationId, stationName, destination, trains);
-                if (!route.getDestination().equals("See train") && resultList.contains(route)) {
+                if (resultList.contains(route)) {
                     int index = resultList.indexOf(route);
-                    if (resultList.get(index).getTrains().size() < 3) {
+                    if (resultList.get(index).getTrains().size() < Route.ROUTE_TRAIN_LIMIT) {
                         resultList.get(index).getTrains().add(train);
                     }
                 } else {

@@ -22,10 +22,12 @@ public class Train {
         return timeRemaining;
     }
 
+    // TODO: Can be used for a GoogleMaps Activity
     public String getLatitude() {
         return latitude;
     }
 
+    // TODO: Can be used for a GoogleMaps Activity
     public String getLongitude() {
         return longitude;
     }

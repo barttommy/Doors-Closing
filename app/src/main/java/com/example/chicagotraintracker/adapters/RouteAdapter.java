@@ -43,9 +43,9 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
         holder.directionText.setTextColor(color);
         holder.stationText.setText(selection.getStationName());
         holder.directionText.setText(selection.getDestination());
-
         holder.arrivalsText.setText("");
         holder.timeText.setText("");
+
         ArrayList<Train> trains = selection.getTrains();
         int size = trains.size();
         for (int i = 0; i < size; i++) {
@@ -66,21 +66,21 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
     private int getColor(String line) {
         switch(line) {
-            case ("Brn"):
+            case (Route.BROWN_LINE):
                 return mainActivity.getResources().getColor(R.color.brownLine, null);
-            case ("P"):
+            case (Route.PURPLE_LINE):
                 return mainActivity.getResources().getColor(R.color.purpleLine, null);
-            case ("Red"):
+            case (Route.RED_LINE):
                 return mainActivity.getResources().getColor(R.color.redLine, null);
-            case ("Blue"):
+            case (Route.BLUE_LINE):
                 return mainActivity.getResources().getColor(R.color.blueLine, null);
-            case ("G"):
+            case (Route.GREEN_LINE):
                 return mainActivity.getResources().getColor(R.color.greenLine, null);
-            case ("Org"):
+            case (Route.ORANGE_LINE):
                 return mainActivity.getResources().getColor(R.color.orangeLine, null);
-            case ("Pink"):
+            case (Route.PINK_LINE):
                 return mainActivity.getResources().getColor(R.color.pinkLine, null);
-            case ("Y"):
+            case (Route.YELLOW_LINE):
                 return mainActivity.getResources().getColor(R.color.yellowLine, null);
             default:
                 return Color.WHITE;

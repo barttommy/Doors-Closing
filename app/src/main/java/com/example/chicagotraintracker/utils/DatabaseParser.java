@@ -1,5 +1,8 @@
 package com.example.chicagotraintracker.utils;
 
+import android.util.Log;
+
+import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
 
 import org.json.JSONArray;
@@ -10,13 +13,14 @@ import java.io.BufferedReader;
 import java.util.HashMap;
 
 /*
-   Parses database json located in assets folder. Can be easily adapted to load from live json request,
-   but seems unnecessary given the relatively consistent context of the data.
+   Parses database json located in assets folder. Can be easily adapted to load from live
+   json request, but seems unnecessary given the relatively consistent context of the data.
 
    Data source: https://data.cityofchicago.org/api/views/8pix-ypme/rows.json?accessType=DOWNLOAD
  */
 public class DatabaseParser {
 
+    private static final String TAG = "DatabaseParser";
     private HashMap<String, Station> stationData = new HashMap<>();
 
     public DatabaseParser(BufferedReader reader) {
@@ -47,45 +51,48 @@ public class DatabaseParser {
             JSONArray data = database.getJSONArray("data");
 
             for (int i = 0; i < data.length(); i++) {
-                JSONArray station = data.getJSONArray(i);
+                JSONArray jsonArray = data.getJSONArray(i);
 
-                String stationName = station.getString(11);
-                String detailedName = station.getString(12);
-                String mapId = station.getString(13);
+                String stationName = jsonArray.getString(11);
+                String detailedName = jsonArray.getString(12);
+                String mapId = jsonArray.getString(13);
                 HashMap<String, Boolean> trainLines  = new HashMap<>();
 
-                trainLines.put("red", station.getBoolean(15));
-                trainLines.put("blue", station.getBoolean(16));
-                trainLines.put("green", station.getBoolean(17));
-                trainLines.put("brown", station.getBoolean(18));
-                trainLines.put("purple", station.getBoolean(19) || station.getBoolean(20));
-                trainLines.put("yellow", station.getBoolean(21));
-                trainLines.put("pink", station.getBoolean(22));
-                trainLines.put("orange", station.getBoolean(23));
+                trainLines.put(Route.RED_LINE, jsonArray.getBoolean(15));
+                trainLines.put(Route.BLUE_LINE, jsonArray.getBoolean(16));
+                trainLines.put(Route.GREEN_LINE, jsonArray.getBoolean(17));
+                trainLines.put(Route.BROWN_LINE, jsonArray.getBoolean(18));
+                trainLines.put(Route.PURPLE_LINE,
+                        jsonArray.getBoolean(19) || jsonArray.getBoolean(20));
+                trainLines.put(Route.YELLOW_LINE, jsonArray.getBoolean(21));
+                trainLines.put(Route.PINK_LINE, jsonArray.getBoolean(22));
+                trainLines.put(Route.ORANGE_LINE, jsonArray.getBoolean(23));
 
-                JSONArray location = station.getJSONArray(24);
+                JSONArray location = jsonArray.getJSONArray(24);
                 String lat = location.getString(1);
                 String lon = location.getString(2);
 
-                Station st = new Station(mapId, stationName, detailedName, trainLines, lat, lon);
-
+                Station station;
                 if (stationData.containsKey(mapId)) {
-                    try {
-                        Station s1 = stationData.get(mapId);
-                        if (s1 != null) {
-                            HashMap<String, Boolean> map = s1.getTrainLines();
-                            for (String key: map.keySet()) {
-                                map.put(key, map.get(key) || trainLines.get(key)); // TODO unboxing warning
+                    station = stationData.get(mapId);
+                    if (station != null) {
+                        HashMap<String, Boolean> map = station.getTrainLines();
+                        for (String line : map.keySet()) {
+                            if (map.containsKey(line) && trainLines.containsKey(line)) {
+                                try {
+                                    map.put(line, map.get(line) || trainLines.get(line));
+                                } catch (NullPointerException e) {
+                                    e.printStackTrace();
+                                    Log.d(TAG, "parseJSON: Unboxing Exception");
+                                }
                             }
                         }
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
                     }
                 } else {
-                    stationData.put(mapId, st);
+                    station = new Station(mapId, stationName, detailedName, trainLines, lat, lon);
+                    stationData.put(mapId, station);
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

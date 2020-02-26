@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int LOCATION_REQUEST_CODE = 123;
     private static final int LOCATION_MIN_TIME = 15 * 1000;
     private static final int LOCATION_MIN_DIST = 300;
+    private static final String LOCATION_APP_TITLE = "Trains Near You";
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
@@ -120,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         dialogManager = new DialogManager(this);
 
+        setTitle(LOCATION_APP_TITLE);
         setupDrawer();
-        setTitle("Trains Near You");
-        setupLocationListener();
         loadStationData();
-        getLastKnownLocation();
+        setupLocationListener();
+        requestLocationUpdates();
     }
 
     @Override
@@ -156,25 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void getLastKnownLocation() {
-        if (!checkPermission()) return;
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(this,
-                new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                locationHandler.setLocation(location);
-                                requestedStations.clear();
-                                requestedStations.addAll(locationHandler.getRequestedStations());
-                                doRefresh();
-                            } else {
-                                Log.d(TAG, "onSuccess: Location is null");
-                            }
-                        }
-                    }
-                );
-    }
-
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Refreshing data");
         swiper.setRefreshing(true);
@@ -195,10 +177,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void requestLocationUpdates() {
+        getLastKnownLocation();
         if (checkPermission() && locationManager != null) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
         }
+    }
+
+    private void getLastKnownLocation() {
+        if (!checkPermission()) return;
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this,
+                new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            locationHandler.setLocation(location);
+                            requestedStations.clear();
+                            requestedStations.addAll(locationHandler.getRequestedStations());
+                            doRefresh();
+                        } else {
+                            Log.d(TAG, "onSuccess: Location is null");
+                        }
+                    }
+                }
+        );
     }
 
     public void updateLocation(Location location) {
@@ -269,12 +271,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Instant start = Instant.now();
             DatabaseParser data = new DatabaseParser(reader);
             Instant end = Instant.now();
-            Log.d(TAG, "loadStationData: Loaded in " + java.time.Duration.between(start, end));
+            Log.d(TAG,
+                    "loadStationData: Loaded in " + java.time.Duration.between(start, end));
             stationData = data.getStationData();
         } catch(Exception e) {
             e.printStackTrace();
             Log.d(TAG, "loadStationData: FATAL");
-            dialogManager.showErrorDialog(R.string.error_database_title, R.string.error_database_message);
+            dialogManager.showErrorDialog(
+                    R.string.error_database_title,
+                    R.string.error_database_message);
         }
     }
 
@@ -304,52 +309,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void selectDrawerItem(int position) {
-        switch (position) {
-            case 0:
-                isLocationRequest = true;
-                setTitle("Trains Near You");
-                requestLocationUpdates();
-                break;
-            case 1:
-                openTwitter();
-                break;
-            case 2:
-                Toast.makeText(this, String.format("Selected %s!", DRAWER_ITEMS[position]),
-                        Toast.LENGTH_SHORT).show();
-                break;
+        String item = DRAWER_ITEMS[position];
+
+        if (item.equals(DRAWER_ITEMS[0])) {
+            isLocationRequest = true;
+            setTitle(LOCATION_APP_TITLE);
+            requestLocationUpdates();
+        } else if (item.equals(DRAWER_ITEMS[1])) {
+            openTwitter();
+        } else if (item.equals(DRAWER_ITEMS[2])) {
+            Toast.makeText(this, String.format("Selected %s!", DRAWER_ITEMS[position]),
+                    Toast.LENGTH_SHORT).show();
         }
         drawerLayout.closeDrawer(drawerList);
-    }
-
-    public void openTwitter() {
-        Intent intent;
-        try {
-            getPackageManager().getPackageInfo("com.twitter.android", 0);
-            intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("twitter://user?screen_name=" + CTA_TWITTER_NAME));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        } catch (Exception e) {
-            intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://twitter.com/" + CTA_TWITTER_NAME));
-        }
-        startActivity(intent);
-    }
-
-    boolean connectedToNetwork() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    return true;
-                }
-            }
-        }
-        dialogManager.showErrorDialog(
-                R.string.error_network_title,
-                R.string.error_network_message);
-        return false;
     }
 
     private void setupDrawer() {
@@ -374,6 +346,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+    }
+
+    public void openTwitter() {
+        Intent intent;
+        try {
+            getPackageManager().getPackageInfo("com.twitter.android", 0);
+            intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("twitter://user?screen_name=" + CTA_TWITTER_NAME));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        } catch (Exception e) {
+            intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://twitter.com/" + CTA_TWITTER_NAME));
+        }
+        startActivity(intent);
+    }
+
+    boolean connectedToNetwork() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    return true;
+                }
+            }
+        }
+        dialogManager.showErrorDialog(
+                R.string.error_network_title,
+                R.string.error_network_message);
+        return false;
     }
 
     @Override

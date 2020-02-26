@@ -3,6 +3,7 @@ package com.example.chicagotraintracker.utils;
 import android.location.Location;
 import android.util.Log;
 
+import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
 import com.example.chicagotraintracker.activities.MainActivity;
 
@@ -15,7 +16,10 @@ public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
     private static final double LOCATION_REQUEST_RANGE_KM = 0.8;
-    private static final String[] TRAIN_LINES = {"red", "blue", "green", "brown", "purple", "yellow", "pink", "orange"};
+    private static final String[] TRAIN_LINES = {
+            Route.RED_LINE, Route.BLUE_LINE, Route.GREEN_LINE, Route.BROWN_LINE,
+            Route.PURPLE_LINE, Route.YELLOW_LINE, Route.PINK_LINE, Route.ORANGE_LINE
+    };
 
     private Location currentLocation;
     private ArrayList<Station> stationsInRange = new ArrayList<>(16);
@@ -97,6 +101,7 @@ public class LocationHandler {
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
+            Log.d(TAG, "updateLinesInRange: Unboxing exception");
         }
     }
 
