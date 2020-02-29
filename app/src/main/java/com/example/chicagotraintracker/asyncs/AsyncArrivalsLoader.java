@@ -92,6 +92,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                     if (resultList.get(index).getTrains().size() < Route.ROUTE_TRAIN_LIMIT) {
                         resultList.get(index).getTrains().add(train);
                     }
+                } else if (requestedStations.size() > 1) {
+                    addUniqueRoutes(route);
                 } else {
                     resultList.add(route);
                 }
@@ -99,6 +101,17 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    // For location requests, only add routes if they are not already stored by a closer station
+    private void addUniqueRoutes(Route route) {
+        for (Route r: resultList) {
+            if (r.getLine().equals(route.getLine())
+                    && r.getDestination().equals(route.getDestination())) {
+                return;
+            }
+        }
+        resultList.add(route);
     }
 
     private String formatArrivalTime(String expectedArrival) {

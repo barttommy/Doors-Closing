@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setTitle(LOCATION_APP_TITLE);
         setupDrawer();
         loadStationData();
-        //setupLocationListener();
     }
 
     @Override
@@ -240,6 +239,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void acceptResults(ArrayList<Route> results) {
         routeList.clear();
+
+        // Master of satisfied train lines
+
+        // Loop through routes
+
+        // if !route.equals(route + 1) && master.contains(line)
+            // remove
+
+
         routeList.addAll(results);
         Collections.sort(routeList);
         routeAdapter.notifyDataSetChanged();
