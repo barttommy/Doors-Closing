@@ -9,10 +9,10 @@ import java.util.ArrayList;
  */
 public class Route implements Comparable<Route> {
 
-    /* number of trains to show per route */
+    // Number of trains to show per route
     public static final int ROUTE_TRAIN_LIMIT = 3;
 
-    /* train line strings as they appear in the api */
+    // Train line strings as they appear in the api
     public static final String BROWN_LINE = "Brn";
     public static final String PURPLE_LINE = "P";
     public static final String RED_LINE = "Red";
@@ -29,7 +29,8 @@ public class Route implements Comparable<Route> {
     private ArrayList<Train> trains;
     private int hashCode;
 
-    public Route (String line, String stationId, String stationName, String destination, ArrayList<Train> trains) {
+    public Route (String line, String stationId, String stationName,
+                  String destination, ArrayList<Train> trains) {
         this.line = line;
         this.stationId = stationId;
         this.stationName = stationName;
@@ -62,9 +63,9 @@ public class Route implements Comparable<Route> {
         if (that == this) return true;
         else if (!(that instanceof Route)) return false;
         Route route = (Route) that;
-        return this.line.equals(route.getLine()) &&
-                this.stationId.equals(route.getStationId()) &&
-                this.destination.equals(route.getDestination());
+        return this.line.equals(route.getLine())
+                && this.stationId.equals(route.getStationId())
+                && this.destination.equals(route.getDestination());
     }
 
     @Override

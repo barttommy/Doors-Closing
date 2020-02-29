@@ -22,12 +22,13 @@
 
     <TextView
         android:id="@+id/directionTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/direction_label"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="@+id/stationTextView"
         app:layout_constraintTop_toBottomOf="@+id/stationTextView" />
 
@@ -36,7 +37,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
         android:fontFamily="@font/roboto"
         android:hint="@string/arrivals"
         android:textColor="@android:color/white"

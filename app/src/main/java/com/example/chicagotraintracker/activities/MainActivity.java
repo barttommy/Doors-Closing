@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String CTA_TWITTER_NAME = "cta";
     private static final int LOCATION_REQUEST_CODE = 123;
     private static final int LOCATION_MIN_TIME = 15 * 1000;
-    private static final int LOCATION_MIN_DIST = 300;
+    private static final int LOCATION_MIN_DIST = 500;
     private static final String LOCATION_APP_TITLE = "Trains Near You";
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
@@ -124,8 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setTitle(LOCATION_APP_TITLE);
         setupDrawer();
         loadStationData();
-        setupLocationListener();
-        requestLocationUpdates();
+        //setupLocationListener();
     }
 
     @Override
@@ -137,12 +136,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        doRefresh();
-        if (isLocationRequest
-                && checkPermission()
-                && locationManager != null
-                && locationListener != null) {
-            requestLocationUpdates();
+        if (!requestedStations.isEmpty() && !isLocationRequest) {
+            doRefresh();
+        }
+        if (isLocationRequest && checkPermission()) {
+            if (locationManager != null && locationListener != null) {
+                requestLocationUpdates();
+            } else if (locationManager == null && locationListener == null) {
+                setupLocationListener();
+            }
         }
     }
 
@@ -185,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation: ");
         if (!checkPermission()) return;
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this,
                 new OnSuccessListener<Location>() {
@@ -204,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateLocation(Location location) {
+        Log.d(TAG, "updateLocation: ");
         Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
                 location.getLatitude(), location.getLongitude()));
         locationHandler.setLocation(location);
@@ -229,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
                     && grantResults[0] == PERMISSION_GRANTED) {
-                doRefresh();
+                requestLocationUpdates();
             }
         }
     }
@@ -256,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void loadManualRequest(Station station) {
+        Log.d(TAG, "loadManualRequest: for station: " + station.getDetailedName());
         setTitle(station.getName());
         isLocationRequest = false;
         locationManager.removeUpdates(locationListener);
@@ -310,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void selectDrawerItem(int position) {
         String item = DRAWER_ITEMS[position];
-
         if (item.equals(DRAWER_ITEMS[0])) {
             isLocationRequest = true;
             setTitle(LOCATION_APP_TITLE);
@@ -318,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (item.equals(DRAWER_ITEMS[1])) {
             openTwitter();
         } else if (item.equals(DRAWER_ITEMS[2])) {
-            Toast.makeText(this, String.format("Selected %s!", DRAWER_ITEMS[position]),
+            Toast.makeText(this, String.format("Selected %s!", item),
                     Toast.LENGTH_SHORT).show();
         }
         drawerLayout.closeDrawer(drawerList);
@@ -382,6 +386,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        // TODO
+        // TODO detail cell with arrival times -> like the weather app
+        // Remove "arriving at xx:xx" from original cell
+        // Map activity? easy to implement but who would actually use it?
     }
 }

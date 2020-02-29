@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+// TODO Fix - addison and belmont, could be because of purple line and red line.
+// TODO implementing non duplicates would probably fix this problem anyways
 public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
@@ -22,7 +24,7 @@ public class LocationHandler {
     };
 
     private Location currentLocation;
-    private ArrayList<Station> stationsInRange = new ArrayList<>(16);
+    private ArrayList<Station> stationsInRange = new ArrayList<>();
     private HashMap<String, Boolean> linesInRange = newLinesInRange();
     private HashSet<Station> requestedStations = new HashSet<>();
 
@@ -41,9 +43,9 @@ public class LocationHandler {
 
     /*
      * Searches for the best stations within range of the user. Considers all
-     * available lines (as defined in linesInRange via the database) and returns the nearest stations
-     * that satisfy the available lines in the area. This information is then meant
-     * to be forwarded to the AsyncArrivalsLoader to get train arrival data.
+     * available lines (as defined in linesInRange via the database) and returns the nearest
+     * stations that satisfy the available lines in the area. This information can then be
+     * forwarded to the AsyncArrivalsLoader to get train arrival data.
      */
     private void requestBestStations() {
         HashMap<String, Boolean> map = newLinesInRange();
@@ -77,11 +79,11 @@ public class LocationHandler {
         }
     }
 
-    //TODO? better to insert and sort or sort afterwords
     private void insertByDistance(Station s) {
         stationsInRange.add(s);
         double distance = s.getDistance();
-        for (int i = stationsInRange.size() - 1; i > 0 && distance < stationsInRange.get(i-1).getDistance(); i--) {
+        for (int i = stationsInRange.size() - 1;
+             i > 0 && distance < stationsInRange.get(i-1).getDistance(); i--) {
             Collections.swap(stationsInRange, i, i-1);
         }
     }
