@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.chicagotraintracker.R;
 import com.example.chicagotraintracker.activities.MainActivity;
 import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
@@ -28,6 +29,7 @@ import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
@@ -35,7 +37,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
     private static final String TAG = "AsyncArrivalsLoader";
     private static final String API_BASE = "http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?";
-    private static final String API_KEY = "73436616b5af4465bc65790aa9d4886c";
+    private static final int MAX_STATIONS = 4;
 
     @SuppressLint("StaticFieldLeak")
     private MainActivity mainActivity;
@@ -59,8 +61,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             parseJSON(s);
             mainActivity.acceptResults(resultList);
         }
-        Instant end = Instant.now();
-        Log.d(TAG, "onPostExecute: Loaded in " + Duration.between(start, end));
+        Log.d(TAG, "onPostExecute: Loaded in " +
+                Duration.between(start, Instant.now()));
     }
 
     private void parseJSON(String s) {
@@ -130,8 +132,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         } else if (hour == 0) {
             hour = 12;
         }
-
         String minutesString = (minutes < 10) ? "0" + minutes : Integer.toString(minutes);
+
         return String.format("Arriving at %s:%s %s", hour, minutesString, meridiem);
     }
 
@@ -151,10 +153,15 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         BufferedReader reader = null;
         try {
             Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
-            buildURL.appendQueryParameter("key", API_KEY);
-            for (Station station: requestedStations) {
-                buildURL.appendQueryParameter("mapid", station.getMapId());
+            buildURL.appendQueryParameter("key",
+                    mainActivity.getResources().getString(R.string.api_key));
+
+            // API Call has a limit of MAX_STATIONS that can be requested
+            Iterator<Station> itr = requestedStations.iterator();
+            for (int i = 0; i < MAX_STATIONS && itr.hasNext(); i++) {
+                buildURL.appendQueryParameter("mapid", itr.next().getMapId());
             }
+
             buildURL.appendQueryParameter("", "40530");
             buildURL.appendQueryParameter("outputType", "JSON");
             String urlToUse = buildURL.build().toString();
@@ -164,6 +171,10 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
+
+            if (isCancelled()) {
+                return null;
+            }
 
             int responseCode = connection.getResponseCode();
             String responseText = connection.getResponseMessage();

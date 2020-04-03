@@ -18,7 +18,7 @@ public class MyLocationListener implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged: " + location);
+        Log.d(TAG, "onLocationChanged: Location changed");
         if (location != null) {
             mainActivity.updateLocation(location);
         }

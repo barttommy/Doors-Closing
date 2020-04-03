@@ -15,6 +15,7 @@ import com.example.chicagotraintracker.activities.MainActivity;
 
 import java.util.ArrayList;
 
+// TODO can reuse imageviews instead of creating new objects on each location refresh?
 public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
     private ArrayList<Route> routeList;
@@ -28,7 +29,8 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     @NonNull
     @Override
     public RouteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.route_row_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.route_row_item, parent, false);
         itemView.setOnClickListener(mainActivity);
         return new RouteViewHolder(itemView);
     }

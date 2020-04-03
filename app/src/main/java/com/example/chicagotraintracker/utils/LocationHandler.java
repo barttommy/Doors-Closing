@@ -12,12 +12,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-// TODO Fix - addison and belmont, could be because of purple line and red line.
-// TODO implementing non duplicates would probably fix this problem anyways
 public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
-    private static final double LOCATION_REQUEST_RANGE_KM = 0.8;
+    private static final double LOCATION_REQUEST_RANGE_KM = 1.60934; // One mile
     private static final String[] TRAIN_LINES = {
             Route.RED_LINE, Route.BLUE_LINE, Route.GREEN_LINE, Route.BROWN_LINE,
             Route.PURPLE_LINE, Route.YELLOW_LINE, Route.PINK_LINE, Route.ORANGE_LINE
@@ -37,15 +35,35 @@ public class LocationHandler {
         requestBestStations();
     }
 
-   public  HashSet<Station> getRequestedStations() {
+    public  HashSet<Station> getRequestedStations() {
         return requestedStations;
     }
 
     /*
-     * Searches for the best stations within range of the user. Considers all
-     * available lines (as defined in linesInRange via the database) and returns the nearest
-     * stations that satisfy the available lines in the area. This information can then be
-     * forwarded to the AsyncArrivalsLoader to get train arrival data.
+     * Update linesInRange with all stations within LOCATION_REQUEST_RANGE_KM of user location
+     */
+    private void getNearbyStations() {
+        try {
+            for (Station station: MainActivity.stationData.values()) {
+                double lon = Double.parseDouble(station.getLon());
+                double lat = Double.parseDouble(station.getLat());
+                double distance = getDistance(
+                        currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
+                if (distance <= LOCATION_REQUEST_RANGE_KM) {
+                    station.setDistance(distance);
+                    insertByDistance(station);
+                    linesInRange = getMapDisjunction(linesInRange, station.getTrainLines());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "getNearbyStations: FAILED");
+        }
+    }
+
+    /*
+     * Update requestedStations with the closest stations that satisfy the available lines in the
+     * area.
      */
     private void requestBestStations() {
         HashMap<String, Boolean> map = newLinesInRange();
@@ -53,29 +71,10 @@ public class LocationHandler {
             if (map.equals(linesInRange)) return;
             Station station = stationsInRange.get(i);
             HashMap<String, Boolean> old = new HashMap<>(map);
-            updateLinesInRange(map, station.getTrainLines());
+            map = getMapDisjunction(map, station.getTrainLines());
             if (!old.equals(map)) {
                 requestedStations.add(station);
             }
-        }
-    }
-
-    private void getNearbyStations() {
-        try {
-            for (Station station: MainActivity.stationData.values()) {
-                double lon = Double.parseDouble(station.getLon());
-                double lat = Double.parseDouble(station.getLat());
-                double distance = distanceBetweenCoords(
-                        currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
-                if (distance <= LOCATION_REQUEST_RANGE_KM) {
-                    station.setDistance(distance);
-                    insertByDistance(station);
-                    updateLinesInRange(linesInRange, station.getTrainLines());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "getNearbyStations: FAILED");
         }
     }
 
@@ -96,19 +95,22 @@ public class LocationHandler {
         return map;
     }
 
-    private void updateLinesInRange(HashMap<String, Boolean> h1, HashMap<String, Boolean> h2) {
+    private HashMap<String, Boolean> getMapDisjunction(HashMap<String, Boolean> map1,
+                                                       HashMap<String, Boolean> map2) {
+        HashMap<String, Boolean> result = new HashMap<>(map1);
         try {
-            for (String key: h1.keySet()) {
-                h1.put(key, h1.get(key) || h2.get(key));
+            for (String key: map1.keySet()) {
+                result.put(key, map1.get(key) || map2.get(key));
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
             Log.d(TAG, "updateLinesInRange: Unboxing exception");
         }
+        return result;
     }
 
     // Haversine formula to calculate distance between coordinates
-    private double distanceBetweenCoords(double lat1, double lat2, double lon1, double lon2) {
+    private double getDistance(double lat1, double lat2, double lon1, double lon2) {
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)

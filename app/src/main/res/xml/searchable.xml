@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- App Colors -->
-<!--    <color name="colorPrimary">#383838</color>-->
-    <color name="colorPrimary">#292929</color>
-<!--    <color name="colorPrimaryDark">#292929</color>-->
-    <color name="colorPrimaryDark">#121212</color>
-    <color name="colorAccent">#2196F3</color>
-    <color name="colorFont">#FFFFFF</color>
-    <color name="colorFontHint">#c4c4c4</color>
-    <color name="white">#FFFFFF</color>
 
-    <!-- Train Colors   -->
-    <color name="brownLine">#b38054</color>
-    <color name="purpleLine">#a148e0</color>
-    <color name="redLine">#e34242</color>
-    <color name="blueLine">#3E86F5</color>
-    <color name="greenLine">#34B13C</color>
-    <color name="orangeLine">#FFA200</color>
-    <color name="pinkLine">#F19CF5</color>
-    <color name="yellowLine">#F1EE17</color>
-</resources>
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/app_name"
+    android:hint="@string/search_hint" />

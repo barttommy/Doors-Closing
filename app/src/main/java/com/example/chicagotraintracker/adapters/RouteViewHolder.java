@@ -19,10 +19,10 @@ class RouteViewHolder extends RecyclerView.ViewHolder {
 
     RouteViewHolder(@NonNull View itemView) {
         super(itemView);
-        stationText = itemView.findViewById(R.id.stationTextView);
-        directionText = itemView.findViewById(R.id.directionTextView);
-        arrivalsText = itemView.findViewById(R.id.arrivalsTextView);
-        timeText = itemView.findViewById(R.id.timeTextView);
-        trainImage = itemView.findViewById(R.id.trainImageView);
+        stationText = itemView.findViewById(R.id.route_stationTextView);
+        directionText = itemView.findViewById(R.id.route_directionTextView);
+        arrivalsText = itemView.findViewById(R.id.route_arrivalsTextView);
+        timeText = itemView.findViewById(R.id.route_timeTextView);
+        trainImage = itemView.findViewById(R.id.route_trainImageView);
     }
 }

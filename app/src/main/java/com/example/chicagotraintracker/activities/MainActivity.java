@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.chicagotraintracker.utils.DatabaseParser;
@@ -64,16 +67,17 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
     Light and dark theme
     Update search bar, use search activity instead of dialog based search
     Drawer options / settings
+    Is high accuracy permission needed?
  */
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
     private static final String CTA_TWITTER_NAME = "cta";
-    private static final int LOCATION_REQUEST_CODE = 123;
-    private static final int LOCATION_MIN_TIME = 15 * 1000;
-    private static final int LOCATION_MIN_DIST = 500;
     private static final String LOCATION_APP_TITLE = "Trains Near You";
+    private static final int LOCATION_REQUEST_CODE = 123;
+    private static final int LOCATION_MIN_TIME = 10 * 1000;
+    private static final int LOCATION_MIN_DIST = 500;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
@@ -84,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LocationHandler locationHandler;
     private FusedLocationProviderClient mFusedLocationClient;
 
-    private AsyncArrivalsLoader asyncTask;
+    private AsyncArrivalsLoader asyncArrivalsLoader;
     private RouteAdapter routeAdapter;
     private RecyclerView arrivalsRecycler;
     private SwipeRefreshLayout swiper;
@@ -109,13 +113,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         arrivalsRecycler.addItemDecoration(new MarginItemDecoration(24));
 
         swiper = findViewById(R.id.swiper);
-        swiper.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        doRefresh();
-                    }
-                });
+        swiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                doRefresh();
+            }
+        });
 
         locationHandler = new LocationHandler();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -153,21 +156,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (locationManager != null && locationListener != null) {
             locationManager.removeUpdates(locationListener);
         }
-        if (asyncTask != null) {
-            asyncTask.cancel(true);
-        }
+        cancelAsync(asyncArrivalsLoader);
     }
 
     private void doRefresh() {
-        Log.d(TAG, "doRefresh: Refreshing data");
+        Log.d(TAG, "doRefresh: Reloading data");
         swiper.setRefreshing(true);
         if (connectedToNetwork() && !requestedStations.isEmpty()) {
-            asyncTask = new AsyncArrivalsLoader(this, requestedStations);
-            asyncTask.execute();
+            cancelAsync(asyncArrivalsLoader);
+            asyncArrivalsLoader = new AsyncArrivalsLoader(this, requestedStations);
+            asyncArrivalsLoader.execute();
         } else {
             arrivalsRecycler.setVisibility(View.GONE);
             routeAdapter.notifyDataSetChanged();
             swiper.setRefreshing(false);
+        }
+    }
+
+    private void cancelAsync(AsyncTask async) {
+        if (async != null && !async.isCancelled()) {
+            Log.d(TAG, "cancelAsync: Canceling previous task");
+            async.cancel(true);
         }
     }
 
@@ -186,19 +195,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getLastKnownLocation() {
-        Log.d(TAG, "getLastKnownLocation: ");
         if (!checkPermission()) return;
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(this,
-                new OnSuccessListener<Location>() {
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
                             locationHandler.setLocation(location);
                             requestedStations.clear();
                             requestedStations.addAll(locationHandler.getRequestedStations());
+                            Log.d(TAG, "onSuccess: loading stations at last known location");
                             doRefresh();
                         } else {
-                            Log.d(TAG, "onSuccess: Location is null");
+                            Log.d(TAG, "onSuccess: Last known location is null");
                         }
                     }
                 }
@@ -206,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateLocation(Location location) {
-        Log.d(TAG, "updateLocation: ");
         Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
                 location.getLatitude(), location.getLongitude()));
         locationHandler.setLocation(location);
@@ -239,20 +247,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void acceptResults(ArrayList<Route> results) {
         routeList.clear();
-
-        // Master of satisfied train lines
-
-        // Loop through routes
-
-        // if !route.equals(route + 1) && master.contains(line)
-            // remove
-
-
         routeList.addAll(results);
         Collections.sort(routeList);
         routeAdapter.notifyDataSetChanged();
-        arrivalsRecycler.setVisibility(View.VISIBLE);
         swiper.setRefreshing(false);
+        if (!routeList.isEmpty()) {
+            arrivalsRecycler.setVisibility(View.VISIBLE);
+        }
     }
 
     public ArrayList<Station> search(String request) {
@@ -299,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -330,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (item.equals(DRAWER_ITEMS[1])) {
             openTwitter();
         } else if (item.equals(DRAWER_ITEMS[2])) {
+            // TODO
             Toast.makeText(this, String.format("Selected %s!", item),
                     Toast.LENGTH_SHORT).show();
         }
@@ -386,15 +388,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
-        dialogManager.showErrorDialog(
-                R.string.error_network_title,
-                R.string.error_network_message);
+//        dialogManager.showErrorDialog(
+//                R.string.error_network_title,
+//                R.string.error_network_message);
         return false;
     }
 
     @Override
     public void onClick(View v) {
-        // TODO detail cell with arrival times -> like the weather app
+        // TODO maybe a detail cell with arrival times -> like the weather app?
         // Remove "arriving at xx:xx" from original cell
         // Map activity? easy to implement but who would actually use it?
     }
