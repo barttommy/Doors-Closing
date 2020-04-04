@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.chicagotraintracker.utils.DatabaseParser;
@@ -60,15 +58,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
-/* TODO:
-    Google maps
-    isDelayed snackbar
-    Light and dark theme
-    Update search bar, use search activity instead of dialog based search
-    Drawer options / settings
-    Is high accuracy permission needed?
- */
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -309,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
             return true;
         } else if (item.getItemId() == R.id.action_search) {
+            // TODO search activity
             dialogManager.showInputDialog();
             return true;
         } else {
@@ -331,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (item.equals(DRAWER_ITEMS[1])) {
             openTwitter();
         } else if (item.equals(DRAWER_ITEMS[2])) {
-            // TODO
+            // TODO Data provided by Chicago Transit Authority
             Toast.makeText(this, String.format("Selected %s!", item),
                     Toast.LENGTH_SHORT).show();
         }
@@ -382,10 +372,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (cm != null) {
             NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
             if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    return true;
-                }
+                return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
             }
         }
 //        dialogManager.showErrorDialog(
@@ -396,8 +384,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        // TODO maybe a detail cell with arrival times -> like the weather app?
-        // Remove "arriving at xx:xx" from original cell
-        // Map activity? easy to implement but who would actually use it?
+        // TODO
     }
 }

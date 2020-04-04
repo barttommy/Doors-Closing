@@ -1,6 +1,5 @@
 package com.example.chicagotraintracker.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chicagotraintracker.R;
 import com.example.chicagotraintracker.activities.MainActivity;
-import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
