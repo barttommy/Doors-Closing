@@ -54,7 +54,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         if (s == null) {
-            Log.d(TAG, "onPostExecute: FAILED: NULL");
+            Log.d(TAG, "onPostExecute: FAILED");
         } else if (failed){
             Log.d(TAG, "onPostExecute: FAILED: CONNECTION ERROR");
         } else {
@@ -153,8 +153,10 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         BufferedReader reader = null;
         try {
             Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
-            buildURL.appendQueryParameter("key",
-                    mainActivity.getResources().getString(R.string.api_key));
+
+            // See note in MainActivity.java for a public key
+            buildURL.appendQueryParameter(
+                    "key", mainActivity.getResources().getString(R.string.api_key));
 
             // API Call has a limit of MAX_STATIONS that can be requested
             Iterator<Station> itr = requestedStations.iterator();
@@ -172,6 +174,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             connection.setRequestMethod("GET");
             connection.connect();
 
+            // TODO
             if (isCancelled()) {
                 return null;
             }
@@ -179,7 +182,8 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             int responseCode = connection.getResponseCode();
             String responseText = connection.getResponseMessage();
 
-            Log.d(TAG, String.format("doInBackground: responseCode: %s responseText: %s", responseCode, responseText));
+            Log.d(TAG, String.format("doInBackground: responseCode: %s responseText: %s",
+                    responseCode, responseText));
 
             StringBuilder builder = new StringBuilder();
             if (responseCode == HTTP_OK) {

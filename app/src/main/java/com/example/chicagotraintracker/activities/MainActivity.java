@@ -51,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,7 +58,13 @@ import java.util.HashSet;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+/*
+ * In order to run, the app must have an API key in AsyncArrivalLoader.java
+ * A public test key can be found here:
+ * https://www.transitchicago.com/developers/traintracker/testkey/
+ */
+
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final String CTA_TWITTER_NAME = "cta";
@@ -67,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int LOCATION_REQUEST_CODE = 123;
     private static final int LOCATION_MIN_TIME = 10 * 1000;
     private static final int LOCATION_MIN_DIST = 500;
+    private static final int SEARCH_CODE = 585;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
@@ -95,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        arrivalsRecycler = findViewById(R.id.arrivalsRecycler);
+        arrivalsRecycler = findViewById(R.id.arrivals_recycler);
         routeAdapter = new RouteAdapter(routeList, this);
         arrivalsRecycler.setAdapter(routeAdapter);
         arrivalsRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -162,78 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void cancelAsync(AsyncTask async) {
-        if (async != null && !async.isCancelled()) {
-            Log.d(TAG, "cancelAsync: Canceling previous task");
-            async.cancel(true);
-        }
-    }
-
-    private void setupLocationListener() {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new MyLocationListener(this);
-        requestLocationUpdates();
-    }
-
-    private void requestLocationUpdates() {
-        getLastKnownLocation();
-        if (checkPermission() && locationManager != null) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
-        }
-    }
-
-    private void getLastKnownLocation() {
-        if (!checkPermission()) return;
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            locationHandler.setLocation(location);
-                            requestedStations.clear();
-                            requestedStations.addAll(locationHandler.getRequestedStations());
-                            Log.d(TAG, "onSuccess: loading stations at last known location");
-                            doRefresh();
-                        } else {
-                            Log.d(TAG, "onSuccess: Last known location is null");
-                        }
-                    }
-                }
-        );
-    }
-
-    public void updateLocation(Location location) {
-        Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
-                location.getLatitude(), location.getLongitude()));
-        locationHandler.setLocation(location);
-        requestedStations.clear();
-        requestedStations.addAll(locationHandler.getRequestedStations());
-        doRefresh();
-    }
-
-    private boolean checkPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]
-                    { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult
-            (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
-                    && grantResults[0] == PERMISSION_GRANTED) {
-                requestLocationUpdates();
-            }
-        }
-    }
-
+    // AsyncArrivalsLoader Callback
     public void acceptResults(ArrayList<Route> results) {
         routeList.clear();
         routeList.addAll(results);
@@ -245,16 +180,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public ArrayList<Station> search(String request) {
-        ArrayList<Station> searchResult = new ArrayList<>();
-        request = request.toLowerCase();
-        for (Station station: stationData.values()) {
-            if (station.getName().toLowerCase().contains(request)) {
-                searchResult.add(station);
+    private void cancelAsync(AsyncTask async) {
+        if (async != null && !async.isCancelled()) {
+            Log.d(TAG, "cancelAsync: Canceling previous task");
+            async.cancel(true);
+        }
+    }
+
+    private void startSearchActivity() {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivityForResult(intent, SEARCH_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SEARCH_CODE && resultCode == RESULT_OK && data != null) {
+            if (data.hasExtra("STATION")) {
+                Station station = (Station) data.getSerializableExtra("STATION");
+                if (station != null) {
+                    loadManualRequest(station);
+                }
             }
         }
-        Collections.sort(searchResult);
-        return searchResult;
     }
 
     public void loadManualRequest(Station station) {
@@ -271,11 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(getAssets().open("CTA_Train_Database.json")));
-            Instant start = Instant.now();
             DatabaseParser data = new DatabaseParser(reader);
-            Instant end = Instant.now();
-            Log.d(TAG,
-                    "loadStationData: Loaded in " + java.time.Duration.between(start, end));
             stationData = data.getStationData();
         } catch(Exception e) {
             e.printStackTrace();
@@ -296,14 +240,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
             Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
-            return true;
         } else if (item.getItemId() == R.id.action_search) {
-            // TODO search activity
-            dialogManager.showInputDialog();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
+            startSearchActivity();
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -376,14 +316,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
             }
         }
-//        dialogManager.showErrorDialog(
-//                R.string.error_network_title,
-//                R.string.error_network_message);
         return false;
     }
 
+    private void setupLocationListener() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener(this);
+        requestLocationUpdates();
+    }
+
+    private void requestLocationUpdates() {
+        getLastKnownLocation();
+        if (checkPermission() && locationManager != null) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
+        }
+    }
+
+    private void getLastKnownLocation() {
+        if (!checkPermission()) return;
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                if (location != null) {
+                                    locationHandler.setLocation(location);
+                                    requestedStations.clear();
+                                    requestedStations.addAll(locationHandler.getRequestedStations());
+                                    Log.d(TAG, "onSuccess: loading stations at last known location");
+                                    doRefresh();
+                                } else {
+                                    Log.d(TAG, "onSuccess: Last known location is null");
+                                }
+                            }
+                        }
+                );
+    }
+
+    public void updateLocation(Location location) {
+        Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
+                location.getLatitude(), location.getLongitude()));
+        locationHandler.setLocation(location);
+        requestedStations.clear();
+        requestedStations.addAll(locationHandler.getRequestedStations());
+        doRefresh();
+    }
+
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]
+                    { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
+            return false;
+        }
+        return true;
+    }
+
     @Override
-    public void onClick(View v) {
-        // TODO
+    public void onRequestPermissionsResult
+            (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
+                    && grantResults[0] == PERMISSION_GRANTED) {
+                requestLocationUpdates();
+            }
+        }
     }
 }

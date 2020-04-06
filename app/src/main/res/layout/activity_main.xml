@@ -19,7 +19,7 @@
             tools:context=".activities.MainActivity">
 
             <TextView
-                android:id="@+id/errorMessageView"
+                android:id="@+id/arrivals_error_msg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -33,10 +33,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/errorTitleView" />
+                app:layout_constraintTop_toBottomOf="@+id/arrivals_error_title" />
 
             <TextView
-                android:id="@+id/errorTitleView"
+                android:id="@+id/arrivals_error_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -55,7 +55,7 @@
                 app:layout_constraintVertical_bias="0.25" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/arrivalsRecycler"
+                android:id="@+id/arrivals_recycler"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@color/colorPrimaryDark"
