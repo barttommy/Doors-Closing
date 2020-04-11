@@ -238,9 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
-        } else if (item.getItemId() == R.id.action_search) {
+        if (item.getItemId() == R.id.action_search) {
             startSearchActivity();
         }
         return super.onOptionsItemSelected(item);

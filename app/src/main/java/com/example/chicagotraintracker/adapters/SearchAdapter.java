@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chicagotraintracker.R;
 import com.example.chicagotraintracker.activities.MainActivity;
 import com.example.chicagotraintracker.activities.SearchActivity;
+import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
@@ -35,10 +37,26 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-        Station selection = searchResults.get(position);
+        Station station = searchResults.get(position);
+
+        holder.stationText.setText(station.getName());
 
         // TODO
-        holder.stationText.setText(selection.getDetailedName());
+        String[] trainLines = searchActivity.getResources().getStringArray(R.array.train_lines);
+        HashMap<String, Boolean> availableTrainLines = station.getTrainLines();
+
+        for (String line : trainLines) {
+            try {
+                if (availableTrainLines.get(line)) {
+                    //holder.itemView.get
+                    holder.itemView.findViewWithTag(line).setVisibility(View.VISIBLE);
+                } else {
+                    holder.itemView.findViewWithTag(line).setVisibility(View.GONE);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

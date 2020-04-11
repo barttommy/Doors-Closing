@@ -3,6 +3,7 @@ package com.example.chicagotraintracker.utils;
 import android.location.Location;
 import android.util.Log;
 
+import com.example.chicagotraintracker.R;
 import com.example.chicagotraintracker.models.Route;
 import com.example.chicagotraintracker.models.Station;
 import com.example.chicagotraintracker.activities.MainActivity;
@@ -16,10 +17,6 @@ public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
     private static final double LOCATION_REQUEST_RANGE_KM = 1.60934; // One mile
-    private static final String[] TRAIN_LINES = {
-            Route.RED_LINE, Route.BLUE_LINE, Route.GREEN_LINE, Route.BROWN_LINE,
-            Route.PURPLE_LINE, Route.YELLOW_LINE, Route.PINK_LINE, Route.ORANGE_LINE
-    };
 
     private Location currentLocation;
     private ArrayList<Station> stationsInRange = new ArrayList<>();
@@ -89,7 +86,8 @@ public class LocationHandler {
 
     private HashMap<String, Boolean> newLinesInRange() {
         HashMap<String, Boolean> map = new HashMap<>();
-        for (String line : TRAIN_LINES) {
+        String[] trainLines = Route.TRAIN_LINES;
+        for (String line: trainLines) {
             map.put(line, false);
         }
         return map;

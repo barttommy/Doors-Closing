@@ -194,7 +194,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 failed = true;
             }
 
-            String line;
+            String line; //TODO thread interrupted on cancel
             while ((line = reader.readLine()) != null) {
                 builder.append(line).append("\n");
             }

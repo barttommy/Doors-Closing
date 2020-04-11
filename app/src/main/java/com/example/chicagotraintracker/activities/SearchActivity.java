@@ -38,7 +38,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         searchAdapter = new SearchAdapter(searchResults, this);
         searchRecycler.setAdapter(searchAdapter);
         searchRecycler.setLayoutManager(new LinearLayoutManager(this));
-        searchRecycler.addItemDecoration(new MarginItemDecoration(24)); // TODO
+        searchRecycler.addItemDecoration(new MarginItemDecoration(24));
 
         setTitle("");
     }

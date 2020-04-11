@@ -1,5 +1,6 @@
 package com.example.chicagotraintracker.adapters;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,23 +66,24 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     }
 
     private int getColor(String line) {
+        Resources res = mainActivity.getResources();
         switch(line) {
             case (Route.BROWN_LINE):
-                return mainActivity.getResources().getColor(R.color.brownLine, null);
+                return res.getColor(R.color.brownLine, null);
             case (Route.PURPLE_LINE):
-                return mainActivity.getResources().getColor(R.color.purpleLine, null);
+                return res.getColor(R.color.purpleLine, null);
             case (Route.RED_LINE):
-                return mainActivity.getResources().getColor(R.color.redLine, null);
+                return res.getColor(R.color.redLine, null);
             case (Route.BLUE_LINE):
-                return mainActivity.getResources().getColor(R.color.blueLine, null);
+                return res.getColor(R.color.blueLine, null);
             case (Route.GREEN_LINE):
-                return mainActivity.getResources().getColor(R.color.greenLine, null);
+                return res.getColor(R.color.greenLine, null);
             case (Route.ORANGE_LINE):
-                return mainActivity.getResources().getColor(R.color.orangeLine, null);
+                return res.getColor(R.color.orangeLine, null);
             case (Route.PINK_LINE):
-                return mainActivity.getResources().getColor(R.color.pinkLine, null);
+                return res.getColor(R.color.pinkLine, null);
             case (Route.YELLOW_LINE):
-                return mainActivity.getResources().getColor(R.color.yellowLine, null);
+                return res.getColor(R.color.yellowLine, null);
             default:
                 return Color.WHITE;
         }

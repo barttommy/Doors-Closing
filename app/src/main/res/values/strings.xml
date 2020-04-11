@@ -24,11 +24,32 @@
         Unable to access your current location. Ensure that device location is turned on.
     </string>
 
-    <!-- Layout Error Message -->
+    <!-- Layout error message -->
     <string name="error_no_trains_found_title">No Nearby Trains Found</string>
     <string name="error_no_trains_found_message">
         Ensure that you have location permissions enabled. You can also try searching for a station manually.
     </string>
     <string name="drawer_icon">Drawer Icon</string>
+
+    <!--  Train line names as defined in API  -->
+    <string name="red_line">Red</string>
+    <string name="blue_line">Blue</string>
+    <string name="green_line">G</string>
+    <string name="brown_line">Brn</string>
+    <string name="purple_line">P</string>
+    <string name="yellow_line">Y</string>
+    <string name="pink_line">Pink</string>
+    <string name="orange_line">Org</string>
+
+    <string-array name="train_lines">
+        <item>@string/red_line</item>
+        <item>@string/blue_line</item>
+        <item>@string/green_line</item>
+        <item>@string/brown_line</item>
+        <item>@string/purple_line</item>
+        <item>@string/yellow_line</item>
+        <item>@string/pink_line</item>
+        <item>@string/orange_line</item>
+    </string-array>
 
 </resources>

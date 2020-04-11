@@ -13,6 +13,7 @@ public class Route implements Comparable<Route> {
     public static final int ROUTE_TRAIN_LIMIT = 3;
 
     // Train line strings as they appear in the api
+    // TODO this is also stored in strings.xml, clean up
     public static final String BROWN_LINE = "Brn";
     public static final String PURPLE_LINE = "P";
     public static final String RED_LINE = "Red";
@@ -21,6 +22,11 @@ public class Route implements Comparable<Route> {
     public static final String ORANGE_LINE = "Org";
     public static final String PINK_LINE = "Pink";
     public static final String YELLOW_LINE = "Y";
+
+    public static final String[] TRAIN_LINES = {
+            Route.RED_LINE, Route.BLUE_LINE, Route.GREEN_LINE, Route.BROWN_LINE,
+            Route.PURPLE_LINE, Route.YELLOW_LINE, Route.PINK_LINE, Route.ORANGE_LINE
+    };
 
     private String line;
     private String stationId;
