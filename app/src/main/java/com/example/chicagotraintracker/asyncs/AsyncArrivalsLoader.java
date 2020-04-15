@@ -174,10 +174,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             connection.setRequestMethod("GET");
             connection.connect();
 
-            // TODO
-            if (isCancelled()) {
-                return null;
-            }
+            if (isCancelled()) return null;
 
             int responseCode = connection.getResponseCode();
             String responseText = connection.getResponseMessage();
@@ -194,9 +191,11 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 failed = true;
             }
 
-            String line; //TODO thread interrupted on cancel
+            String line;
+            if (isCancelled()) return null;
             while ((line = reader.readLine()) != null) {
                 builder.append(line).append("\n");
+                if (isCancelled()) return null;
             }
 
             return builder.toString();

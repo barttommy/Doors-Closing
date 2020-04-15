@@ -63,7 +63,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * A public test key can be found here:
  * https://www.transitchicago.com/developers/traintracker/testkey/
  */
-
+//TODO set status bar color to same as action bar color instead of colorprimarydark? for looks
+//TODO center search view? its a little off for some reason...
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -192,6 +193,11 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, SEARCH_CODE);
     }
 
+    private void startAboutActivity() {
+        Intent intent = new Intent(this, AboutActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -238,7 +244,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_search) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
+        } else if (item.getItemId() == R.id.action_search) {
             startSearchActivity();
         }
         return super.onOptionsItemSelected(item);
@@ -251,17 +259,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void selectDrawerItem(int position) {
-        String item = DRAWER_ITEMS[position];
-        if (item.equals(DRAWER_ITEMS[0])) {
-            isLocationRequest = true;
-            setTitle(LOCATION_APP_TITLE);
-            requestLocationUpdates();
-        } else if (item.equals(DRAWER_ITEMS[1])) {
-            openTwitter();
-        } else if (item.equals(DRAWER_ITEMS[2])) {
-            // TODO Data provided by Chicago Transit Authority
-            Toast.makeText(this, String.format("Selected %s!", item),
-                    Toast.LENGTH_SHORT).show();
+        switch(position) {
+            case 0:
+                isLocationRequest = true;
+                setTitle(LOCATION_APP_TITLE);
+                requestLocationUpdates();
+                break;
+            case 1:
+                openTwitter();
+                break;
+            case 2:
+                startAboutActivity();
+                break;
         }
         drawerLayout.closeDrawer(drawerList);
     }

@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">Train Tracker</string>
+    <string name="app_name">Doors Closing</string>
+    <string name="app_desc">A Chicago train tracking application</string>
+    <string name="app_credit">Data provided by Chicago Transit Authority</string>
+
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="station_label">Station Label</string>
