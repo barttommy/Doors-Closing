@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -174,8 +175,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             connection.setRequestMethod("GET");
             connection.connect();
 
-            if (isCancelled()) return null;
-
             int responseCode = connection.getResponseCode();
             String responseText = connection.getResponseMessage();
 
@@ -192,14 +191,13 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             }
 
             String line;
-            if (isCancelled()) return null;
             while ((line = reader.readLine()) != null) {
                 builder.append(line).append("\n");
-                if (isCancelled()) return null;
             }
 
             return builder.toString();
-
+        } catch (InterruptedIOException e) {
+            Log.d(TAG, "doInBackground: Thread canceled: InterruptedIOException");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

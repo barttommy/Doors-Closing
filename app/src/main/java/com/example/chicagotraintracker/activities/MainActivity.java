@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.chicagotraintracker.utils.DatabaseParser;
 import com.example.chicagotraintracker.utils.DialogManager;
@@ -63,8 +62,6 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * A public test key can be found here:
  * https://www.transitchicago.com/developers/traintracker/testkey/
  */
-//TODO set status bar color to same as action bar color instead of colorprimarydark? for looks
-//TODO center search view? its a little off for some reason...
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -78,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DialogManager dialogManager;
 
-    private boolean isLocationRequest = true;
+    private boolean requestingLocation = true;
     private LocationManager locationManager;
     private MyLocationListener locationListener;
     private LocationHandler locationHandler;
@@ -123,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
         setTitle(LOCATION_APP_TITLE);
         setupDrawer();
         loadStationData();
+
+        if (!checkLocationPermission()) {
+            requestLocationPermission();
+        }
     }
 
     @Override
@@ -134,24 +135,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!requestedStations.isEmpty() && !isLocationRequest) {
+        if (!requestedStations.isEmpty() && !requestingLocation) {
             doRefresh();
-        }
-        if (isLocationRequest && checkPermission()) {
-            if (locationManager != null && locationListener != null) {
-                requestLocationUpdates();
-            } else if (locationManager == null && locationListener == null) {
-                setupLocationListener();
-            }
+        } else if (requestingLocation) {
+            setupLocationServices();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (locationManager != null && locationListener != null) {
-            locationManager.removeUpdates(locationListener);
-        }
+        stopLocationRequests();
         cancelAsync(asyncArrivalsLoader);
     }
 
@@ -163,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
             asyncArrivalsLoader = new AsyncArrivalsLoader(this, requestedStations);
             asyncArrivalsLoader.execute();
         } else {
-            arrivalsRecycler.setVisibility(View.GONE);
-            routeAdapter.notifyDataSetChanged();
+            showNearbyTrainsError();
             swiper.setRefreshing(false);
         }
     }
@@ -214,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
     public void loadManualRequest(Station station) {
         Log.d(TAG, "loadManualRequest: for station: " + station.getDetailedName());
         setTitle(station.getName());
-        isLocationRequest = false;
-        locationManager.removeUpdates(locationListener);
+        requestingLocation = false;
+        stopLocationRequests();
         requestedStations.clear();
         requestedStations.add(station);
         doRefresh();
@@ -261,9 +254,9 @@ public class MainActivity extends AppCompatActivity {
     private void selectDrawerItem(int position) {
         switch(position) {
             case 0:
-                isLocationRequest = true;
+                requestingLocation = true;
                 setTitle(LOCATION_APP_TITLE);
-                requestLocationUpdates();
+                setupLocationServices();
                 break;
             case 1:
                 openTwitter();
@@ -313,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    boolean connectedToNetwork() {
+    private boolean connectedToNetwork() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
@@ -326,7 +319,23 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void setupLocationListener() {
+    /*
+     * Location setup and permissions
+     */
+
+    private void setupLocationServices() {
+        if (checkLocationPermission() && requestingLocation) {
+            if (locationManager != null && locationListener != null) {
+                requestLocationUpdates();
+            } else if (locationManager == null && locationListener == null) {
+                startLocationListener();
+            }
+        } else {
+            showNearbyTrainsError();
+        }
+    }
+
+    private void startLocationListener() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new MyLocationListener(this);
         requestLocationUpdates();
@@ -334,32 +343,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestLocationUpdates() {
         getLastKnownLocation();
-        if (checkPermission() && locationManager != null) {
+        if (checkLocationPermission() && locationManager != null) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     LOCATION_MIN_TIME, LOCATION_MIN_DIST, locationListener);
         }
     }
 
     private void getLastKnownLocation() {
-        if (!checkPermission()) return;
+        if (!checkLocationPermission()) return;
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    locationHandler.setLocation(location);
-                                    requestedStations.clear();
-                                    requestedStations.addAll(locationHandler.getRequestedStations());
-                                    Log.d(TAG, "onSuccess: loading stations at last known location");
-                                    doRefresh();
-                                } else {
-                                    Log.d(TAG, "onSuccess: Last known location is null");
-                                }
-                            }
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            locationHandler.setLocation(location);
+                            requestedStations.clear();
+                            requestedStations.addAll(locationHandler.getRequestedStations());
+                            Log.d(TAG, "onSuccess: loading stations at last known location");
+                            doRefresh();
+                        } else {
+                            Log.d(TAG, "onSuccess: Last known location is null");
                         }
-                );
+                    }
+                });
     }
 
+    // MyLocationListener update callback
     public void updateLocation(Location location) {
         Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
                 location.getLatitude(), location.getLongitude()));
@@ -369,14 +378,15 @@ public class MainActivity extends AppCompatActivity {
         doRefresh();
     }
 
-    private boolean checkPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]
-                    { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
-            return false;
-        }
-        return true;
+    private boolean checkLocationPermission() {
+        return ContextCompat
+                .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]
+                { Manifest.permission.ACCESS_FINE_LOCATION }, LOCATION_REQUEST_CODE);
     }
 
     @Override
@@ -386,8 +396,21 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION)
                     && grantResults[0] == PERMISSION_GRANTED) {
-                requestLocationUpdates();
+                setupLocationServices();
             }
+        }
+    }
+
+    private void showNearbyTrainsError() {
+        arrivalsRecycler.setVisibility(View.GONE);
+        routeList.clear();
+        requestedStations.clear();
+        routeAdapter.notifyDataSetChanged();
+    }
+
+    private void stopLocationRequests() {
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
         }
     }
 }

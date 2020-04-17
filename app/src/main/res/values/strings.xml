@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Doors Closing</string>
     <string name="app_desc">A Chicago train tracking application</string>
-    <string name="app_credit">Data provided by Chicago Transit Authority</string>
+    <string name="app_credit">Data provided by the Chicago Transit Authority</string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -9,23 +9,12 @@
     <string name="direction_label">Direction Label</string>
     <string name="arrivals">Arrivals</string>
     <string name="time">Time</string>
+    <string name="search">Search</string>
 
     <!-- DialogManager -->
-    <string name="search_title">Search</string>
-    <string name="search_hint">i.e. Lake or Adams/Wabash</string>
-    <string name="search_results_title">Choose a station</string>
-    <string name="search">Search</string>
-    <string name="OK">OK</string>
     <string name="error_database_title">Unable to load station info</string>
     <string name="error_database_message">Fatal error occurred when parsing CTA station database</string>
-    <string name="error_network_title">No Network Connection</string>
-    <string name="error_network_message">Train arrivals cannot be viewed without a network connection</string>
-    <string name="error_search_title">Station not found</string>
-    <string name="error_search_message">No station found with requested name</string>
-    <string name="error_location_title">No Location</string>
-    <string name="error_location_message">
-        Unable to access your current location. Ensure that device location is turned on.
-    </string>
+    <string name="OK">OK</string>
 
     <!-- Layout error message -->
     <string name="error_no_trains_found_title">No Nearby Trains Found</string>
