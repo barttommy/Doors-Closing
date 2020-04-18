@@ -67,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String CTA_TWITTER_NAME = "cta";
     private static final String LOCATION_APP_TITLE = "Trains Near You";
-    private static final int LOCATION_REQUEST_CODE = 123;
     private static final int LOCATION_MIN_TIME = 10 * 1000;
     private static final int LOCATION_MIN_DIST = 500;
-    private static final int SEARCH_CODE = 585;
+    private static final int LOCATION_REQUEST_CODE = 100;
+    private static final int SEARCH_CODE = 200;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
 
     private DialogManager dialogManager;
@@ -363,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             doRefresh();
                         } else {
                             Log.d(TAG, "onSuccess: Last known location is null");
+                            showNearbyTrainsError();
                         }
                     }
                 });
@@ -370,6 +371,11 @@ public class MainActivity extends AppCompatActivity {
 
     // MyLocationListener update callback
     public void updateLocation(Location location) {
+        if (location == null) {
+            Log.d(TAG, "updateLocation: location is null");
+            showNearbyTrainsError();
+            return;
+        }
         Log.d(TAG, String.format("updateLocation: Adding routes at location %.4f %.4f",
                 location.getLatitude(), location.getLongitude()));
         locationHandler.setLocation(location);
@@ -404,7 +410,9 @@ public class MainActivity extends AppCompatActivity {
     private void showNearbyTrainsError() {
         arrivalsRecycler.setVisibility(View.GONE);
         routeList.clear();
-        requestedStations.clear();
+        if (requestingLocation) {
+            requestedStations.clear();
+        }
         routeAdapter.notifyDataSetChanged();
     }
 

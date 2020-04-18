@@ -13,13 +13,16 @@
 
     <!-- DialogManager -->
     <string name="error_database_title">Unable to load station info</string>
-    <string name="error_database_message">Fatal error occurred when parsing CTA station database</string>
+    <string name="error_database_message">
+        Fatal error occurred when parsing CTA station database
+    </string>
     <string name="OK">OK</string>
 
     <!-- Layout error message -->
-    <string name="error_no_trains_found_title">No Nearby Trains Found</string>
+    <string name="error_no_trains_found_title">No Trains Found</string>
     <string name="error_no_trains_found_message">
-        Ensure that you have location permissions enabled. You can also try searching for a station manually.
+        Ensure that you have an internet connection and location permissions enabled.
+        Use the search bar to select stations manually.
     </string>
     <string name="drawer_icon">Drawer Icon</string>
 
