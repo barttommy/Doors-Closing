@@ -5,15 +5,13 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
- * A Route is a collection of incoming Trains that share the same line, station, and destination
+ * A Route stores a collection of incoming Trains that share the same line, station, and destination
  */
 public class Route implements Comparable<Route> {
 
-    // Number of trains to show per route
     public static final int ROUTE_TRAIN_LIMIT = 3;
 
     // Train line strings as they appear in the api
-    // TODO this is also stored in strings.xml, clean up
     public static final String BROWN_LINE = "Brn";
     public static final String PURPLE_LINE = "P";
     public static final String RED_LINE = "Red";

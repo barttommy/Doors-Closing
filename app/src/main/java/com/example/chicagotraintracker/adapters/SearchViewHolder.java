@@ -8,24 +8,32 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chicagotraintracker.R;
+import com.example.chicagotraintracker.models.Route;
 
 class SearchViewHolder extends RecyclerView.ViewHolder {
 
     TextView stationText;
-    ImageView redLine, blueLine, greenLine, brownLine, purpleLine,
-            yellowLine, pinkLine, orangeLine;
 
     SearchViewHolder(@NonNull View itemView) {
         super(itemView);
 
         stationText = itemView.findViewById(R.id.search_station);
-        redLine = itemView.findViewById(R.id.search_red_line);
-        blueLine = itemView.findViewById(R.id.search_blue_line);
-        greenLine = itemView.findViewById(R.id.search_green_line);
-        brownLine = itemView.findViewById(R.id.search_brown_line);
-        purpleLine = itemView.findViewById(R.id.search_purple_line);
-        yellowLine = itemView.findViewById(R.id.search_yellow_line);
-        pinkLine = itemView.findViewById(R.id.search_pink_line);
-        orangeLine = itemView.findViewById(R.id.search_orange_line);
+
+        itemView.findViewById(R.id.search_red_line)
+                .setTag(Route.RED_LINE);
+        itemView.findViewById(R.id.search_blue_line)
+                .setTag(Route.BLUE_LINE);
+        itemView.findViewById(R.id.search_green_line)
+                .setTag(Route.GREEN_LINE);
+        itemView.findViewById(R.id.search_brown_line)
+                .setTag(Route.BROWN_LINE);
+        itemView.findViewById(R.id.search_purple_line)
+                .setTag(Route.PURPLE_LINE);
+        itemView.findViewById(R.id.search_yellow_line)
+                .setTag(Route.YELLOW_LINE);
+        itemView.findViewById(R.id.search_pink_line)
+                .setTag(Route.PINK_LINE);
+        itemView.findViewById(R.id.search_orange_line)
+                .setTag(Route.ORANGE_LINE);
     }
 }

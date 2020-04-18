@@ -38,17 +38,12 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
         Station station = searchResults.get(position);
-
         holder.stationText.setText(station.getName());
 
-        // TODO
-        String[] trainLines = searchActivity.getResources().getStringArray(R.array.train_lines);
         HashMap<String, Boolean> availableTrainLines = station.getTrainLines();
-
-        for (String line : trainLines) {
+        for (String line : Route.TRAIN_LINES) {
             try {
                 if (availableTrainLines.get(line)) {
-                    //holder.itemView.get
                     holder.itemView.findViewWithTag(line).setVisibility(View.VISIBLE);
                 } else {
                     holder.itemView.findViewWithTag(line).setVisibility(View.GONE);
