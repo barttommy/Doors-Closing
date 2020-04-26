@@ -11,4 +11,5 @@ Doors Closing works with each of Chicago's 145 CTA train stations. The search fe
 The project began when I continued my work from DemonHacks 2019 ([check out what me and my team made here!](https://github.com/agranados0121/DemonHacks))
 
 Tommy Bart
+
 November 2019 - April 2020
