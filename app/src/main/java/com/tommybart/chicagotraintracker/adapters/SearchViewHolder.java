@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Route;
 
 class SearchViewHolder extends RecyclerView.ViewHolder {
 

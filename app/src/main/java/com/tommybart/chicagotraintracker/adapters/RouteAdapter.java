@@ -10,20 +10,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Train;
-import com.tommybart.chicagotraintracker.activities.MainActivity;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Train;
+import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
 
 import java.util.ArrayList;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
 
     private ArrayList<Route> routeList;
-    private MainActivity mainActivity;
+    private ArrivalsActivity arrivalsActivity;
 
-    public RouteAdapter(ArrayList<Route> routeList, MainActivity mainActivity) {
+    public RouteAdapter(ArrayList<Route> routeList, ArrivalsActivity arrivalsActivity) {
         this.routeList = routeList;
-        this.mainActivity = mainActivity;
+        this.arrivalsActivity = arrivalsActivity;
     }
 
     @NonNull
@@ -66,7 +66,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteViewHolder> {
     }
 
     private int getColor(String line) {
-        Resources res = mainActivity.getResources();
+        Resources res = arrivalsActivity.getResources();
         switch(line) {
             case (Route.BROWN_LINE):
                 return res.getColor(R.color.brownLine, null);

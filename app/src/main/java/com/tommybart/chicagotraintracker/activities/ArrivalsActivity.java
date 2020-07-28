@@ -39,8 +39,8 @@ import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration;
 import com.tommybart.chicagotraintracker.utils.MyLocationListener;
 import com.tommybart.chicagotraintracker.R;
 import com.tommybart.chicagotraintracker.adapters.RouteAdapter;
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Station;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
 import com.tommybart.chicagotraintracker.asyncs.AsyncArrivalsLoader;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -62,9 +62,9 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * A public test key can be found here:
  * https://www.transitchicago.com/developers/traintracker/testkey/
  */
-public class MainActivity extends AppCompatActivity {
+public class ArrivalsActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "ArrivalsActivity";
     private static final String CTA_TWITTER_NAME = "cta";
     private static final String LOCATION_APP_TITLE = "Trains Near You";
     private static final int LOCATION_MIN_TIME = 10 * 1000;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_arrivals);
 
         arrivalsRecycler = findViewById(R.id.arrivals_recycler);
         routeAdapter = new RouteAdapter(routeList, this);

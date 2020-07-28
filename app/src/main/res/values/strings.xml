@@ -25,5 +25,7 @@
         Use the search bar to select stations manually.
     </string>
     <string name="drawer_icon">Drawer Icon</string>
+    <string name="navigation_header">Navigation header</string>
+    <string name="email">doorsclosingapp@gmail.com</string>
 
 </resources>

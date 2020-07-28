@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.models;
+package com.tommybart.chicagotraintracker.data.models;
 
 import androidx.annotation.Nullable;
 
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * A Route stores a collection of incoming Trains that share the same line, station, and destination
  */
-public class Route implements Comparable<Route> {
+public class Route implements Comparable<Route>{
 
     public static final int ROUTE_TRAIN_LIMIT = 3;
 

@@ -3,9 +3,9 @@ package com.tommybart.chicagotraintracker.utils;
 import android.location.Location;
 import android.util.Log;
 
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Station;
-import com.tommybart.chicagotraintracker.activities.MainActivity;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
+import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class LocationHandler {
      */
     private void getNearbyStations() {
         try {
-            for (Station station: MainActivity.stationData.values()) {
+            for (Station station: ArrivalsActivity.stationData.values()) {
                 double lon = Double.parseDouble(station.getLon());
                 double lat = Double.parseDouble(station.getLat());
                 double distance = getDistance(

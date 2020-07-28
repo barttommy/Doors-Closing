@@ -6,14 +6,19 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.activities.MainActivity;
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Station;
-import com.tommybart.chicagotraintracker.models.Train;
+import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
+import com.tommybart.chicagotraintracker.data.models.Train;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,11 +27,7 @@ import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,14 +42,14 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
     private static final int MAX_STATIONS = 4;
 
     @SuppressLint("StaticFieldLeak")
-    private MainActivity mainActivity;
+    private ArrivalsActivity arrivalsActivity;
     private HashSet<Station> requestedStations;
     private ArrayList<Route> resultList = new ArrayList<>();
     private boolean failed = true;
     private Instant start;
 
-    public AsyncArrivalsLoader(MainActivity mainActivity, HashSet<Station> requestedStations) {
-        this.mainActivity = mainActivity;
+    public AsyncArrivalsLoader(ArrivalsActivity arrivalsActivity, HashSet<Station> requestedStations) {
+        this.arrivalsActivity = arrivalsActivity;
         this.requestedStations = requestedStations;
     }
 
@@ -60,7 +61,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
             Log.d(TAG, "onPostExecute: FAILED: CONNECTION ERROR");
         } else {
             parseJSON(s);
-            mainActivity.acceptResults(resultList);
+            arrivalsActivity.acceptResults(resultList);
         }
         Log.d(TAG, "onPostExecute: Loaded in " +
                 Duration.between(start, Instant.now()));
@@ -155,9 +156,9 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
         try {
             Uri.Builder buildURL = Uri.parse(API_BASE).buildUpon();
 
-            // See note in MainActivity.java for a public key
+            // See note in ArrivalsActivity.java for a public key
             buildURL.appendQueryParameter(
-                    "key", mainActivity.getResources().getString(R.string.api_key));
+                    "key", arrivalsActivity.getResources().getString(R.string.api_key));
 
             // API Call has a limit of MAX_STATIONS that can be requested
             Iterator<Station> itr = requestedStations.iterator();

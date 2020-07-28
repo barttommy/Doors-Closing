@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tommybart.chicagotraintracker.R;
 import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration;
 import com.tommybart.chicagotraintracker.adapters.SearchAdapter;
-import com.tommybart.chicagotraintracker.models.Station;
+import com.tommybart.chicagotraintracker.data.models.Station;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_search);
 
         searchRecycler = findViewById(R.id.search_recycler);
-        searchResults.addAll(MainActivity.stationData.values());
+        searchResults.addAll(ArrivalsActivity.stationData.values());
         searchAdapter = new SearchAdapter(searchResults, this);
         searchRecycler.setAdapter(searchAdapter);
         searchRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -74,7 +74,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private void doFilter(String query) {
         searchResults.clear();
         query = query.toLowerCase();
-        for (Station station: MainActivity.stationData.values()) {
+        for (Station station: ArrivalsActivity.stationData.values()) {
             if (station.getName().toLowerCase().contains(query)) {
                 searchResults.add(station);
             }
@@ -92,7 +92,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void sendResult(Station selected) {
-        Intent data = new Intent(this, MainActivity.class);
+        Intent data = new Intent(this, ArrivalsActivity.class);
         data.putExtra("STATION", selected);
         setResult(RESULT_OK, data);
         finish();

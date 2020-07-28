@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.models;
+package com.tommybart.chicagotraintracker.data.models;
 
 public class Train {
 

@@ -5,21 +5,21 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.tommybart.chicagotraintracker.activities.MainActivity;
+import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
 
 public class MyLocationListener implements LocationListener {
 
     private static final String TAG = "MyLocationListener";
-    private MainActivity mainActivity;
+    private ArrivalsActivity arrivalsActivity;
 
-    public MyLocationListener(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public MyLocationListener(ArrivalsActivity arrivalsActivity) {
+        this.arrivalsActivity = arrivalsActivity;
     }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged: Location changed");
-        mainActivity.updateLocation(location);
+        arrivalsActivity.updateLocation(location);
     }
 
     @Override

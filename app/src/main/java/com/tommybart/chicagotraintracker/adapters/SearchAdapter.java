@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tommybart.chicagotraintracker.R;
 import com.tommybart.chicagotraintracker.activities.SearchActivity;
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Station;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,11 +1,11 @@
-package com.tommybart.chicagotraintracker.models;
+package com.tommybart.chicagotraintracker.data.models;
 
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class Station implements Comparable<Station>, Serializable {
+public class Station implements Serializable, Comparable<Station> {
 
     private String mapId;
     private String name;

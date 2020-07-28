@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/nav_arrivals">
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.tommybart.chicagotraintracker.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/nav_arrivals"
+        android:name="com.tommybart.chicagotraintracker.ui.arrivals.ArrivalsFragment"
+        android:label="arrivals_fragment"
+        tools:layout="@layout/arrivals_fragment" />
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.tommybart.chicagotraintracker.ui.about.AboutFragment"
+        android:label="about_fragment"
+        tools:layout="@layout/about_fragment" />
+</navigation>

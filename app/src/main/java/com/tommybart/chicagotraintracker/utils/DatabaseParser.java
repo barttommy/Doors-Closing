@@ -2,8 +2,8 @@ package com.tommybart.chicagotraintracker.utils;
 
 import android.util.Log;
 
-import com.tommybart.chicagotraintracker.models.Route;
-import com.tommybart.chicagotraintracker.models.Station;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
 
 import org.json.JSONArray;
 import org.json.JSONException;
