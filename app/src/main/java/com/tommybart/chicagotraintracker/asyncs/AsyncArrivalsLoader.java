@@ -158,7 +158,7 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
 
             // See note in ArrivalsActivity.java for a public key
             buildURL.appendQueryParameter(
-                    "key", arrivalsActivity.getResources().getString(R.string.api_key));
+                    "key", arrivalsActivity.getResources().getString(R.string.cta_api_key));
 
             // API Call has a limit of MAX_STATIONS that can be requested
             Iterator<Station> itr = requestedStations.iterator();

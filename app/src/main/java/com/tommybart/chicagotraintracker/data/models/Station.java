@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import java.io.Serializable;
 import java.util.HashMap;
 
+// TODO: Delete
 public class Station implements Serializable, Comparable<Station> {
 
     private String mapId;
@@ -51,10 +52,12 @@ public class Station implements Serializable, Comparable<Station> {
         return lon;
     }
 
+    // TODO: Delete!
     public double getDistance() {
         return distance;
     }
 
+    // TODO: Delete!
     public void setDistance(double distance) {
         this.distance = distance;
     }

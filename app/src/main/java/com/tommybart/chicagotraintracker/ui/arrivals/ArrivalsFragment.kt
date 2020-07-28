@@ -8,6 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.tommybart.chicagotraintracker.R
+import com.tommybart.chicagotraintracker.data.network.ChicagoDataPortalApiService
+import kotlinx.android.synthetic.main.arrivals_fragment.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ArrivalsFragment : Fragment() {
 
@@ -26,6 +32,12 @@ class ArrivalsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ArrivalsViewModel::class.java)
         // TODO: Use the ViewModel
-    }
 
+        // TODO: DELETE (here for now to ensure functionality)
+        val api = ChicagoDataPortalApiService(requireContext())
+        GlobalScope.launch(Dispatchers.Main) {
+            val stationDataResponse = api.getStationDataAsync().await()
+            textView_arrivals.text = stationDataResponse[0].toString()
+        }
+    }
 }
