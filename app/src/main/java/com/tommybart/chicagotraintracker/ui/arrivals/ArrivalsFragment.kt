@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.network.ChicagoDataPortalApiService
+import com.tommybart.chicagotraintracker.data.network.ConnectivityInterceptorImpl
+import com.tommybart.chicagotraintracker.data.network.StationNetworkDataSourceImpl
 import kotlinx.android.synthetic.main.arrivals_fragment.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +37,15 @@ class ArrivalsFragment : Fragment() {
         // TODO: Use the ViewModel
 
         // TODO: DELETE (here for now to ensure functionality)
-        val api = ChicagoDataPortalApiService(requireContext())
+        val api = ChicagoDataPortalApiService(requireContext(), ConnectivityInterceptorImpl(requireContext()))
+        val dataSource = StationNetworkDataSourceImpl(api)
+
+        dataSource.downloadStationData.observe(viewLifecycleOwner, Observer {
+            textView_arrivals.text = it.toString()
+        })
+
         GlobalScope.launch(Dispatchers.Main) {
-            val stationDataResponse = api.getStationDataAsync().await()
-            textView_arrivals.text = stationDataResponse[0].toString()
+            dataSource.fetchStationData()
         }
     }
 }

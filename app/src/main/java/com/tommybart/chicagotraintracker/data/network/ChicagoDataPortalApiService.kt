@@ -21,7 +21,8 @@ interface ChicagoDataPortalApiService {
     //TODO: Connectivity interceptor
     companion object {
         operator fun invoke(
-            context: Context
+            context: Context,
+            interceptor: Interceptor
         ): ChicagoDataPortalApiService {
             val requestInterceptor = Interceptor { chain ->
                 val url = chain.request()
@@ -39,6 +40,7 @@ interface ChicagoDataPortalApiService {
 
             val okHttpClient = OkHttpClient.Builder()
                     .addInterceptor(requestInterceptor)
+                    .addInterceptor(interceptor)
                     .build()
 
             return Retrofit.Builder()

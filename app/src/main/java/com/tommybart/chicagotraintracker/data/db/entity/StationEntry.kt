@@ -1,10 +1,13 @@
 package com.tommybart.chicagotraintracker.data.db.entity
 
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.tommybart.chicagotraintracker.data.models.Location
 
-// TODO: table name, etc
+@Entity(tableName = "station_data")
 data class StationEntry(
     @SerializedName("map_id")
     val mapId: String,
@@ -16,6 +19,7 @@ data class StationEntry(
     val stopName: String,
     @SerializedName("direction_id")
     val directionId: String,
+    @Embedded
     val location: Location,
     @SerializedName("ada")
     val disabilityAccessible: Boolean,
@@ -35,4 +39,7 @@ data class StationEntry(
     val red: Boolean,
     @SerializedName("y")
     val yellow: Boolean
-)
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null
+}
