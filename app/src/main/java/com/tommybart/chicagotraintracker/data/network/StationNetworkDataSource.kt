@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 
 interface StationNetworkDataSource {
-    val downloadStationData: LiveData<List<StationEntry>> // TODO?
+    val downloadStationData: LiveData<List<StationEntry>>
 
     suspend fun fetchStationData()
 }

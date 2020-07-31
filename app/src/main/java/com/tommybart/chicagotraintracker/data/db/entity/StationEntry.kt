@@ -1,6 +1,5 @@
 package com.tommybart.chicagotraintracker.data.db.entity
 
-
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey

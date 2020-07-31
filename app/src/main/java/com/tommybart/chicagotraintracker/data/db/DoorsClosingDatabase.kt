@@ -10,12 +10,12 @@ import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
     entities = [StationEntry::class],
     version = 1
 )
-abstract class StationDatabase : RoomDatabase() {
+abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
 
     companion object {
-        @Volatile private var instance: StationDatabase? = null
+        @Volatile private var instance: DoorsClosingDatabase? = null
         private val LOCK = Any()
 
         operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
@@ -24,7 +24,7 @@ abstract class StationDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext,
-                StationDatabase::class.java, "station.db")
+                DoorsClosingDatabase::class.java, "doorsClosing.db")
                 .build()
     }
 }

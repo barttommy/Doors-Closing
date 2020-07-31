@@ -18,7 +18,6 @@ interface ChicagoDataPortalApiService {
     @GET("resource/8pix-ypme.json")
     fun getStationDataAsync(): Deferred<List<StationEntry>>
 
-    //TODO: Connectivity interceptor
     companion object {
         operator fun invoke(
             context: Context,

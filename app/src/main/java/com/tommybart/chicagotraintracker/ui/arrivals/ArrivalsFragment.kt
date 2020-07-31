@@ -1,51 +1,50 @@
 package com.tommybart.chicagotraintracker.ui.arrivals
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-
+import androidx.lifecycle.ViewModelProvider
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.network.ChicagoDataPortalApiService
-import com.tommybart.chicagotraintracker.data.network.ConnectivityInterceptorImpl
-import com.tommybart.chicagotraintracker.data.network.StationNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import com.tommybart.chicagotraintracker.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.arrivals_fragment.*
-import kotlinx.android.synthetic.main.nav_header_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
 
-class ArrivalsFragment : Fragment() {
+class ArrivalsFragment : ScopedFragment(), KodeinAware {
 
-    companion object {
-        fun newInstance() = ArrivalsFragment()
-    }
-
+    override val kodein by closestKodein()
+    private val viewModelFactory: ArrivalsViewModelFactory by instance<ArrivalsViewModelFactory>()
     private lateinit var viewModel: ArrivalsViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.arrivals_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ArrivalsViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(ArrivalsViewModel::class.java)
+        bindUI()
+    }
 
-        // TODO: DELETE (here for now to ensure functionality)
-        val api = ChicagoDataPortalApiService(requireContext(), ConnectivityInterceptorImpl(requireContext()))
-        val dataSource = StationNetworkDataSourceImpl(api)
-
-        dataSource.downloadStationData.observe(viewLifecycleOwner, Observer {
-            textView_arrivals.text = it.toString()
+    private fun bindUI() = launch {
+        val stationData = viewModel.stationData.await()
+        stationData.observe(viewLifecycleOwner, Observer {
+            if (it == null) return@Observer
+            updateText(it)
         })
+    }
 
-        GlobalScope.launch(Dispatchers.Main) {
-            dataSource.fetchStationData()
-        }
+    private fun updateText(stationData: List<StationEntry>) {
+        textView_arrivals.text = stationData.toString()
     }
 }
