@@ -166,7 +166,6 @@ public class AsyncArrivalsLoader extends AsyncTask<String, Void, String> {
                 buildURL.appendQueryParameter("mapid", itr.next().getMapId());
             }
 
-            buildURL.appendQueryParameter("", "40530");
             buildURL.appendQueryParameter("outputType", "JSON");
             String urlToUse = buildURL.build().toString();
             Log.d(TAG, "downloadData: for API URL = " + urlToUse);

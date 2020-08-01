@@ -1,9 +1,11 @@
 package com.tommybart.chicagotraintracker.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.data.db.StationDao
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
-import com.tommybart.chicagotraintracker.data.network.StationNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
+import com.tommybart.chicagotraintracker.internal.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ class StationRepositoryImpl(
     }
 
     private suspend fun fetchStationData() {
+        Log.d(TAG, "fetching station data")
         stationNetworkDataSource.fetchStationData()
     }
 

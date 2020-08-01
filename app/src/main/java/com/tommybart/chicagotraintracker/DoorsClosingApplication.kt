@@ -3,6 +3,9 @@ package com.tommybart.chicagotraintracker
 import android.app.Application
 import com.tommybart.chicagotraintracker.data.db.DoorsClosingDatabase
 import com.tommybart.chicagotraintracker.data.network.*
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.ChicagoDataPortalApiService
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.data.repository.StationRepositoryImpl
 import com.tommybart.chicagotraintracker.ui.arrivals.ArrivalsViewModelFactory

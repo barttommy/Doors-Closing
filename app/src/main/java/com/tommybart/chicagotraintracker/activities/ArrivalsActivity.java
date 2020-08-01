@@ -1,17 +1,5 @@
 package com.tommybart.chicagotraintracker.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -28,28 +16,33 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.tommybart.chicagotraintracker.utils.DatabaseParser;
-import com.tommybart.chicagotraintracker.utils.DialogManager;
-import com.tommybart.chicagotraintracker.adapters.DrawerAdapter;
-import com.tommybart.chicagotraintracker.utils.LocationHandler;
-import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration;
-import com.tommybart.chicagotraintracker.utils.MyLocationListener;
-import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.adapters.RouteAdapter;
-import com.tommybart.chicagotraintracker.data.models.Route;
-import com.tommybart.chicagotraintracker.data.models.Station;
-import com.tommybart.chicagotraintracker.asyncs.AsyncArrivalsLoader;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.tommybart.chicagotraintracker.R;
+import com.tommybart.chicagotraintracker.adapters.DrawerAdapter;
+import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration;
+import com.tommybart.chicagotraintracker.adapters.RouteAdapter;
+import com.tommybart.chicagotraintracker.asyncs.AsyncArrivalsLoader;
+import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.data.models.Station;
+import com.tommybart.chicagotraintracker.utils.LocationHandler;
+import com.tommybart.chicagotraintracker.utils.MyLocationListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,8 +65,6 @@ public class ArrivalsActivity extends AppCompatActivity {
     private static final int LOCATION_REQUEST_CODE = 100;
     private static final int SEARCH_CODE = 200;
     private static final String[] DRAWER_ITEMS = {"Nearby Trains", "CTA Twitter", "About"};
-
-    private DialogManager dialogManager;
 
     private boolean requestingLocation = true;
     private LocationManager locationManager;
@@ -106,20 +97,13 @@ public class ArrivalsActivity extends AppCompatActivity {
         arrivalsRecycler.addItemDecoration(new MarginItemDecoration(24));
 
         swiper = findViewById(R.id.swiper);
-        swiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                doRefresh();
-            }
-        });
+        swiper.setOnRefreshListener(this::doRefresh);
 
         locationHandler = new LocationHandler();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        dialogManager = new DialogManager(this);
 
         setTitle(LOCATION_APP_TITLE);
         setupDrawer();
-        loadStationData();
 
         if (!checkLocationPermission()) {
             requestLocationPermission();
@@ -214,21 +198,6 @@ public class ArrivalsActivity extends AppCompatActivity {
         doRefresh();
     }
 
-    private void loadStationData() {
-        try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("CTA_Train_Database.json")));
-            DatabaseParser data = new DatabaseParser(reader);
-            stationData = data.getStationData();
-        } catch(Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "loadStationData: FATAL");
-            dialogManager.showErrorDialog(
-                    R.string.error_database_title,
-                    R.string.error_database_message);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -273,12 +242,7 @@ public class ArrivalsActivity extends AppCompatActivity {
         drawerList = findViewById(R.id.left_drawer);
         drawerList.setAdapter(new DrawerAdapter(DRAWER_ITEMS, this));
         drawerList.setOnItemClickListener(
-                new ListView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        selectDrawerItem(position);
-                    }
-                }
+                (parent, view, position, id) -> selectDrawerItem(position)
         );
         drawerToggle = new ActionBarDrawerToggle(
                 this,
@@ -352,19 +316,16 @@ public class ArrivalsActivity extends AppCompatActivity {
     private void getLastKnownLocation() {
         if (!checkLocationPermission()) return;
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            locationHandler.setLocation(location);
-                            requestedStations.clear();
-                            requestedStations.addAll(locationHandler.getRequestedStations());
-                            Log.d(TAG, "onSuccess: loading stations at last known location");
-                            doRefresh();
-                        } else {
-                            Log.d(TAG, "onSuccess: Last known location is null");
-                            showNearbyTrainsError();
-                        }
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        locationHandler.setLocation(location);
+                        requestedStations.clear();
+                        requestedStations.addAll(locationHandler.getRequestedStations());
+                        Log.d(TAG, "onSuccess: loading stations at last known location");
+                        doRefresh();
+                    } else {
+                        Log.d(TAG, "onSuccess: Last known location is null");
+                        showNearbyTrainsError();
                     }
                 });
     }
