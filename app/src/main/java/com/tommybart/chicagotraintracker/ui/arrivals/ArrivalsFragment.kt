@@ -41,8 +41,8 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
         val apiService = CtaApiService(requireContext())
         GlobalScope.launch(Dispatchers.Main) {
             val mapIds = listOf("40530", "41220")
-            val response = apiService.getArrivalsAsync(mapIds).await()
-            textView_arrivals.text = response.toString()
+            val apiResponse = apiService.getArrivalsAsync(mapIds).await()
+            textView_arrivals.text = apiResponse.toString()
         }
     }
 

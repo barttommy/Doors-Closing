@@ -32,10 +32,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.adapters.DrawerAdapter;
 import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration;
 import com.tommybart.chicagotraintracker.adapters.RouteAdapter;
-import com.tommybart.chicagotraintracker.asyncs.AsyncArrivalsLoader;
 import com.tommybart.chicagotraintracker.data.models.Route;
 import com.tommybart.chicagotraintracker.data.models.Station;
 import com.tommybart.chicagotraintracker.utils.LocationHandler;
@@ -72,14 +70,10 @@ public class ArrivalsActivity extends AppCompatActivity {
     private LocationHandler locationHandler;
     private FusedLocationProviderClient mFusedLocationClient;
 
-    private AsyncArrivalsLoader asyncArrivalsLoader;
+    //private AsyncArrivalsLoader asyncArrivalsLoader;
     private RouteAdapter routeAdapter;
     private RecyclerView arrivalsRecycler;
     private SwipeRefreshLayout swiper;
-
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
 
     private ArrayList<Route> routeList = new ArrayList<>();
     public static HashMap<String, Station> stationData = new HashMap<>();
@@ -103,7 +97,6 @@ public class ArrivalsActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         setTitle(LOCATION_APP_TITLE);
-        setupDrawer();
 
         if (!checkLocationPermission()) {
             requestLocationPermission();
@@ -113,7 +106,6 @@ public class ArrivalsActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
     }
 
     @Override
@@ -130,16 +122,16 @@ public class ArrivalsActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopLocationRequests();
-        cancelAsync(asyncArrivalsLoader);
+        //cancelAsync(asyncArrivalsLoader);
     }
 
     private void doRefresh() {
         Log.d(TAG, "doRefresh: Reloading data");
         swiper.setRefreshing(true);
         if (connectedToNetwork() && !requestedStations.isEmpty()) {
-            cancelAsync(asyncArrivalsLoader);
-            asyncArrivalsLoader = new AsyncArrivalsLoader(this, requestedStations);
-            asyncArrivalsLoader.execute();
+            //cancelAsync(asyncArrivalsLoader);
+            //asyncArrivalsLoader = new AsyncArrivalsLoader(this, requestedStations);
+            //asyncArrivalsLoader.execute();
         } else {
             showNearbyTrainsError();
             swiper.setRefreshing(false);
@@ -206,54 +198,10 @@ public class ArrivalsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
-        } else if (item.getItemId() == R.id.action_search) {
+        if (item.getItemId() == R.id.action_search) {
             startSearchActivity();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onConfigurationChanged(@NotNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    private void selectDrawerItem(int position) {
-        switch(position) {
-            case 0:
-                requestingLocation = true;
-                setTitle(LOCATION_APP_TITLE);
-                setupLocationServices();
-                break;
-            case 1:
-                openTwitter();
-                break;
-            case 2:
-                startAboutActivity();
-                break;
-        }
-        drawerLayout.closeDrawer(drawerList);
-    }
-
-    private void setupDrawer() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        drawerList = findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new DrawerAdapter(DRAWER_ITEMS, this));
-        drawerList.setOnItemClickListener(
-                (parent, view, position, id) -> selectDrawerItem(position)
-        );
-        drawerToggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        }
     }
 
     public void openTwitter() {

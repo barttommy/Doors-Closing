@@ -14,6 +14,8 @@ public class Station implements Serializable, Comparable<Station> {
     private String lat;
     private String lon;
     private HashMap<String, Boolean> trainLines;
+
+    // Delete
     private double distance;
 
     private int hashCode;

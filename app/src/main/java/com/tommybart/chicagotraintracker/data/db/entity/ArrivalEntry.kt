@@ -1,9 +1,10 @@
 package com.tommybart.chicagotraintracker.data.db.entity
 
 
+import androidx.room.Embedded
 import com.google.gson.annotations.SerializedName
-import com.tommybart.chicagotraintracker.data.models.Location
 
+// TODO custom deserialization
 data class ArrivalEntry(
     @SerializedName("arrT")
     val arrivalTime: String,
@@ -14,15 +15,12 @@ data class ArrivalEntry(
     val isApproaching: Boolean, // TODO?
     @SerializedName("isDly")
     val isDelayed: Boolean,
-    //TODO?
-    val lat: String,
-    val lon: String,
+    @Embedded
+    val location: Location,
     @SerializedName("rt")
-    val routeName: String,
+    val trainLine: String, // TODO - use enum? also figure out way to extract route vs train?
     @SerializedName("staId")
     val stationId: String,
-    val staNm: String,
-    val stpDe: String,
-    val stpId: String,
-    val trDr: String
+    @SerializedName("staNm")
+    val stationName: String
 )

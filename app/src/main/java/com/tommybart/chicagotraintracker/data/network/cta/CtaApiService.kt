@@ -2,13 +2,16 @@ package com.tommybart.chicagotraintracker.data.network.cta
 
 import android.content.Context
 import android.util.Log
+import com.google.gson.GsonBuilder
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.network.ApiClient
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
-import com.tommybart.chicagotraintracker.internal.TAG
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -50,7 +53,18 @@ interface CtaApiService {
                 //.addInterceptor(interceptor)
                 .build()
 
-            return ApiClient(BASE_URL, okHttpClient)
+            val converterFactory = GsonConverterFactory.create(
+                GsonBuilder()
+                    .registerTypeAdapter(CtaApiResponse::class.java, CtaDeserializer())
+                    .create()
+            )
+
+            return Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
+                .addConverterFactory(converterFactory)
+                .build()
                 .create(CtaApiService::class.java)
         }
     }

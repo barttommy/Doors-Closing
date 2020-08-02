@@ -1,52 +1,37 @@
 package com.tommybart.chicagotraintracker.data.models;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import java.util.ArrayList;
 
 /**
- * A Route stores a collection of incoming Trains that share the same line, station, and destination
+ * A Route stores a collection of incoming Trains at a station that share the same line and
+ * destination
  */
 public class Route implements Comparable<Route>{
 
-    public static final int ROUTE_TRAIN_LIMIT = 3;
+    public static final int TRAIN_LIMIT = 3;
 
-    // Train line strings as they appear in the api
-    public static final String RED_LINE = "Red";
-    public static final String BLUE_LINE = "Blue";
-    public static final String GREEN_LINE = "G";
-    public static final String BROWN_LINE = "Brn";
-    public static final String PURPLE_LINE = "P";
-    public static final String YELLOW_LINE = "Y";
-    public static final String PINK_LINE = "Pink";
-    public static final String ORANGE_LINE = "Org";
-
-    public static final String[] TRAIN_LINES = {
-            Route.RED_LINE, Route.BLUE_LINE, Route.GREEN_LINE, Route.BROWN_LINE,
-            Route.PURPLE_LINE, Route.YELLOW_LINE, Route.PINK_LINE, Route.ORANGE_LINE
-    };
-
-    private String line;
-    private String stationId;
+    private int stationId;
     private String stationName;
-    private String destination;
-    private ArrayList<Train> trains;
+    private String destinationName;
+    private TrainLine trainLine;
+    private ArrayList<Train> arrivals;
     private int hashCode;
 
-    public Route (String line, String stationId, String stationName,
-                  String destination, ArrayList<Train> trains) {
-        this.line = line;
+    public Route (int stationId, String stationName, String destinationName,
+                  TrainLine trainLine, ArrayList<Train> arrivals) {
         this.stationId = stationId;
         this.stationName = stationName;
-        this.destination = destination;
-        this.trains = trains;
+        this.destinationName = destinationName;
+        this.trainLine = trainLine;
+        this.arrivals = arrivals;
     }
 
-    public String getLine() {
-        return line;
-    }
-
-    private String getStationId() {
+    private int getStationId() {
         return stationId;
     }
 
@@ -54,12 +39,16 @@ public class Route implements Comparable<Route>{
         return stationName;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getDestinationName() {
+        return destinationName;
     }
 
-    public ArrayList<Train> getTrains() {
-        return trains;
+    public TrainLine getTrainLine() {
+        return trainLine;
+    }
+
+    public ArrayList<Train> getArrivals() {
+        return arrivals;
     }
 
     @Override
@@ -67,27 +56,39 @@ public class Route implements Comparable<Route>{
         if (that == this) return true;
         else if (!(that instanceof Route)) return false;
         Route route = (Route) that;
-        return this.line.equals(route.getLine())
-                && this.stationId.equals(route.getStationId())
-                && this.destination.equals(route.getDestination());
-    }
-
-    @Override
-    public int compareTo(Route route) {
-        int cmp = this.getStationId().compareTo(route.getStationId());
-        if (cmp == 0) cmp = this.getLine().compareTo(route.getLine());
-        if (cmp == 0) cmp = this.getDestination().compareTo(route.getDestination());
-        return cmp;
+        return this.stationId == route.getStationId()
+                && this.destinationName.equals(route.getDestinationName())
+                && this.trainLine == getTrainLine();
     }
 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
             hashCode = 17;
-            hashCode = 37 * hashCode + line.hashCode();
-            hashCode = 37 * hashCode + stationId.hashCode();
-            hashCode = 37 * hashCode + destination.hashCode();
+            hashCode = 37 * hashCode + trainLine.hashCode();
+            hashCode = 37 * hashCode + stationId;
+            hashCode = 37 * hashCode + destinationName.hashCode();
         }
         return hashCode;
+    }
+
+    @Override
+    public int compareTo(Route route) {
+        int cmp = Integer.compare(this.stationId, route.getStationId());
+        if (cmp == 0) cmp = this.trainLine.compareTo(route.getTrainLine());
+        if (cmp == 0) cmp = this.destinationName.compareTo(route.getDestinationName());
+        return cmp;
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return "Route{" +
+                "stationId=" + stationId +
+                ", stationName='" + stationName + '\'' +
+                ", destinationName='" + destinationName + '\'' +
+                ", trainLine=" + trainLine +
+                ", arrivals=" + arrivals +
+                '}';
     }
 }

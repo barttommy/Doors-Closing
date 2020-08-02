@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
-import com.tommybart.chicagotraintracker.internal.TAG
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
 class StationNetworkDataSourceImpl(
     private val chicagoDataPortalApiService: ChicagoDataPortalApiService

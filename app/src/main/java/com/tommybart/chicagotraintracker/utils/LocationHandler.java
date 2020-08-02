@@ -6,12 +6,14 @@ import android.util.Log;
 import com.tommybart.chicagotraintracker.data.models.Route;
 import com.tommybart.chicagotraintracker.data.models.Station;
 import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
+import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+// TODO - compiles but doesn't work with new implementation yet
 public class LocationHandler {
 
     private static final String TAG = "LocationHandler";
@@ -19,7 +21,7 @@ public class LocationHandler {
 
     private Location currentLocation;
     private ArrayList<Station> stationsInRange = new ArrayList<>();
-    private HashMap<String, Boolean> linesInRange = newLinesInRange();
+    private HashMap<TrainLine, Boolean> linesInRange = newLinesInRange();
     private HashSet<Station> requestedStations = new HashSet<>();
 
     public void setLocation(Location location) {
@@ -62,11 +64,11 @@ public class LocationHandler {
      * area.
      */
     private void requestBestStations() {
-        HashMap<String, Boolean> map = newLinesInRange();
+        HashMap<TrainLine, Boolean> map = newLinesInRange();
         for (int i = 0; i < stationsInRange.size(); i++) {
             if (map.equals(linesInRange)) return;
             Station station = stationsInRange.get(i);
-            HashMap<String, Boolean> old = new HashMap<>(map);
+            HashMap<TrainLine, Boolean> old = new HashMap<>(map);
             map = getMapDisjunction(map, station.getTrainLines());
             if (!old.equals(map)) {
                 requestedStations.add(station);
@@ -83,20 +85,20 @@ public class LocationHandler {
         }
     }
 
-    private HashMap<String, Boolean> newLinesInRange() {
-        HashMap<String, Boolean> map = new HashMap<>();
-        String[] trainLines = Route.TRAIN_LINES;
-        for (String line: trainLines) {
+    private HashMap<TrainLine, Boolean> newLinesInRange() {
+        HashMap<TrainLine, Boolean> map = new HashMap<>();
+        TrainLine[] trainLines = TrainLine.values();
+        for (TrainLine line: trainLines) {
             map.put(line, false);
         }
         return map;
     }
 
-    private HashMap<String, Boolean> getMapDisjunction(HashMap<String, Boolean> map1,
+    private HashMap<TrainLine, Boolean> getMapDisjunction(HashMap<TrainLine, Boolean> map1,
                                                        HashMap<String, Boolean> map2) {
-        HashMap<String, Boolean> result = new HashMap<>(map1);
+        HashMap<TrainLine, Boolean> result = new HashMap<>(map1);
         try {
-            for (String key: map1.keySet()) {
+            for (TrainLine key: map1.keySet()) {
                 result.put(key, map1.get(key) || map2.get(key));
             }
         } catch (NullPointerException e) {

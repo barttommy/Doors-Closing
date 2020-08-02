@@ -4,12 +4,13 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import com.tommybart.chicagotraintracker.data.models.Location
 
 @Entity(tableName = "station_data")
 data class StationEntry(
+    // ID naming convention is inconsistent between APIs. For this app's purposes, "stationId"
+    // will refer to the unique "parent" stationId (or, in this case,  mapId)
     @SerializedName("map_id")
-    val mapId: String,
+    val stationId: String,
     @SerializedName("station_name")
     val stationName: String,
     @SerializedName("station_descriptive_name")

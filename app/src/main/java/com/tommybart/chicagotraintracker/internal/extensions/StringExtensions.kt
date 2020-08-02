@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.internal
+package com.tommybart.chicagotraintracker.internal.extensions
 
 val Any.TAG: String
     get() {

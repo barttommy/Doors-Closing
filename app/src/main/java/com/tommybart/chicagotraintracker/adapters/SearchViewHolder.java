@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tommybart.chicagotraintracker.R;
 import com.tommybart.chicagotraintracker.data.models.Route;
+import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 class SearchViewHolder extends RecyclerView.ViewHolder {
 
@@ -19,20 +20,20 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
         stationText = itemView.findViewById(R.id.search_station);
 
         itemView.findViewById(R.id.search_red_line)
-                .setTag(Route.RED_LINE);
+                .setTag(TrainLine.RED);
         itemView.findViewById(R.id.search_blue_line)
-                .setTag(Route.BLUE_LINE);
+                .setTag(TrainLine.BLUE);
         itemView.findViewById(R.id.search_green_line)
-                .setTag(Route.GREEN_LINE);
+                .setTag(TrainLine.GREEN);
         itemView.findViewById(R.id.search_brown_line)
-                .setTag(Route.BROWN_LINE);
+                .setTag(TrainLine.BROWN);
         itemView.findViewById(R.id.search_purple_line)
-                .setTag(Route.PURPLE_LINE);
+                .setTag(TrainLine.PURPLE);
         itemView.findViewById(R.id.search_yellow_line)
-                .setTag(Route.YELLOW_LINE);
+                .setTag(TrainLine.YELLOW);
         itemView.findViewById(R.id.search_pink_line)
-                .setTag(Route.PINK_LINE);
+                .setTag(TrainLine.PINK);
         itemView.findViewById(R.id.search_orange_line)
-                .setTag(Route.ORANGE_LINE);
+                .setTag(TrainLine.ORANGE);
     }
 }

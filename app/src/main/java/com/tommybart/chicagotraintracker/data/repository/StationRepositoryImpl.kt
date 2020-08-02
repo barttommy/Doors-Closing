@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.data.db.StationDao
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
-import com.tommybart.chicagotraintracker.internal.TAG
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

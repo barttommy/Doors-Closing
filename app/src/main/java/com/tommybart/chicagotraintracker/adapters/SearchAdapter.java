@@ -11,6 +11,7 @@ import com.tommybart.chicagotraintracker.R;
 import com.tommybart.chicagotraintracker.activities.SearchActivity;
 import com.tommybart.chicagotraintracker.data.models.Route;
 import com.tommybart.chicagotraintracker.data.models.Station;
+import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         holder.stationText.setText(station.getName());
 
         HashMap<String, Boolean> availableTrainLines = station.getTrainLines();
-        for (String line : Route.TRAIN_LINES) {
+        for (TrainLine line : TrainLine.values()) {
             try {
                 if (availableTrainLines.get(line)) {
                     holder.itemView.findViewWithTag(line).setVisibility(View.VISIBLE);

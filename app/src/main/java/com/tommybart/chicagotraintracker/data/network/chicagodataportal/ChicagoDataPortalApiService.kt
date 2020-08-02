@@ -1,12 +1,14 @@
 package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 
 import android.content.Context
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
-import com.tommybart.chicagotraintracker.data.network.ApiClient
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 //https://data.cityofchicago.org/resource/8pix-ypme.json?$$app_token=APP_TOKEN_GOES_HERE
@@ -41,7 +43,12 @@ interface ChicagoDataPortalApiService {
                 .addInterceptor(interceptor)
                 .build()
 
-            return ApiClient(BASE_URL, okHttpClient)
+            return Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(BASE_URL)
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
                 .create(ChicagoDataPortalApiService::class.java)
         }
     }

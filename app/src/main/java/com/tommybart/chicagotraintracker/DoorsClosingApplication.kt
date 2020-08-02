@@ -1,6 +1,7 @@
 package com.tommybart.chicagotraintracker
 
 import android.app.Application
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.tommybart.chicagotraintracker.data.db.DoorsClosingDatabase
 import com.tommybart.chicagotraintracker.data.network.*
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.ChicagoDataPortalApiService
@@ -18,6 +19,7 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 
+@Suppress("unused")
 class DoorsClosingApplication : Application(), KodeinAware {
     override val kodein: LazyKodein = Kodein.lazy {
         import(androidXModule(this@DoorsClosingApplication))
@@ -29,5 +31,10 @@ class DoorsClosingApplication : Application(), KodeinAware {
         bind<StationNetworkDataSource>() with singleton { StationNetworkDataSourceImpl(instance()) }
         bind<StationRepository>() with singleton { StationRepositoryImpl(instance(), instance()) }
         bind() from provider { ArrivalsViewModelFactory(instance()) }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        AndroidThreeTen.init(this)
     }
 }
