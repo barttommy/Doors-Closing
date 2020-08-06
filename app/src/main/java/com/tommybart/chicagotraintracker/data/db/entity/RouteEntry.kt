@@ -7,9 +7,6 @@ import androidx.room.PrimaryKey
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.internal.TrainLine
 
-// TODO: Good morning! Here's what to do: save routes somehow with arrivals
-//  ignored(deserilize? might not work), type converter for trainlines, other errors
-
 @Entity(
     tableName = "route_data",
     indices = [Index(value = ["stationId", "destinationName", "trainLine"], unique = true)]

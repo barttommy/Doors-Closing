@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.data.db.RouteDao
 import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.cta.ArrivalsNetworkDataSource
-import com.tommybart.chicagotraintracker.data.network.cta.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
@@ -28,19 +28,16 @@ class ArrivalsRepositoryImpl(
 
     override suspend fun getRouteData(): LiveData<List<RouteWithArrivals>> {
 
-//        fun deleteOldArrivals(): Int {
-//            val currentDate = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID))
-//                .toLocalDateTime()
-//                .toString()
-//            Log.d(TAG, currentDate)
-//            return routeDao.deleteOldArrivals(currentDate)
-//        }
+        val currentDate = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
+        fun deleteOldArrivals(): Int {
+            return routeDao.deleteOldArrivals(currentDate)
+        }
 
         return withContext(Dispatchers.IO) {
             initArrivalData()
-//            val deletedArrivals = deleteOldArrivals()
-//            val deletedRoutes = routeDao.deleteRoutesWithoutArrivals()
-//            Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
+            val deletedArrivals = deleteOldArrivals()
+            val deletedRoutes = routeDao.deleteRoutesWithoutArrivals()
+            Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
             return@withContext routeDao.getRoutesWithArrivals()
         }
     }

@@ -6,10 +6,7 @@ import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
-import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
-
-import static com.tommybart.chicagotraintracker.data.network.cta.CtaDeserializerKt.CHICAGO_ZONE_ID;
 
 public class Train {
 

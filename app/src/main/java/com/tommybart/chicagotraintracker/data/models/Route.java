@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class Route implements Comparable<Route>{
 
     public static final int TRAIN_LIMIT = 3;
+    public static final String CHICAGO_ZONE_ID = "America/Chicago";
 
     private int stationId;
     private String stationName;

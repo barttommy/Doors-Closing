@@ -1,9 +1,9 @@
-package com.tommybart.chicagotraintracker.data.db
+package com.tommybart.chicagotraintracker.data.db.typeconverters
 
 import androidx.room.TypeConverter
 import com.tommybart.chicagotraintracker.internal.TrainLine
 
-class Converters {
+class TrainLineConverter {
     @TypeConverter
     fun toTrainLine(value: String): TrainLine = TrainLine.valueOf(value)
 

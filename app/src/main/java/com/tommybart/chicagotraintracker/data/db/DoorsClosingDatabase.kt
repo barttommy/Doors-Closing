@@ -6,12 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.tommybart.chicagotraintracker.data.db.entity.*
+import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateTimeConverter
+import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConverter
 
 @Database(
     entities = [StationEntry::class, RouteEntry::class, TrainEntry::class],
     version = 1
 )
-@TypeConverters(Converters::class)
+@TypeConverters(TrainLineConverter::class, LocalDateTimeConverter::class)
 abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao

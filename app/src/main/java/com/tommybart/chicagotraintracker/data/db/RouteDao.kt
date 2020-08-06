@@ -5,6 +5,7 @@ import androidx.room.*
 import com.tommybart.chicagotraintracker.data.db.entity.RouteEntry
 import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
 import com.tommybart.chicagotraintracker.data.db.entity.TrainEntry
+import org.threeten.bp.LocalDateTime
 
 @Dao
 abstract class RouteDao {
@@ -26,10 +27,9 @@ abstract class RouteDao {
     @Query("SELECT * FROM route_data")
     abstract fun getRoutesWithArrivals(): LiveData<List<RouteWithArrivals>>
 
-    // TODO Deletes aren't working
-//    @Query("DELETE FROM train_data WHERE DATE(arrivalTime) < DATE(:currentDate)")
-//    abstract fun deleteOldArrivals(currentDate: String): Int
-//
-//    @Query("DELETE FROM route_data WHERE id NOT IN (SELECT routeId FROM train_data)")
-//    abstract fun deleteRoutesWithoutArrivals(): Int
+    @Query("DELETE FROM train_data WHERE DATETIME(arrivalTime) < DATETIME(:currentDate)")
+    abstract fun deleteOldArrivals(currentDate: LocalDateTime): Int
+
+    @Query("DELETE FROM route_data WHERE id NOT IN (SELECT routeId FROM train_data)")
+    abstract fun deleteRoutesWithoutArrivals(): Int
 }
