@@ -2,7 +2,6 @@ package com.tommybart.chicagotraintracker.data.models;
 
 import androidx.annotation.NonNull;
 
-import com.tommybart.chicagotraintracker.data.db.entity.Location;
 import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import org.threeten.bp.Duration;
@@ -62,11 +61,10 @@ public class Train {
         return location;
     }
 
-    // TODO - calculate with prdT vs arrT? See api documentation
     public int getArrivalTimeMinutes() {
         Instant arrivalTimeInstant = arrivalTime.toInstant();
-        Instant chicagoTime = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toInstant();
-        return (int) (Duration.between(chicagoTime, arrivalTime).toMillis() / 60000);
+        Instant predictionTimeInstant = predictionTime.toInstant();
+        return (int) Duration.between(predictionTimeInstant, arrivalTimeInstant).toMinutes();
     }
 
     public String getArrivalTimeDetail() {

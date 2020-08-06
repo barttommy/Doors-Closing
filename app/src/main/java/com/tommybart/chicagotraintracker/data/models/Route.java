@@ -58,7 +58,7 @@ public class Route implements Comparable<Route>{
         Route route = (Route) that;
         return this.stationId == route.getStationId()
                 && this.destinationName.equals(route.getDestinationName())
-                && this.trainLine == getTrainLine();
+                && this.trainLine == route.getTrainLine();
     }
 
     @Override

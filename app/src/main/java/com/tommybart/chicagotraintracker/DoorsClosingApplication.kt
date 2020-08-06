@@ -7,6 +7,11 @@ import com.tommybart.chicagotraintracker.data.network.*
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.ChicagoDataPortalApiService
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.network.cta.ArrivalsNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.cta.ArrivalsNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.network.cta.CtaApiService
+import com.tommybart.chicagotraintracker.data.repository.ArrivalsRepository
+import com.tommybart.chicagotraintracker.data.repository.ArrivalsRepositoryImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.data.repository.StationRepositoryImpl
 import com.tommybart.chicagotraintracker.ui.arrivals.ArrivalsViewModelFactory
@@ -26,11 +31,19 @@ class DoorsClosingApplication : Application(), KodeinAware {
 
         bind() from singleton { DoorsClosingDatabase(instance()) }
         bind() from singleton { instance<DoorsClosingDatabase>().stationDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().routeDao() }
+
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
         bind() from singleton { ChicagoDataPortalApiService(instance(), instance()) }
+        bind() from singleton { CtaApiService(instance(), instance())}
+
         bind<StationNetworkDataSource>() with singleton { StationNetworkDataSourceImpl(instance()) }
         bind<StationRepository>() with singleton { StationRepositoryImpl(instance(), instance()) }
-        bind() from provider { ArrivalsViewModelFactory(instance()) }
+
+        bind<ArrivalsNetworkDataSource>() with singleton { ArrivalsNetworkDataSourceImpl(instance()) }
+        bind<ArrivalsRepository>() with singleton { ArrivalsRepositoryImpl(instance(), instance() )}
+
+        bind() from provider { ArrivalsViewModelFactory(instance(), instance()) }
     }
 
     override fun onCreate() {

@@ -22,7 +22,7 @@ enum class TrainLine(val value: String) {
         fun fromValue(value: String) = values.firstOrNull { it.value == value.toLowerCase() }
     }
 
-    fun getColor(resources: Resources) : Int {
+    fun getColor(resources: Resources): Int {
         return when(this) {
             RED -> resources.getColor(R.color.redLine, null)
             BLUE -> resources.getColor(R.color.blueLine, null)

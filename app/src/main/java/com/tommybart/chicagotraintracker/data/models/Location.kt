@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.db.entity
+package com.tommybart.chicagotraintracker.data.models
 
 data class Location(
     val latitude: Double?,

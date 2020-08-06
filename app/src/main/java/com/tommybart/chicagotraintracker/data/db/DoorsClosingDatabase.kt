@@ -4,15 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import androidx.room.TypeConverters
+import com.tommybart.chicagotraintracker.data.db.entity.*
 
 @Database(
-    entities = [StationEntry::class],
+    entities = [StationEntry::class, RouteEntry::class, TrainEntry::class],
     version = 1
 )
+@TypeConverters(Converters::class)
 abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
+    abstract fun routeDao(): RouteDao
 
     companion object {
         @Volatile private var instance: DoorsClosingDatabase? = null

@@ -1,12 +1,12 @@
 package com.tommybart.chicagotraintracker.data.network.cta.response
 
 
-import com.tommybart.chicagotraintracker.data.models.Route
+import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
 import org.threeten.bp.ZonedDateTime
 
 data class ArrivalsContainer(
     val transmissionTime: ZonedDateTime,
     val errorCode: Int?,
     val errorName: String?,
-    val routeList: List<Route>
+    val routeWithArrivalsList: MutableList<RouteWithArrivals>
 )

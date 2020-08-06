@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.tommybart.chicagotraintracker.data.models.Location
 
 @Entity(tableName = "station_data")
 data class StationEntry(

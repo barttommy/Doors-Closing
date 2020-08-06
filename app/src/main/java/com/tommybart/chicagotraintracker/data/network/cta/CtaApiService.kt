@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
+import com.tommybart.chicagotraintracker.data.db.entity.TrainEntry
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
@@ -28,8 +29,8 @@ interface CtaApiService {
 
     companion object {
         operator fun invoke(
-            context: Context
-            //interceptor: Interceptor
+            context: Context,
+            interceptor: Interceptor
         ) : CtaApiService {
 
             val requestInterceptor = Interceptor { chain ->
@@ -50,7 +51,7 @@ interface CtaApiService {
 
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(requestInterceptor)
-                //.addInterceptor(interceptor)
+                .addInterceptor(interceptor)
                 .build()
 
             val converterFactory = GsonConverterFactory.create(

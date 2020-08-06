@@ -1,18 +1,16 @@
 package com.tommybart.chicagotraintracker.ui.arrivals
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
-import com.tommybart.chicagotraintracker.data.network.cta.CtaApiService
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.arrivals_fragment.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -36,21 +34,19 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ArrivalsViewModel::class.java)
-
-        // TODO: Delete, here for testing functionality of api service
-        val apiService = CtaApiService(requireContext())
-        GlobalScope.launch(Dispatchers.Main) {
-            val mapIds = listOf("40530", "41220")
-            val apiResponse = apiService.getArrivalsAsync(mapIds).await()
-            textView_arrivals.text = apiResponse.toString()
-        }
+        bindUI()
     }
 
     private fun bindUI() = launch {
-        val stationData = viewModel.stationData.await()
-        stationData.observe(viewLifecycleOwner, Observer {
+//        val stationData = viewModel.stationData.await()
+//        stationData.observe(viewLifecycleOwner, Observer {
+//            if (it == null) return@Observer
+//        })
+
+        val routeData = viewModel.routeData.await()
+        routeData.observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
-            // TODO
+            textView_arrivals.text = it.toString()
         })
     }
 }
