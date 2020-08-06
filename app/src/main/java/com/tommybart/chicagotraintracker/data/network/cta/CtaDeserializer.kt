@@ -50,8 +50,9 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
                 val bearing = arrival.getNullable("heading")?.asDouble
 
                 val route = RouteEntry(null, stationId, stationName, destinationName, trainLine)
-                val train = TrainEntry(null, null, runNumber, trainLine, arrivalTime,
-                    predictionTime, isApproaching, isDelayed, bearing, Location(latitude, longitude))
+                val train = TrainEntry(null, null, stationId, runNumber, trainLine,
+                    arrivalTime, predictionTime, isApproaching, isDelayed, bearing,
+                    Location(latitude, longitude))
                 val routeWithArrivals = RouteWithArrivals(route, mutableListOf(train))
                 addRoute(routeWithArrivals, train, routeWithArrivalsList)
             } catch (e: Exception) {

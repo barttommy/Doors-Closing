@@ -46,6 +46,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
         val routeData = viewModel.routeData.await()
         routeData.observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
+            Log.d(TAG, "Number of routes: ${it.size}")
             textView_arrivals.text = it.toString()
         })
     }

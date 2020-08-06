@@ -2,8 +2,9 @@ package com.tommybart.chicagotraintracker.data.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.tommybart.chicagotraintracker.data.db.RouteDao
-import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.cta.ArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
@@ -12,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
@@ -26,32 +28,31 @@ class ArrivalsRepositoryImpl(
         }
     }
 
-    override suspend fun getRouteData(): LiveData<List<RouteWithArrivals>> {
-
+    override suspend fun getRouteData(): LiveData<List<Route>> {
         val currentDate = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
-        fun deleteOldArrivals(): Int {
-            return routeDao.deleteOldArrivals(currentDate)
-        }
-
         return withContext(Dispatchers.IO) {
-            initArrivalData()
-            val deletedArrivals = deleteOldArrivals()
-            val deletedRoutes = routeDao.deleteRoutesWithoutArrivals()
-            Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
-            return@withContext routeDao.getRoutesWithArrivals()
+
+            // TODO get stationIds from provider
+            //val requestedStations = listOf(40530, 41220)
+            val requestedStations = listOf(40530)
+
+            initArrivalData(requestedStations)
+            deleteOldData(requestedStations, currentDate)
+            return@withContext Transformations.map(routeDao.getRoutesWithArrivals()) {
+                routesWithArrivals -> routesWithArrivals.map { it.toRoute() }
+            }
         }
     }
 
-    private suspend fun initArrivalData() {
+    private suspend fun initArrivalData(requestedStations: List<Int>) {
         if (isFetchArrivalDataNeeded()) {
-            fetchArrivalData()
+            fetchArrivalData(requestedStations)
         }
     }
 
-    private suspend fun fetchArrivalData() {
-        // TODO get mapIds from provider
+    private suspend fun fetchArrivalData(requestedStations: List<Int>) {
         Log.d(TAG, "fetching arrival data")
-        arrivalsNetworkDataSource.fetchArrivalData(listOf("40530", "41220"))
+        arrivalsNetworkDataSource.fetchArrivalData(requestedStations)
     }
 
     private fun isFetchArrivalDataNeeded(): Boolean {
@@ -60,10 +61,17 @@ class ArrivalsRepositoryImpl(
         return true
     }
 
+    private fun deleteOldData(requestedStations: List<Int>, currentDate: LocalDateTime) {
+        var deletedArrivals = routeDao.deleteArrivalsAtOldStations(requestedStations)
+        deletedArrivals += routeDao.deleteOldArrivals(currentDate)
+        val deletedRoutes = routeDao.deleteRoutesWithoutArrivals()
+        Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
+    }
+
     private fun persistFetchedArrivals(fetchedArrivals: CtaApiResponse) {
         GlobalScope.launch(Dispatchers.IO) {
             fetchedArrivals.arrivalsContainer.routeWithArrivalsList.forEach { routeWithArrivals ->
-                val routeId: Long = routeDao.upsertRoute(routeWithArrivals.route)
+                val routeId: Long = routeDao.upsertRoute(routeWithArrivals.routeEntry)
                 routeDao.upsertArrivalsForRoute(routeId, routeWithArrivals.arrivals)
             }
         }

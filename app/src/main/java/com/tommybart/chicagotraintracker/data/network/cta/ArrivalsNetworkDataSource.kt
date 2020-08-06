@@ -5,5 +5,5 @@ import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiRespons
 
 interface ArrivalsNetworkDataSource {
     val downloadArrivalData: LiveData<CtaApiResponse>
-    suspend fun fetchArrivalData(mapIds: List<String>)
+    suspend fun fetchArrivalData(stationIds: List<Int>)
 }

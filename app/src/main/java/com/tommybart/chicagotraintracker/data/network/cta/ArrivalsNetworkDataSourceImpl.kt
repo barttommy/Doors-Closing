@@ -12,10 +12,10 @@ class ArrivalsNetworkDataSourceImpl(
 
     override val downloadArrivalData: MutableLiveData<CtaApiResponse> = MutableLiveData()
 
-    override suspend fun fetchArrivalData(mapIds: List<String>) {
+    override suspend fun fetchArrivalData(stationIds: List<Int>) {
         try {
             val fetchArrivalData = ctaApiService
-                .getArrivalsAsync(mapIds)
+                .getArrivalsAsync(stationIds)
                 .await()
             downloadArrivalData.postValue(fetchArrivalData)
         } catch(e: NoNetworkConnectionException) {

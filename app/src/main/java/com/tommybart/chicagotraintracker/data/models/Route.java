@@ -21,7 +21,6 @@ public class Route implements Comparable<Route>{
     private String destinationName;
     private TrainLine trainLine;
     private ArrayList<Train> arrivals;
-    private int hashCode;
 
     public Route (int stationId, String stationName, String destinationName,
                   TrainLine trainLine, ArrayList<Train> arrivals) {
@@ -62,6 +61,7 @@ public class Route implements Comparable<Route>{
                 && this.trainLine == route.getTrainLine();
     }
 
+    private int hashCode;
     @Override
     public int hashCode() {
         if (hashCode == 0) {
@@ -81,8 +81,8 @@ public class Route implements Comparable<Route>{
         return cmp;
     }
 
-    @Override
     @NonNull
+    @Override
     public String toString() {
         return "Route{" +
                 "stationId=" + stationId +

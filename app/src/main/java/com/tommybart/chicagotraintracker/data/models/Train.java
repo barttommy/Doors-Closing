@@ -5,41 +5,58 @@ import androidx.annotation.NonNull;
 import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
-import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.LocalDateTime;
 
 public class Train {
 
+    private long routeId;
+    private int stationId;
+    private int runNumber;
     private TrainLine trainLine;
-    private ZonedDateTime arrivalTime;
-    private ZonedDateTime predictionTime;
+    private String predictionTime;
+    private String arrivalTime;
     private Boolean isApproaching;
     private Boolean isDelayed;
     private Double bearing;
     private Location location;
 
-    public Train(TrainLine trainLine, ZonedDateTime arrivalTime, ZonedDateTime predictionTime,
-                 Boolean isApproaching, Boolean isDelayed, Double bearing,
-                 Location location) {
+    public Train(long routeId, int stationId, int runNumber, TrainLine trainLine,
+                 String predictionTime, String arrivalTime, Boolean isApproaching,
+                 Boolean isDelayed, Double bearing, Location location) {
+        this.routeId = routeId;
+        this.stationId = stationId;
+        this.runNumber = runNumber;
         this.trainLine = trainLine;
-        this.arrivalTime = arrivalTime;
         this.predictionTime = predictionTime;
+        this.arrivalTime = arrivalTime;
         this.isApproaching = isApproaching;
         this.isDelayed = isDelayed;
         this.bearing = bearing;
         this.location = location;
     }
 
+    public long getRouteId() {
+        return routeId;
+    }
+
+    public int getStationId() {
+        return stationId;
+    }
+
+    public int getRunNumber() {
+        return runNumber;
+    }
+
     public TrainLine getTrainLine() {
         return trainLine;
     }
 
-    public ZonedDateTime getArrivalTime() {
-        return arrivalTime;
+    public String getPredictionTime() {
+        return predictionTime;
     }
 
-    public ZonedDateTime getPredictionTime() {
-        return predictionTime;
+    public String getArrivalTime() {
+        return arrivalTime;
     }
 
     public Boolean isApproaching() {
@@ -59,14 +76,15 @@ public class Train {
     }
 
     public int getArrivalTimeMinutes() {
-        Instant arrivalTimeInstant = arrivalTime.toInstant();
-        Instant predictionTimeInstant = predictionTime.toInstant();
+        LocalDateTime predictionTimeInstant = LocalDateTime.parse(predictionTime);
+        LocalDateTime arrivalTimeInstant = LocalDateTime.parse(arrivalTime);
         return (int) Duration.between(predictionTimeInstant, arrivalTimeInstant).toMinutes();
     }
 
     public String getArrivalTimeDetail() {
-        int hour = arrivalTime.getHour();
-        int minutes = arrivalTime.getMinute();
+        LocalDateTime parsedArrivalTime = LocalDateTime.parse(arrivalTime);
+        int hour = parsedArrivalTime.getHour();
+        int minutes = parsedArrivalTime.getMinute();
 
         String meridiem = "am";
         if (hour > 12) {
@@ -82,13 +100,15 @@ public class Train {
         return String.format("Arriving at %s:%s %s", hour, minutesString, meridiem);
     }
 
-    @Override
     @NonNull
+    @Override
     public String toString() {
         return "Train{" +
-                "trainLine=" + trainLine +
-                ", arrivalTime=" + arrivalTime +
-                ", predictionTime=" + predictionTime +
+                "routeId=" + routeId +
+                ", runNumber=" + runNumber +
+                ", trainLine=" + trainLine +
+                ", predictionTime='" + predictionTime + '\'' +
+                ", arrivalTime='" + arrivalTime + '\'' +
                 ", isApproaching=" + isApproaching +
                 ", isDelayed=" + isDelayed +
                 ", bearing=" + bearing +

@@ -10,6 +10,7 @@ data class TrainEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
     var routeId: Long? = null,
+    val stationId: Int,
     val runNumber: Int,
     val trainLine: TrainLine,
     val arrivalTime: String,

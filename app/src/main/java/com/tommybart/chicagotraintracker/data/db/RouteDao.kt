@@ -17,6 +17,7 @@ abstract class RouteDao {
         _upsertAll(arrivals)
     }
 
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun _upsertAll(arrivals: List<TrainEntry>)
 
@@ -29,6 +30,9 @@ abstract class RouteDao {
 
     @Query("DELETE FROM train_data WHERE DATETIME(arrivalTime) < DATETIME(:currentDate)")
     abstract fun deleteOldArrivals(currentDate: LocalDateTime): Int
+
+    @Query("DELETE FROM train_data WHERE stationId NOT IN (:stationIds)")
+    abstract fun deleteArrivalsAtOldStations(stationIds: List<Int>): Int
 
     @Query("DELETE FROM route_data WHERE id NOT IN (SELECT routeId FROM train_data)")
     abstract fun deleteRoutesWithoutArrivals(): Int

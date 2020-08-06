@@ -24,7 +24,7 @@ interface CtaApiService {
 
     @GET("ttarrivals.aspx?outputType=JSON")
     fun getArrivalsAsync(
-        @Query("mapid") mapIds: List<String>
+        @Query("mapid") mapIds: List<Int>
     ) : Deferred<CtaApiResponse>
 
     companion object {
