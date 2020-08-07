@@ -6,18 +6,18 @@ import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiRespons
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
-class ArrivalsNetworkDataSourceImpl(
+class RouteNetworkDataSourceImpl(
     private val ctaApiService: CtaApiService
-) : ArrivalsNetworkDataSource {
+) : RouteNetworkDataSource {
 
-    override val downloadArrivalData: MutableLiveData<CtaApiResponse> = MutableLiveData()
+    override val downloadRouteData: MutableLiveData<CtaApiResponse> = MutableLiveData()
 
-    override suspend fun fetchArrivalData(stationIds: List<Int>) {
+    override suspend fun fetchRouteData(stationIds: List<Int>) {
         try {
             val fetchArrivalData = ctaApiService
                 .getArrivalsAsync(stationIds)
                 .await()
-            downloadArrivalData.postValue(fetchArrivalData)
+            downloadRouteData.postValue(fetchArrivalData)
         } catch(e: NoNetworkConnectionException) {
             Log.w(TAG, "No network connection", e)
         }

@@ -5,19 +5,28 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.tommybart.chicagotraintracker.data.db.entity.*
+import com.tommybart.chicagotraintracker.data.db.entity.responseinfo.ResponseInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateTimeConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConverter
 
 @Database(
-    entities = [StationEntry::class, RouteEntry::class, TrainEntry::class],
+    entities = [
+        StationEntry::class,
+        ResponseInfoEntry::class,
+        RouteEntry::class,
+        TrainEntry::class
+    ],
     version = 1
 )
 @TypeConverters(TrainLineConverter::class, LocalDateTimeConverter::class)
 abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
-    abstract fun routeDao(): RouteDao
+    abstract fun responseInfoDao(): ResponseInfoDao
+    abstract fun routeDao(): RouteWithArrivalsDao
 
     companion object {
         @Volatile private var instance: DoorsClosingDatabase? = null

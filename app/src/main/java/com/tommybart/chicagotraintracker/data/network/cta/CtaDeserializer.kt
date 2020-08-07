@@ -4,12 +4,13 @@ import android.util.Log
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.tommybart.chicagotraintracker.data.db.entity.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
-import com.tommybart.chicagotraintracker.data.db.entity.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.responseinfo.ResponseInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.data.models.Route
-import com.tommybart.chicagotraintracker.data.network.cta.response.ArrivalsContainer
+import com.tommybart.chicagotraintracker.data.network.cta.response.RouteContainer
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.TrainLine
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
@@ -24,12 +25,13 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
     ): CtaApiResponse {
 
         val apiResponse = json?.asJsonObject
-        val arrivalsContainer = apiResponse?.get("ctatt")?.asJsonObject
+        val container = apiResponse?.get("ctatt")?.asJsonObject
 
-        val transmissionTime = arrivalsContainer?.getNullable("tmst")?.asString
-        val errorCode = arrivalsContainer?.getNullable("errCd")?.asInt
-        val errorName = arrivalsContainer?.getNullable("errNm")?.asString
-        val arrivals = arrivalsContainer?.getNullable("eta")?.asJsonArray
+        val transmissionTime = container?.get("tmst")?.asString
+        val errorCode = container?.getNullable("errCd")?.asInt
+        val errorName = container?.getNullable("errNm")?.asString
+        val arrivals = container?.getNullable("eta")?.asJsonArray
+        val responseInfo = ResponseInfoEntry(transmissionTime, errorCode, errorName)
 
         val routeWithArrivalsList = mutableListOf<RouteWithArrivals>()
         arrivals?.forEach {
@@ -55,14 +57,13 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
                     Location(latitude, longitude))
                 val routeWithArrivals = RouteWithArrivals(route, mutableListOf(train))
                 addRoute(routeWithArrivals, train, routeWithArrivalsList)
+
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to parse arrival", e)
             }
         }
 
-        return CtaApiResponse(
-            ArrivalsContainer(transmissionTime, errorCode, errorName, routeWithArrivalsList)
-        )
+        return CtaApiResponse(RouteContainer(responseInfo, routeWithArrivalsList))
     }
 
     private fun addRoute(

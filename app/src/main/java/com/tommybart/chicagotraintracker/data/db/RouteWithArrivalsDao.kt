@@ -2,13 +2,13 @@ package com.tommybart.chicagotraintracker.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.tommybart.chicagotraintracker.data.db.entity.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.RouteWithArrivals
-import com.tommybart.chicagotraintracker.data.db.entity.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
 import org.threeten.bp.LocalDateTime
 
 @Dao
-abstract class RouteDao {
+abstract class RouteWithArrivalsDao {
 
     fun upsertArrivalsForRoute(routeId: Long, arrivals: List<TrainEntry>) {
         arrivals.forEach { train ->
@@ -16,7 +16,6 @@ abstract class RouteDao {
         }
         _upsertAll(arrivals)
     }
-
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun _upsertAll(arrivals: List<TrainEntry>)

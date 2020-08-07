@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
 
 @Dao
 interface StationDao {

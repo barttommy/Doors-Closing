@@ -5,7 +5,6 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.db.entity.TrainEntry
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
@@ -39,8 +38,6 @@ interface CtaApiService {
                     .newBuilder()
                     .addQueryParameter("key", context.getString(R.string.cta_api_key))
                     .build()
-
-                Log.d(TAG, url.toString())
 
                 val request = chain.request()
                     .newBuilder()

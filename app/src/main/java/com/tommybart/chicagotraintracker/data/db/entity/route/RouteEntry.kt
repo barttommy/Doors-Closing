@@ -1,10 +1,9 @@
-package com.tommybart.chicagotraintracker.data.db.entity
+package com.tommybart.chicagotraintracker.data.db.entity.route
 
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.internal.TrainLine
 
 @Entity(

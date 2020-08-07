@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.db.entity
+package com.tommybart.chicagotraintracker.data.db.entity.station
 
 import androidx.room.Embedded
 import androidx.room.Entity

@@ -76,9 +76,10 @@ public class Train {
     }
 
     public int getArrivalTimeMinutes() {
-        LocalDateTime predictionTimeInstant = LocalDateTime.parse(predictionTime);
-        LocalDateTime arrivalTimeInstant = LocalDateTime.parse(arrivalTime);
-        return (int) Duration.between(predictionTimeInstant, arrivalTimeInstant).toMinutes();
+        return (int) Duration.between(
+                LocalDateTime.parse(predictionTime),
+                LocalDateTime.parse(arrivalTime)
+        ).toMinutes();
     }
 
     public String getArrivalTimeDetail() {

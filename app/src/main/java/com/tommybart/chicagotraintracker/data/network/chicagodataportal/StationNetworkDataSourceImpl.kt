@@ -2,7 +2,7 @@ package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
