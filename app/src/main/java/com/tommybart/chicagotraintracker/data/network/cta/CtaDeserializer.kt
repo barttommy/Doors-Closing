@@ -4,13 +4,13 @@ import android.util.Log
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.tommybart.chicagotraintracker.data.db.entity.responseinfo.ResponseInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivalsinfo.RouteArrivalsInfoEntry
 import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteArrivals
 import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.data.models.Route
-import com.tommybart.chicagotraintracker.data.network.cta.response.RouteContainer
+import com.tommybart.chicagotraintracker.data.network.cta.response.RouteArrivalsContainer
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.TrainLine
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
@@ -31,9 +31,9 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
         val errorCode = container?.getNullable("errCd")?.asInt
         val errorName = container?.getNullable("errNm")?.asString
         val arrivals = container?.getNullable("eta")?.asJsonArray
-        val responseInfo = ResponseInfoEntry(transmissionTime, errorCode, errorName)
+        val responseInfo = RouteArrivalsInfoEntry(transmissionTime, errorCode, errorName)
 
-        val routeWithArrivalsList = mutableListOf<RouteWithArrivals>()
+        val routeWithArrivalsList = mutableListOf<RouteArrivals>()
         arrivals?.forEach {
             try {
                 val arrival = it.asJsonObject
@@ -55,7 +55,7 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
                 val train = TrainEntry(null, null, stationId, runNumber, trainLine,
                     arrivalTime, predictionTime, isApproaching, isDelayed, bearing,
                     Location(latitude, longitude))
-                val routeWithArrivals = RouteWithArrivals(route, mutableListOf(train))
+                val routeWithArrivals = RouteArrivals(route, mutableListOf(train))
                 addRoute(routeWithArrivals, train, routeWithArrivalsList)
 
             } catch (e: Exception) {
@@ -63,22 +63,22 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
             }
         }
 
-        return CtaApiResponse(RouteContainer(responseInfo, routeWithArrivalsList))
+        return CtaApiResponse(RouteArrivalsContainer(responseInfo, routeWithArrivalsList))
     }
 
     private fun addRoute(
-        routeWithArrivals: RouteWithArrivals,
+        routeArrivals: RouteArrivals,
         train: TrainEntry,
-        routeWithArrivalsList: MutableList<RouteWithArrivals>
+        routeArrivalsList: MutableList<RouteArrivals>
     ) {
-        if (routeWithArrivalsList.contains(routeWithArrivals)) {
-            val index = routeWithArrivalsList.indexOf(routeWithArrivals)
-            val preExistingRoute = routeWithArrivalsList[index]
+        if (routeArrivalsList.contains(routeArrivals)) {
+            val index = routeArrivalsList.indexOf(routeArrivals)
+            val preExistingRoute = routeArrivalsList[index]
             if (preExistingRoute.arrivals.size < Route.TRAIN_LIMIT) {
                 preExistingRoute.arrivals.add(train)
             }
         } else {
-            routeWithArrivalsList.add(routeWithArrivals)
+            routeArrivalsList.add(routeArrivals)
         }
     }
 }

@@ -3,12 +3,12 @@ package com.tommybart.chicagotraintracker.data.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.RouteWithArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.route.RouteArrivals
 import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
 import org.threeten.bp.LocalDateTime
 
 @Dao
-abstract class RouteWithArrivalsDao {
+abstract class RouteArrivalsDao {
 
     fun upsertArrivalsForRoute(routeId: Long, arrivals: List<TrainEntry>) {
         arrivals.forEach { train ->
@@ -25,7 +25,7 @@ abstract class RouteWithArrivalsDao {
 
     @Transaction
     @Query("SELECT * FROM route_data")
-    abstract fun getRoutesWithArrivals(): LiveData<List<RouteWithArrivals>>
+    abstract fun getRoutesWithArrivals(): LiveData<List<RouteArrivals>>
 
     @Query("DELETE FROM train_data WHERE DATETIME(arrivalTime) < DATETIME(:currentDate)")
     abstract fun deleteOldArrivals(currentDate: LocalDateTime): Int

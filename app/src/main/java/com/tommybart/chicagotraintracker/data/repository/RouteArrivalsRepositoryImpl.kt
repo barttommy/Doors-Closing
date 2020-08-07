@@ -3,11 +3,11 @@ package com.tommybart.chicagotraintracker.data.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.tommybart.chicagotraintracker.data.db.ResponseInfoDao
-import com.tommybart.chicagotraintracker.data.db.RouteWithArrivalsDao
+import com.tommybart.chicagotraintracker.data.db.RouteArrivalsInfoDao
+import com.tommybart.chicagotraintracker.data.db.RouteArrivalsDao
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
-import com.tommybart.chicagotraintracker.data.network.cta.RouteNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.cta.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
@@ -20,14 +20,14 @@ import org.threeten.bp.ZonedDateTime
 
 const val FETCH_DELAY: Long = 1
 
-class RouteRepositoryImpl(
-    private val responseInfoDao: ResponseInfoDao,
-    private val routeWithArrivalsDao: RouteWithArrivalsDao,
-    private val routeNetworkDataSource: RouteNetworkDataSource
-) : RouteRepository {
+class RouteArrivalsRepositoryImpl(
+    private val routeArrivalsInfoDao: RouteArrivalsInfoDao,
+    private val routeArrivalsDao: RouteArrivalsDao,
+    private val routeArrivalsNetworkDataSource: RouteArrivalsNetworkDataSource
+) : RouteArrivalsRepository {
 
     init {
-        routeNetworkDataSource.downloadRouteData.observeForever { ctaApiResponse ->
+        routeArrivalsNetworkDataSource.downloadRouteData.observeForever { ctaApiResponse ->
             persistFetchedData(ctaApiResponse)
         }
     }
@@ -43,7 +43,7 @@ class RouteRepositoryImpl(
 
             initRouteData(requestedStations, currentDateTime)
             deleteOldData(requestedStations, currentDateTime)
-            return@withContext Transformations.map(routeWithArrivalsDao.getRoutesWithArrivals()) {
+            return@withContext Transformations.map(routeArrivalsDao.getRoutesWithArrivals()) {
                 routesWithArrivals -> routesWithArrivals.map { it.toRoute() }
             }
         }
@@ -58,30 +58,30 @@ class RouteRepositoryImpl(
 
     // TODO return true if location changed (location currently unimplemented)
     private fun isFetchRouteDataNeeded(currentDateTime: LocalDateTime): Boolean {
-        val responseInfo = responseInfoDao.getResponseInfoSync() ?: return true
-        val fetchDateTime = LocalDateTime.parse(responseInfo.transmissionTime)
+        val responseInfo = routeArrivalsInfoDao.getResponseInfoSync() ?: return true
+        val fetchDateTime = LocalDateTime.parse(responseInfo.transmissionTime) ?: return true
         return fetchDateTime.isBefore(currentDateTime.minusMinutes(FETCH_DELAY))
     }
 
     private suspend fun fetchRouteData(requestedStations: List<Int>) {
         Log.d(TAG, "Fetching new arrival data")
-        routeNetworkDataSource.fetchRouteData(requestedStations)
+        routeArrivalsNetworkDataSource.fetchRouteData(requestedStations)
     }
 
     private fun deleteOldData(requestedStations: List<Int>, currentDateTime: LocalDateTime) {
-        var deletedArrivals = routeWithArrivalsDao.deleteArrivalsAtOldStations(requestedStations)
-        deletedArrivals += routeWithArrivalsDao.deleteOldArrivals(currentDateTime)
-        val deletedRoutes = routeWithArrivalsDao.deleteRoutesWithoutArrivals()
+        var deletedArrivals = routeArrivalsDao.deleteArrivalsAtOldStations(requestedStations)
+        deletedArrivals += routeArrivalsDao.deleteOldArrivals(currentDateTime)
+        val deletedRoutes = routeArrivalsDao.deleteRoutesWithoutArrivals()
         Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
     }
 
     private fun persistFetchedData(ctaApiResponse: CtaApiResponse) {
         GlobalScope.launch(Dispatchers.IO) {
-            ctaApiResponse.routeContainer.routeWithArrivalsList.forEach { routeWithArrivals ->
-                val routeId: Long = routeWithArrivalsDao.upsertRoute(routeWithArrivals.routeEntry)
-                routeWithArrivalsDao.upsertArrivalsForRoute(routeId, routeWithArrivals.arrivals)
+            ctaApiResponse.routeArrivalsContainer.routeArrivalsList.forEach { routeWithArrivals ->
+                val routeId: Long = routeArrivalsDao.upsertRoute(routeWithArrivals.routeEntry)
+                routeArrivalsDao.upsertArrivalsForRoute(routeId, routeWithArrivals.arrivals)
             }
-            responseInfoDao.upsert(ctaApiResponse.routeContainer.responseInfo)
+            routeArrivalsInfoDao.upsert(ctaApiResponse.routeArrivalsContainer.routeArrivalsInfo)
         }
     }
 }

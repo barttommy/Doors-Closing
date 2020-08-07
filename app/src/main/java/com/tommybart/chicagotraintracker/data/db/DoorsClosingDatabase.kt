@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.tommybart.chicagotraintracker.data.db.entity.responseinfo.ResponseInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivalsinfo.RouteArrivalsInfoEntry
 import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
 import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
 import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
@@ -15,7 +15,7 @@ import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConvert
 @Database(
     entities = [
         StationEntry::class,
-        ResponseInfoEntry::class,
+        RouteArrivalsInfoEntry::class,
         RouteEntry::class,
         TrainEntry::class
     ],
@@ -25,8 +25,8 @@ import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConvert
 abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
-    abstract fun responseInfoDao(): ResponseInfoDao
-    abstract fun routeDao(): RouteWithArrivalsDao
+    abstract fun responseInfoDao(): RouteArrivalsInfoDao
+    abstract fun routeDao(): RouteArrivalsDao
 
     companion object {
         @Volatile private var instance: DoorsClosingDatabase? = null

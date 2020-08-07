@@ -6,9 +6,9 @@ import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiRespons
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
-class RouteNetworkDataSourceImpl(
+class RouteArrivalsNetworkDataSourceImpl(
     private val ctaApiService: CtaApiService
-) : RouteNetworkDataSource {
+) : RouteArrivalsNetworkDataSource {
 
     override val downloadRouteData: MutableLiveData<CtaApiResponse> = MutableLiveData()
 

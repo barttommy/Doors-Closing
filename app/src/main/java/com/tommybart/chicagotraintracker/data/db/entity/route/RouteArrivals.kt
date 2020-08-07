@@ -6,7 +6,7 @@ import androidx.room.Relation
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Train
 
-data class RouteWithArrivals(
+data class RouteArrivals(
     @Embedded
     val routeEntry: RouteEntry,
     @Relation(parentColumn = "id", entityColumn = "routeId")
@@ -45,7 +45,7 @@ data class RouteWithArrivals(
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
-        else if (other !is RouteWithArrivals) return false
+        else if (other !is RouteArrivals) return false
         return routeEntry == other.routeEntry
     }
 
