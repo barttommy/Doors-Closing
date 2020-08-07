@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.db.entity.route
+package com.tommybart.chicagotraintracker.data.db.entity.routearrivals
 
 import androidx.room.Embedded
 import androidx.room.Ignore
@@ -13,16 +13,13 @@ data class RouteArrivals(
     val arrivals: MutableList<TrainEntry>
 ) {
 
-    fun toRoute(): Route {
-        val arrivals = convertArrivals()
-        return Route(
-            routeEntry.stationId,
-            routeEntry.stationName,
-            routeEntry.destinationName,
-            routeEntry.trainLine,
-            arrivals
-        )
-    }
+    fun toRoute() = Route(
+        routeEntry.stationId,
+        routeEntry.stationName,
+        routeEntry.destinationName,
+        routeEntry.trainLine,
+        convertArrivals()
+    )
 
     private fun convertArrivals(): ArrayList<Train> {
         val conversionResult = arrayListOf<Train>()

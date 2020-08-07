@@ -43,14 +43,14 @@ public class LocationHandler {
     private void getNearbyStations() {
         try {
             for (Station station: ArrivalsActivity.stationData.values()) {
-                double lon = Double.parseDouble(station.getLon());
-                double lat = Double.parseDouble(station.getLat());
+                double lon = station.getLocation().getLongitude();
+                double lat = station.getLocation().getLatitude();
                 double distance = getDistance(
                         currentLocation.getLatitude(), lat, currentLocation.getLongitude(), lon);
                 if (distance <= LOCATION_REQUEST_RANGE_KM) {
-                    station.setDistance(distance);
+                    //station.setDistance(distance);
                     insertByDistance(station);
-                    linesInRange = getMapDisjunction(linesInRange, station.getTrainLines());
+                    //linesInRange = getMapDisjunction(linesInRange, station.getTrainLines());
                 }
             }
         } catch (Exception e) {
@@ -69,20 +69,20 @@ public class LocationHandler {
             if (map.equals(linesInRange)) return;
             Station station = stationsInRange.get(i);
             HashMap<TrainLine, Boolean> old = new HashMap<>(map);
-            map = getMapDisjunction(map, station.getTrainLines());
-            if (!old.equals(map)) {
-                requestedStations.add(station);
-            }
+//            map = getMapDisjunction(map, station.getTrainLines());
+//            if (!old.equals(map)) {
+//                requestedStations.add(station);
+//            }
         }
     }
 
     private void insertByDistance(Station s) {
         stationsInRange.add(s);
-        double distance = s.getDistance();
-        for (int i = stationsInRange.size() - 1;
-             i > 0 && distance < stationsInRange.get(i-1).getDistance(); i--) {
-            Collections.swap(stationsInRange, i, i-1);
-        }
+        //double distance = s.getDistance();
+//        for (int i = stationsInRange.size() - 1;
+//             i > 0 && distance < stationsInRange.get(i-1).getDistance(); i--) {
+//            Collections.swap(stationsInRange, i, i-1);
+//        }
     }
 
     private HashMap<TrainLine, Boolean> newLinesInRange() {

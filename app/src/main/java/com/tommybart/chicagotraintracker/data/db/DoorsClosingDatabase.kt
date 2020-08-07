@@ -5,16 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.tommybart.chicagotraintracker.data.db.entity.routearrivalsinfo.RouteArrivalsInfoEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
-import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
+import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import com.tommybart.chicagotraintracker.data.db.entity.StationInfoEntry
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateTimeConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConverter
 
 @Database(
     entities = [
         StationEntry::class,
+        StationInfoEntry::class,
         RouteArrivalsInfoEntry::class,
         RouteEntry::class,
         TrainEntry::class
@@ -25,8 +27,9 @@ import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConvert
 abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
-    abstract fun responseInfoDao(): RouteArrivalsInfoDao
-    abstract fun routeDao(): RouteArrivalsDao
+    abstract fun stationInfoDao(): StationInfoDao
+    abstract fun routeArrivalsDao(): RouteArrivalsDao
+    abstract fun routeArrivalsInfoDao(): RouteArrivalsInfoDao
 
     companion object {
         @Volatile private var instance: DoorsClosingDatabase? = null

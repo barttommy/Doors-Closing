@@ -4,10 +4,10 @@ import android.util.Log
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.tommybart.chicagotraintracker.data.db.entity.routearrivalsinfo.RouteArrivalsInfoEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.route.RouteArrivals
-import com.tommybart.chicagotraintracker.data.db.entity.route.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsInfoEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteEntry
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.TrainEntry
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.network.cta.response.RouteArrivalsContainer
@@ -52,9 +52,9 @@ class CtaDeserializer : JsonDeserializer<CtaApiResponse> {
                 val bearing = arrival.getNullable("heading")?.asDouble
 
                 val route = RouteEntry(null, stationId, stationName, destinationName, trainLine)
+                val location = if (latitude == null || longitude == null) null else Location(latitude, longitude)
                 val train = TrainEntry(null, null, stationId, runNumber, trainLine,
-                    arrivalTime, predictionTime, isApproaching, isDelayed, bearing,
-                    Location(latitude, longitude))
+                    arrivalTime, predictionTime, isApproaching, isDelayed, bearing, location)
                 val routeWithArrivals = RouteArrivals(route, mutableListOf(train))
                 addRoute(routeWithArrivals, train, routeWithArrivalsList)
 

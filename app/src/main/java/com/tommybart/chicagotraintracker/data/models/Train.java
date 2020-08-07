@@ -1,6 +1,7 @@
 package com.tommybart.chicagotraintracker.data.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.tommybart.chicagotraintracker.internal.TrainLine;
 
@@ -71,6 +72,7 @@ public class Train {
         return bearing;
     }
 
+    @Nullable
     public Location getLocation() {
         return location;
     }

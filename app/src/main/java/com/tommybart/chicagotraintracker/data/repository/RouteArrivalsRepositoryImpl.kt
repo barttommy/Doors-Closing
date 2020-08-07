@@ -3,8 +3,8 @@ package com.tommybart.chicagotraintracker.data.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.tommybart.chicagotraintracker.data.db.RouteArrivalsInfoDao
 import com.tommybart.chicagotraintracker.data.db.RouteArrivalsDao
+import com.tommybart.chicagotraintracker.data.db.RouteArrivalsInfoDao
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.cta.RouteArrivalsNetworkDataSource
@@ -18,11 +18,11 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
-const val FETCH_DELAY: Long = 1
+const val CTA_FETCH_MINUTES_DELAY: Long = 1
 
 class RouteArrivalsRepositoryImpl(
-    private val routeArrivalsInfoDao: RouteArrivalsInfoDao,
     private val routeArrivalsDao: RouteArrivalsDao,
+    private val routeArrivalsInfoDao: RouteArrivalsInfoDao,
     private val routeArrivalsNetworkDataSource: RouteArrivalsNetworkDataSource
 ) : RouteArrivalsRepository {
 
@@ -58,9 +58,9 @@ class RouteArrivalsRepositoryImpl(
 
     // TODO return true if location changed (location currently unimplemented)
     private fun isFetchRouteDataNeeded(currentDateTime: LocalDateTime): Boolean {
-        val responseInfo = routeArrivalsInfoDao.getResponseInfoSync() ?: return true
+        val responseInfo = routeArrivalsInfoDao.getRouteArrivalsInfoSync() ?: return true
         val fetchDateTime = LocalDateTime.parse(responseInfo.transmissionTime) ?: return true
-        return fetchDateTime.isBefore(currentDateTime.minusMinutes(FETCH_DELAY))
+        return fetchDateTime.isBefore(currentDateTime.minusMinutes(CTA_FETCH_MINUTES_DELAY))
     }
 
     private suspend fun fetchRouteData(requestedStations: List<Int>) {
@@ -81,7 +81,8 @@ class RouteArrivalsRepositoryImpl(
                 val routeId: Long = routeArrivalsDao.upsertRoute(routeWithArrivals.routeEntry)
                 routeArrivalsDao.upsertArrivalsForRoute(routeId, routeWithArrivals.arrivals)
             }
-            routeArrivalsInfoDao.upsert(ctaApiResponse.routeArrivalsContainer.routeArrivalsInfo)
+            routeArrivalsInfoDao.upsert(
+                ctaApiResponse.routeArrivalsContainer.routeArrivalsInfo)
         }
     }
 }

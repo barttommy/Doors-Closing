@@ -93,7 +93,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     private void sendResult(Station selected) {
         Intent data = new Intent(this, ArrivalsActivity.class);
-        data.putExtra("STATION", selected);
+        //data.putExtra("STATION", selected);
         setResult(RESULT_OK, data);
         finish();
     }

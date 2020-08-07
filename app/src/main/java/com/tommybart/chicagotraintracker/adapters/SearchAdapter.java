@@ -40,18 +40,18 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         Station station = searchResults.get(position);
         holder.stationText.setText(station.getName());
 
-        HashMap<String, Boolean> availableTrainLines = station.getTrainLines();
-        for (TrainLine line : TrainLine.values()) {
-            try {
-                if (availableTrainLines.get(line)) {
-                    holder.itemView.findViewWithTag(line).setVisibility(View.VISIBLE);
-                } else {
-                    holder.itemView.findViewWithTag(line).setVisibility(View.GONE);
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
+//        HashMap<String, Boolean> availableTrainLines = station.getTrainLines();
+//        for (TrainLine line : TrainLine.values()) {
+//            try {
+//                if (availableTrainLines.get(line)) {
+//                    holder.itemView.findViewWithTag(line).setVisibility(View.VISIBLE);
+//                } else {
+//                    holder.itemView.findViewWithTag(line).setVisibility(View.GONE);
+//                }
+//            } catch (NullPointerException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override

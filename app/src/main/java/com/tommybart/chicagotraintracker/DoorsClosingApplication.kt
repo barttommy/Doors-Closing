@@ -31,15 +31,16 @@ class DoorsClosingApplication : Application(), KodeinAware {
 
         bind() from singleton { DoorsClosingDatabase(instance()) }
         bind() from singleton { instance<DoorsClosingDatabase>().stationDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().responseInfoDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().routeDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().stationInfoDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsInfoDao() }
 
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
         bind() from singleton { ChicagoDataPortalApiService(instance(), instance()) }
         bind() from singleton { CtaApiService(instance(), instance())}
 
         bind<StationNetworkDataSource>() with singleton { StationNetworkDataSourceImpl(instance()) }
-        bind<StationRepository>() with singleton { StationRepositoryImpl(instance(), instance()) }
+        bind<StationRepository>() with singleton { StationRepositoryImpl(instance(), instance(), instance()) }
 
         bind<RouteArrivalsNetworkDataSource>() with singleton { RouteArrivalsNetworkDataSourceImpl(instance()) }
         bind<RouteArrivalsRepository>() with singleton { RouteArrivalsRepositoryImpl(instance(), instance(), instance()) }

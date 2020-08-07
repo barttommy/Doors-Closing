@@ -38,16 +38,11 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
     }
 
     private fun bindUI() = launch {
-//        val stationData = viewModel.stationData.await()
-//        stationData.observe(viewLifecycleOwner, Observer {
-//            if (it == null) return@Observer
-//        })
-
         val routeData = viewModel.routeData.await()
-        routeData.observe(viewLifecycleOwner, Observer {
-            if (it == null) return@Observer
-            Log.d(TAG, "Number of routes: ${it.size}")
-            textView_arrivals.text = it.toString()
+        routeData.observe(viewLifecycleOwner, Observer { routeList ->
+            if (routeList == null) return@Observer
+            Log.d(TAG, "Number of routes: ${routeList.size}")
+            textView_arrivals.text = routeList.toString()
         })
     }
 }

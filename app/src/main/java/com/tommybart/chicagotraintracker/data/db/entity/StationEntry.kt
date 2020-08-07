@@ -1,15 +1,19 @@
-package com.tommybart.chicagotraintracker.data.db.entity.station
+package com.tommybart.chicagotraintracker.data.db.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.tommybart.chicagotraintracker.data.models.AvailableTrainLines
 import com.tommybart.chicagotraintracker.data.models.Location
+import com.tommybart.chicagotraintracker.data.models.Station
 
 @Entity(tableName = "station_data")
 data class StationEntry(
-    // ID naming convention is inconsistent between APIs. For this app's purposes, "stationId"
-    // will refer to the unique "parent" stationId (or, in this case,  mapId)
+    /* ID naming convention is inconsistent between APIs (CTA: stationId & stopId VS.
+    CDP: mapId & stopId). For this app's purposes, "stationId" will refer to the unique "parent"
+    stationId (or, in this API's case,  mapId). The "child" station identifiers (referring to specific
+    platform at a station) aren't used or saved in this project */
     @SerializedName("map_id")
     val stationId: String,
     @SerializedName("station_name")
@@ -43,4 +47,12 @@ data class StationEntry(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null
+
+    fun toStation() = Station(
+        stationId, stationName, stationDescriptiveName, convertAvailableTrainLines(), location
+    )
+
+    private fun convertAvailableTrainLines() = AvailableTrainLines(
+        blue, brown, green, orange, purple, purpleExpress, pink, red, yellow
+    )
 }

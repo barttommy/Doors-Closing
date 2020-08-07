@@ -3,7 +3,7 @@ package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 import android.content.Context
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.db.entity.station.StationEntry
+import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient

@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.db.entity.route
+package com.tommybart.chicagotraintracker.data.db.entity.routearrivals
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -13,6 +13,7 @@ import com.tommybart.chicagotraintracker.internal.TrainLine
 data class RouteEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
+    // See note in StationEntry.kt about stationId naming
     val stationId: Int,
     val stationName: String,
     val destinationName: String,

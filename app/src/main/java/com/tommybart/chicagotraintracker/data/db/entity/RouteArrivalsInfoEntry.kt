@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.db.entity.routearrivalsinfo
+package com.tommybart.chicagotraintracker.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
