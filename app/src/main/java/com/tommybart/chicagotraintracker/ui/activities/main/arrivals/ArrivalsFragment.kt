@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.ui.arrivals
+package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
 import android.os.Bundle
 import android.util.Log
@@ -12,13 +12,14 @@ import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.arrivals_fragment.*
 import kotlinx.coroutines.launch
+import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 class ArrivalsFragment : ScopedFragment(), KodeinAware {
 
-    override val kodein by closestKodein()
+    override val kodein: Kodein by closestKodein()
     private val viewModelFactory: ArrivalsViewModelFactory by instance<ArrivalsViewModelFactory>()
     private lateinit var viewModel: ArrivalsViewModel
 

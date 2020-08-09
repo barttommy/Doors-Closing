@@ -1,14 +1,16 @@
 package com.tommybart.chicagotraintracker.data.models;
 
-public class Station implements Comparable<Station> {
+import java.io.Serializable;
 
-    private String stationId;
+public class Station implements Comparable<Station>, Serializable {
+
+    private int stationId;
     private String name;
     private String detailedName;
     private AvailableTrainLines availableTrainLines;
     private Location location;
 
-    public Station(String stationId, String name, String detailedName,
+    public Station(int stationId, String name, String detailedName,
                    AvailableTrainLines availableTrainLines, Location location) {
         this.stationId = stationId;
         this.name = name;
@@ -17,7 +19,7 @@ public class Station implements Comparable<Station> {
         this.location = location;
     }
 
-    public String getStationId() {
+    public int getStationId() {
         return stationId;
     }
 
@@ -41,7 +43,7 @@ public class Station implements Comparable<Station> {
     public int compareTo(Station s) {
         int cmp = this.name.compareTo(s.getName());
         if (cmp == 0) cmp = this.detailedName.compareTo(s.getDetailedName());
-        if (cmp == 0) cmp = this.stationId.compareTo(s.getStationId());
+        if (cmp == 0) cmp = Integer.compare(this.stationId, s.getStationId());
         return cmp;
     }
 }

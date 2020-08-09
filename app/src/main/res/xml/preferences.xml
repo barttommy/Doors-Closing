@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Location">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:disableDependentsState="true"
+            android:key="USE_DEVICE_LOCATION"
+            android:summary="Allow Doors Closing to display arrivals near you"
+            android:title="Use Device Location"
+            android:icon="@drawable/baseline_train_black_36"/>
+
+        <Preference
+            android:key="DEFAULT_STATION"
+            android:title="Default Station"
+            android:summary="The default station for which arrivals are displayed"
+            android:defaultValue="41220"
+            android:dependency="USE_DEVICE_LOCATION"
+            android:icon="@drawable/baseline_train_black_36">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.tommybart.chicagotraintracker"
+                android:targetClass="com.tommybart.chicagotraintracker.ui.activities.search.SearchActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Theme">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:disableDependentsState="true"
+            android:key="DARK_THEME"
+            android:title="Dark Theme"
+            android:icon="@drawable/baseline_train_black_36"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

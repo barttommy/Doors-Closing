@@ -16,10 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        tools:ignore="AllowBackup">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name="com.tommybart.chicagotraintracker.ui.activities.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,17 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ArrivalsActivity">
-        </activity>
+
         <activity
-            android:name=".activities.SearchActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activities.AboutActivity">
+            android:name=".ui.activities.search.SearchActivity">
         </activity>
     </application>
 

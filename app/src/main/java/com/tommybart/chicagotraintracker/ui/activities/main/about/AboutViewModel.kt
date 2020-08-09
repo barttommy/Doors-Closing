@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.ui.about
+package com.tommybart.chicagotraintracker.ui.activities.main.about
 
 import androidx.lifecycle.ViewModel
 

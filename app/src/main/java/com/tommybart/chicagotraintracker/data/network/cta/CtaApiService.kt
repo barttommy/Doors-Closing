@@ -23,7 +23,7 @@ interface CtaApiService {
 
     @GET("ttarrivals.aspx?outputType=JSON")
     fun getArrivalsAsync(
-        @Query("mapid") mapIds: List<Int>
+        @Query("mapid") requestedStationIds: List<Int>
     ) : Deferred<CtaApiResponse>
 
     companion object {
@@ -38,6 +38,8 @@ interface CtaApiService {
                     .newBuilder()
                     .addQueryParameter("key", context.getString(R.string.cta_api_key))
                     .build()
+
+                Log.d(TAG, url.toString())
 
                 val request = chain.request()
                     .newBuilder()

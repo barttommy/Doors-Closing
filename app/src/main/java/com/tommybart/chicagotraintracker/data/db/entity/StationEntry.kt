@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName
 import com.tommybart.chicagotraintracker.data.models.AvailableTrainLines
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.data.models.Station
+import com.tommybart.chicagotraintracker.internal.TrainLine
 
 @Entity(tableName = "station_data")
 data class StationEntry(
@@ -15,7 +16,7 @@ data class StationEntry(
     stationId (or, in this API's case,  mapId). The "child" station identifiers (referring to specific
     platform at a station) aren't used or saved in this project */
     @SerializedName("map_id")
-    val stationId: String,
+    val stationId: Int,
     @SerializedName("station_name")
     val stationName: String,
     @SerializedName("station_descriptive_name")
@@ -28,6 +29,7 @@ data class StationEntry(
     val location: Location,
     @SerializedName("ada")
     val disabilityAccessible: Boolean,
+    val red: Boolean,
     val blue: Boolean,
     @SerializedName("brn")
     val brown: Boolean,
@@ -35,13 +37,12 @@ data class StationEntry(
     val green: Boolean,
     @SerializedName("o")
     val orange: Boolean,
+    @SerializedName("pnk")
+    val pink: Boolean,
     @SerializedName("p")
     val purple: Boolean,
     @SerializedName("pexp")
     val purpleExpress: Boolean,
-    @SerializedName("pnk")
-    val pink: Boolean,
-    val red: Boolean,
     @SerializedName("y")
     val yellow: Boolean
 ) {
@@ -53,6 +54,6 @@ data class StationEntry(
     )
 
     private fun convertAvailableTrainLines() = AvailableTrainLines(
-        blue, brown, green, orange, purple, purpleExpress, pink, red, yellow
+        red, blue, brown, green, orange, pink, purple, purpleExpress, yellow
     )
 }

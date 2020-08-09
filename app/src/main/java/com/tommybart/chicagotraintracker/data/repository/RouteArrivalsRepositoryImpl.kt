@@ -9,6 +9,7 @@ import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.cta.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
+import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProvider
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -32,32 +33,29 @@ class RouteArrivalsRepositoryImpl(
         }
     }
 
-    override suspend fun getRouteData(): LiveData<List<Route>> {
+    override suspend fun getRouteData(requestedStationIds: List<Int>): LiveData<List<Route>> {
         val currentDateTime = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
-
         return withContext(Dispatchers.IO) {
-
-            // TODO get stationIds from provider
-            //val requestedStations = listOf(40530, 41220)
-            val requestedStations = listOf(40530)
-
-            initRouteData(requestedStations, currentDateTime)
-            deleteOldData(requestedStations, currentDateTime)
+            initRouteData(requestedStationIds, currentDateTime)
+            deleteOldData(requestedStationIds, currentDateTime)
             return@withContext Transformations.map(routeArrivalsDao.getRoutesWithArrivals()) {
                 routesWithArrivals -> routesWithArrivals.map { it.toRoute() }
             }
         }
     }
 
-    private suspend fun initRouteData(requestedStations: List<Int>,
+    private suspend fun initRouteData(requestedStationIds: List<Int>,
                                       currentDateTime: LocalDateTime) {
         if (isFetchRouteDataNeeded(currentDateTime)) {
-            fetchRouteData(requestedStations)
+            fetchRouteData(requestedStationIds)
         }
     }
 
     // TODO return true if location changed (location currently unimplemented)
+    // TODO return true if default pref changed
     private fun isFetchRouteDataNeeded(currentDateTime: LocalDateTime): Boolean {
+        return true
+        TODO("Implement changes above")
         val responseInfo = routeArrivalsInfoDao.getRouteArrivalsInfoSync() ?: return true
         val fetchDateTime = LocalDateTime.parse(responseInfo.transmissionTime) ?: return true
         return fetchDateTime.isBefore(currentDateTime.minusMinutes(CTA_FETCH_MINUTES_DELAY))
@@ -68,8 +66,8 @@ class RouteArrivalsRepositoryImpl(
         routeArrivalsNetworkDataSource.fetchRouteData(requestedStations)
     }
 
-    private fun deleteOldData(requestedStations: List<Int>, currentDateTime: LocalDateTime) {
-        var deletedArrivals = routeArrivalsDao.deleteArrivalsAtOldStations(requestedStations)
+    private fun deleteOldData(requestedStationIds: List<Int>, currentDateTime: LocalDateTime) {
+        var deletedArrivals = routeArrivalsDao.deleteArrivalsAtOldStations(requestedStationIds)
         deletedArrivals += routeArrivalsDao.deleteOldArrivals(currentDateTime)
         val deletedRoutes = routeArrivalsDao.deleteRoutesWithoutArrivals()
         Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")

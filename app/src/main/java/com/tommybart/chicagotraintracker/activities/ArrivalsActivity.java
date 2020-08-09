@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -16,15 +15,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -38,8 +34,6 @@ import com.tommybart.chicagotraintracker.data.models.Route;
 import com.tommybart.chicagotraintracker.data.models.Station;
 import com.tommybart.chicagotraintracker.utils.LocationHandler;
 import com.tommybart.chicagotraintracker.utils.MyLocationListener;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -158,8 +152,8 @@ public class ArrivalsActivity extends AppCompatActivity {
     }
 
     private void startSearchActivity() {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivityForResult(intent, SEARCH_CODE);
+//        Intent intent = new Intent(this, SearchActivity.class);
+//        startActivityForResult(intent, SEARCH_CODE);
     }
 
     private void startAboutActivity() {
