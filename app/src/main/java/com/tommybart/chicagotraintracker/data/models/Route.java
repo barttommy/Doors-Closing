@@ -16,23 +16,23 @@ public class Route implements Comparable<Route>{
     public static final int TRAIN_LIMIT = 3;
     public static final String CHICAGO_ZONE_ID = "America/Chicago";
 
-    private int stationId;
+    private int mapId;
     private String stationName;
     private String destinationName;
     private TrainLine trainLine;
     private ArrayList<Train> arrivals;
 
-    public Route (int stationId, String stationName, String destinationName,
+    public Route (int mapId, String stationName, String destinationName,
                   TrainLine trainLine, ArrayList<Train> arrivals) {
-        this.stationId = stationId;
+        this.mapId = mapId;
         this.stationName = stationName;
         this.destinationName = destinationName;
         this.trainLine = trainLine;
         this.arrivals = arrivals;
     }
 
-    private int getStationId() {
-        return stationId;
+    private int getMapId() {
+        return mapId;
     }
 
     public String getStationName() {
@@ -56,7 +56,7 @@ public class Route implements Comparable<Route>{
         if (that == this) return true;
         else if (!(that instanceof Route)) return false;
         Route route = (Route) that;
-        return this.stationId == route.getStationId()
+        return this.mapId == route.getMapId()
                 && this.destinationName.equals(route.getDestinationName())
                 && this.trainLine == route.getTrainLine();
     }
@@ -67,7 +67,7 @@ public class Route implements Comparable<Route>{
         if (hashCode == 0) {
             hashCode = 17;
             hashCode = 37 * hashCode + trainLine.hashCode();
-            hashCode = 37 * hashCode + stationId;
+            hashCode = 37 * hashCode + mapId;
             hashCode = 37 * hashCode + destinationName.hashCode();
         }
         return hashCode;
@@ -75,7 +75,7 @@ public class Route implements Comparable<Route>{
 
     @Override
     public int compareTo(Route route) {
-        int cmp = Integer.compare(this.stationId, route.getStationId());
+        int cmp = Integer.compare(this.mapId, route.getMapId());
         if (cmp == 0) cmp = this.trainLine.compareTo(route.getTrainLine());
         if (cmp == 0) cmp = this.destinationName.compareTo(route.getDestinationName());
         return cmp;
@@ -85,7 +85,7 @@ public class Route implements Comparable<Route>{
     @Override
     public String toString() {
         return "Route{" +
-                "stationId=" + stationId +
+                "mapId=" + mapId +
                 ", stationName='" + stationName + '\'' +
                 ", destinationName='" + destinationName + '\'' +
                 ", trainLine=" + trainLine +

@@ -1,10 +1,9 @@
-package com.tommybart.chicagotraintracker.data.network.cta.response
-
+package com.tommybart.chicagotraintracker.data.network.chicagotransitauthority
 
 import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsInfoEntry
 import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteArrivals
 
-data class RouteArrivalsContainer(
+data class CtaApiResponse(
     val routeArrivalsInfo: RouteArrivalsInfoEntry,
-    val routeArrivalsList: MutableList<RouteArrivals>
+    val routeArrivalsList: List<RouteArrivals>
 )

@@ -13,9 +13,10 @@ class ArrivalsViewModel(
     requestedStationsProvider: RequestedStationsProvider
 ) : ViewModel() {
 
-    private val requestedStationIds: List<Int> = requestedStationsProvider.getRequestedStationIds()
+    private val requestedStationMapIds: List<Int> =
+        requestedStationsProvider.getRequestedStationMapIds()
 
     val routeData: Deferred<LiveData<List<Route>>> by lazyDeferred {
-        routeArrivalsRepository.getRouteData(requestedStationIds)
+        routeArrivalsRepository.getRouteData(requestedStationMapIds)
     }
 }

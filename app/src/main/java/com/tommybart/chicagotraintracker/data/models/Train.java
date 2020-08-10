@@ -11,7 +11,7 @@ import org.threeten.bp.LocalDateTime;
 public class Train {
 
     private long routeId;
-    private int stationId;
+    private int mapId;
     private int runNumber;
     private TrainLine trainLine;
     private String predictionTime;
@@ -21,11 +21,11 @@ public class Train {
     private Double bearing;
     private Location location;
 
-    public Train(long routeId, int stationId, int runNumber, TrainLine trainLine,
+    public Train(long routeId, int mapId, int runNumber, TrainLine trainLine,
                  String predictionTime, String arrivalTime, Boolean isApproaching,
                  Boolean isDelayed, Double bearing, Location location) {
         this.routeId = routeId;
-        this.stationId = stationId;
+        this.mapId = mapId;
         this.runNumber = runNumber;
         this.trainLine = trainLine;
         this.predictionTime = predictionTime;
@@ -40,8 +40,8 @@ public class Train {
         return routeId;
     }
 
-    public int getStationId() {
-        return stationId;
+    public int getMapId() {
+        return mapId;
     }
 
     public int getRunNumber() {

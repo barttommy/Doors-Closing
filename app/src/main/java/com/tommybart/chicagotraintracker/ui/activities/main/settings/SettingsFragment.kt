@@ -6,12 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Station
 import com.tommybart.chicagotraintracker.data.provider.DEFAULT_STATION_PREFERENCE
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
-import com.tommybart.chicagotraintracker.ui.activities.main.MainActivity
 import com.tommybart.chicagotraintracker.ui.activities.search.SEARCH_ACTIVITY_REQUEST_CODE
 import com.tommybart.chicagotraintracker.ui.activities.search.STATION_RESULT_EXTRA
 
@@ -39,12 +37,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (data.hasExtra(STATION_RESULT_EXTRA)) {
                 val station = data.getSerializableExtra(STATION_RESULT_EXTRA) as Station
 
-                Log.d(TAG, "New default station: ${station.name} | ${station.stationId}")
+                Log.d(TAG, "New default station: ${station.name} | ${station.mapId}")
                 // TODO snackbar? how can we get the view from a pref fragment?
 
                 preferenceManager.sharedPreferences
                     .edit()
-                    .putInt(DEFAULT_STATION_PREFERENCE, station.stationId)
+                    .putInt(DEFAULT_STATION_PREFERENCE, station.mapId)
                     .apply()
             }
         }

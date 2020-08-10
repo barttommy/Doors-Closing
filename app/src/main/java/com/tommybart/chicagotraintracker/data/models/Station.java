@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 public class Station implements Comparable<Station>, Serializable {
 
-    private int stationId;
+    private int mapId;
     private String name;
     private String detailedName;
     private AvailableTrainLines availableTrainLines;
     private Location location;
 
-    public Station(int stationId, String name, String detailedName,
+    public Station(int mapId, String name, String detailedName,
                    AvailableTrainLines availableTrainLines, Location location) {
-        this.stationId = stationId;
+        this.mapId = mapId;
         this.name = name;
         this.detailedName = detailedName;
         this.availableTrainLines = availableTrainLines;
         this.location = location;
     }
 
-    public int getStationId() {
-        return stationId;
+    public int getMapId() {
+        return mapId;
     }
 
     public String getName() {
@@ -43,7 +43,7 @@ public class Station implements Comparable<Station>, Serializable {
     public int compareTo(Station s) {
         int cmp = this.name.compareTo(s.getName());
         if (cmp == 0) cmp = this.detailedName.compareTo(s.getDetailedName());
-        if (cmp == 0) cmp = Integer.compare(this.stationId, s.getStationId());
+        if (cmp == 0) cmp = Integer.compare(this.mapId, s.getMapId());
         return cmp;
     }
 }

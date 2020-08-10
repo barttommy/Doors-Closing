@@ -3,19 +3,19 @@ package com.tommybart.chicagotraintracker.data.repository
 import android.util.Log
 import com.tommybart.chicagotraintracker.data.db.StationDao
 import com.tommybart.chicagotraintracker.data.db.StationInfoDao
-import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.data.db.entity.StationInfoEntry
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.CHECK_FOR_UPDATES_DELAY_DAYS
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaApiResponse
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
-
-const val CDP_FETCH_DELAY_DAYS: Long = 7
 
 class StationRepositoryImpl(
     private val stationDao: StationDao,
@@ -23,42 +23,60 @@ class StationRepositoryImpl(
     private val stationNetworkDataSource: StationNetworkDataSource
 ) : StationRepository {
 
+    // TODO init right away? station data is needed everywhere
+
     override suspend fun getStationData(): List<Station> {
+        val currentDateTime = ZonedDateTime.now(ZoneId.of(Route.CHICAGO_ZONE_ID)).toLocalDateTime()
         return withContext(Dispatchers.IO){
-            fetchStationData()
+            fetchStationData(currentDateTime)
             return@withContext stationDao.getStationEntriesSync().map {
                 stationEntry -> stationEntry.toStation()
             }
         }
     }
 
-    private suspend fun fetchStationData() {
-        if (isFetchStationDataNeeded()) {
+    private suspend fun fetchStationData(currentDateTime: LocalDateTime) {
+        if (isFetchStationDataNeeded(currentDateTime)) {
             deleteOldStationData()
             Log.d(TAG, "Fetching station data")
-            saveFetchedStationData(stationNetworkDataSource.fetchStationData())
+            persistStationInfo(currentDateTime, currentDateTime)
+            persistFetchedStations(stationNetworkDataSource.fetchStationData())
+        } else {
+            Log.d(TAG, "Fetch station data not needed")
         }
     }
 
-    /*
-     * Data is extremely static - only changes when real world infrastructure changes (new stations
-     * built / destroyed). Here we only fetch once a week. Could do once a day to ensure the app
-     * works for a brand new station on its first day, at the cost of an slower load time more
-     * often. TODO: Look into how many requests api allows, once a day might be good here.
-     */
-    private fun isFetchStationDataNeeded(): Boolean {
+    private suspend fun isFetchStationDataNeeded(currentDateTime: LocalDateTime): Boolean {
         val stationInfo = stationInfoDao.getStationInfoSync() ?: return true
-        val fetchDateTime = LocalDateTime.parse(stationInfo.lastFetchTime)
-        val currentDateTime = ZonedDateTime.now(ZoneId.of(Route.CHICAGO_ZONE_ID)).toLocalDateTime()
-        return fetchDateTime.isBefore(currentDateTime.minusDays(CDP_FETCH_DELAY_DAYS))
+        val lastUpdateCheckDateTime = LocalDateTime.parse(stationInfo.lastUpdateCheckDate)
+        val delay = currentDateTime.minusDays(CHECK_FOR_UPDATES_DELAY_DAYS)
+        return if (delay.isBefore(lastUpdateCheckDateTime)) {
+            Log.d(TAG, "Already checked for updates today")
+            false
+        } else {
+            fetchIsUpdateNeeded(currentDateTime, LocalDate.parse(stationInfo.lastFetchDate))
+        }
     }
 
-    private fun saveFetchedStationData(stationEntries: List<StationEntry>) {
-        val currentDateTime = ZonedDateTime.now(ZoneId.of(Route.CHICAGO_ZONE_ID))
-            .toLocalDateTime()
-            .toString()
-        stationDao.insertAll(stationEntries)
-        stationInfoDao.upsert(StationInfoEntry(currentDateTime))
+    private suspend fun fetchIsUpdateNeeded(currentDateTime: LocalDateTime,
+                                            lastFetchDate: LocalDate): Boolean {
+        Log.d(TAG, "Checking if station data needs to be updated")
+        updateLastUpdateCheckDate(currentDateTime)
+        return stationNetworkDataSource.fetchIsUpdateNeeded(lastFetchDate)
+    }
+
+    private fun persistStationInfo(currentDateTime: LocalDateTime,
+                                   lastUpdateCheckDate: LocalDateTime) {
+        stationInfoDao.upsert(
+            StationInfoEntry(currentDateTime.toString(), lastUpdateCheckDate.toString()))
+    }
+
+    private fun updateLastUpdateCheckDate(newUpdateCheckDate: LocalDateTime) {
+        stationInfoDao.updateLastUpdateCheckDate(newUpdateCheckDate)
+    }
+
+    private fun persistFetchedStations(sodaApiResponse: SodaApiResponse) {
+        stationDao.insertAll(sodaApiResponse.stationEntries)
     }
 
     private fun deleteOldStationData() {

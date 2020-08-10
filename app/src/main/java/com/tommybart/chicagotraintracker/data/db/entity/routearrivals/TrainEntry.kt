@@ -9,12 +9,12 @@ data class TrainEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
     var routeId: Long? = null,
-    // See note in StationEntry.kt about stationId naming
-    val stationId: Int,
+    // See note in StationEntry.kt about mapId naming
+    val mapId: Int,
     val runNumber: Int,
     val trainLine: TrainLine,
-    val arrivalTime: String,
     val predictionTime: String,
+    val arrivalTime: String,
     val isApproaching: Boolean,
     val isDelayed: Boolean,
     val bearing: Double?,

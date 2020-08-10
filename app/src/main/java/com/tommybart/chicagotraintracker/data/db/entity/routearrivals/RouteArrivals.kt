@@ -14,7 +14,7 @@ data class RouteArrivals(
 ) {
 
     fun toRoute() = Route(
-        routeEntry.stationId,
+        routeEntry.mapId,
         routeEntry.stationName,
         routeEntry.destinationName,
         routeEntry.trainLine,
@@ -27,7 +27,7 @@ data class RouteArrivals(
             conversionResult.add(Train(
                 trainEntry.routeId ?: -1,
                 trainEntry.runNumber,
-                trainEntry.stationId,
+                trainEntry.mapId,
                 trainEntry.trainLine,
                 trainEntry.predictionTime,
                 trainEntry.arrivalTime,

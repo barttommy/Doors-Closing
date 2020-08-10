@@ -1,11 +1,10 @@
-package com.tommybart.chicagotraintracker.data.network.cta
+package com.tommybart.chicagotraintracker.data.network.chicagotransitauthority
 
 import android.content.Context
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.network.cta.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
@@ -23,7 +22,7 @@ interface CtaApiService {
 
     @GET("ttarrivals.aspx?outputType=JSON")
     fun getArrivalsAsync(
-        @Query("mapid") requestedStationIds: List<Int>
+        @Query("mapid") requestedStationMapIds: List<Int>
     ) : Deferred<CtaApiResponse>
 
     companion object {
@@ -39,8 +38,6 @@ interface CtaApiService {
                     .addQueryParameter("key", context.getString(R.string.cta_api_key))
                     .build()
 
-                Log.d(TAG, url.toString())
-
                 val request = chain.request()
                     .newBuilder()
                     .url(url)
@@ -55,7 +52,7 @@ interface CtaApiService {
 
             val converterFactory = GsonConverterFactory.create(
                 GsonBuilder()
-                    .registerTypeAdapter(CtaApiResponse::class.java, CtaDeserializer())
+                    .registerTypeAdapter(CtaApiResponse::class.java, CtaResponseDeserializer())
                     .create()
             )
 

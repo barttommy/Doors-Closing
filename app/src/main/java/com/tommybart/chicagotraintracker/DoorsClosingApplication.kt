@@ -5,12 +5,12 @@ import androidx.preference.PreferenceManager
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.tommybart.chicagotraintracker.data.db.DoorsClosingDatabase
 import com.tommybart.chicagotraintracker.data.network.*
-import com.tommybart.chicagotraintracker.data.network.chicagodataportal.ChicagoDataPortalApiService
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaApiService
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
-import com.tommybart.chicagotraintracker.data.network.cta.RouteArrivalsNetworkDataSource
-import com.tommybart.chicagotraintracker.data.network.cta.RouteArrivalsNetworkDataSourceImpl
-import com.tommybart.chicagotraintracker.data.network.cta.CtaApiService
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
 import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProvider
 import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProviderImpl
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
@@ -42,7 +42,7 @@ class DoorsClosingApplication : Application(), KodeinAware {
 
         // API Services
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
-        bind() from singleton { ChicagoDataPortalApiService(instance(), instance()) }
+        bind() from singleton { SodaApiService(instance(), instance()) }
         bind() from singleton { CtaApiService(instance(), instance())}
 
         // Station

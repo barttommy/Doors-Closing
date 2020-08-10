@@ -16,7 +16,7 @@
             android:key="DEFAULT_STATION"
             android:title="Default Station"
             android:summary="The default station for which arrivals are displayed"
-            android:defaultValue="41220"
+            android:defaultValue="40380"
             android:dependency="USE_DEVICE_LOCATION"
             android:icon="@drawable/baseline_train_black_36">
 

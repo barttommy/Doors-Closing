@@ -6,9 +6,11 @@ class RequestedStationsProviderImpl(
     context: Context
 ) : PreferenceProvider(context), RequestedStationsProvider {
 
-    override fun getRequestedStationIds(): List<Int> {
-        val fullertonStationId = 41220
-        val defaultStationId = preferences.getInt(DEFAULT_STATION_PREFERENCE, fullertonStationId)
+    // TODO Implement for nearby trains
+
+    override fun getRequestedStationMapIds(): List<Int> {
+        val clarkLakeStationId = 40380
+        val defaultStationId = preferences.getInt(DEFAULT_STATION_PREFERENCE, clarkLakeStationId)
         return listOf(defaultStationId)
     }
 }

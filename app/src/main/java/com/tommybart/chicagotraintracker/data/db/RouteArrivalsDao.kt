@@ -32,7 +32,7 @@ abstract class RouteArrivalsDao {
     @Query("DELETE FROM train_data WHERE DATETIME(arrivalTime) < DATETIME(:currentDate)")
     abstract fun deleteOldArrivals(currentDate: LocalDateTime): Int
 
-    @Query("DELETE FROM train_data WHERE stationId NOT IN (:stationIds)")
+    @Query("DELETE FROM train_data WHERE mapId NOT IN (:stationIds)")
     abstract fun deleteArrivalsAtOldStations(stationIds: List<Int>): Int
 
     @Query("DELETE FROM route_data WHERE id NOT IN (SELECT routeId FROM train_data)")

@@ -1,23 +1,40 @@
 package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
+import org.threeten.bp.LocalDate
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-// TODO one interface?
 class StationNetworkDataSourceImpl(
-    private val chicagoDataPortalApiService: ChicagoDataPortalApiService
+    private val sodaApiService: SodaApiService
 ) : StationNetworkDataSource {
 
-    override suspend fun fetchStationData(): List<StationEntry> {
+    override suspend fun fetchStationData(): SodaApiResponse {
         return try {
-            chicagoDataPortalApiService
-                .getStationDataAsync()
-                .await()
+            sodaApiService.getStationDataAsync().await()
         } catch (e: NoNetworkConnectionException) {
             Log.w(TAG, "No network connection", e)
-            listOf()
+            SodaApiResponse(listOf())
+        }
+    }
+
+    // Checks if update is needed by comparing the last fetch date to any updates on the database
+    // See: SodaApiService.kt
+    override suspend fun fetchIsUpdateNeeded(lastFetchDate: LocalDate): Boolean {
+        return try {
+            sodaApiService.getStationsWhereAsync(":updated_at > '$lastFetchDate'")
+                .await()
+                .stationEntries
+                .isNotEmpty()
+        } catch (e: NoNetworkConnectionException) {
+            Log.w(TAG, "No network connection", e)
+            false
         }
     }
 }

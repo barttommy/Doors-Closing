@@ -7,7 +7,8 @@ const val STATION_INFO_ID = 0
 
 @Entity(tableName = "station_info")
 data class StationInfoEntry(
-    val lastFetchTime: String
+    val lastFetchDate: String,
+    val lastUpdateCheckDate: String
 ) {
     @PrimaryKey(autoGenerate = false)
     var id: Int = STATION_INFO_ID
