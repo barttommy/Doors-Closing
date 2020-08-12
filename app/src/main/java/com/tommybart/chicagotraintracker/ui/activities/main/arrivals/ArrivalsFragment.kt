@@ -1,14 +1,20 @@
 package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
+import com.tommybart.chicagotraintracker.ui.LifecycleBoundLocationManager
 import com.tommybart.chicagotraintracker.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.arrivals_fragment.*
 import kotlinx.coroutines.launch
@@ -23,6 +29,10 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
     private val viewModelFactory: ArrivalsViewModelFactory by instance<ArrivalsViewModelFactory>()
     private lateinit var viewModel: ArrivalsViewModel
 
+    private val fusedLocationProviderClient: FusedLocationProviderClient
+        by instance<FusedLocationProviderClient>()
+    private val locationCallback: LocationCallback = object : LocationCallback() { }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,6 +46,9 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ArrivalsViewModel::class.java)
         bindUI()
+        if (hasLocationPermission()) {
+            bindLocationManager()
+        }
     }
 
     private fun bindUI() = launch {
@@ -45,5 +58,21 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware {
             Log.d(TAG, "Number of routes: ${routeList.size}")
             textView_arrivals.text = routeList.toString()
         })
+    }
+
+    private fun bindLocationManager() {
+        LifecycleBoundLocationManager(
+            this,
+            fusedLocationProviderClient,
+            locationCallback
+        )
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return viewModel.isAllowingDeviceLocation &&
+            ContextCompat.checkSelfPermission(
+                this.requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
     }
 }

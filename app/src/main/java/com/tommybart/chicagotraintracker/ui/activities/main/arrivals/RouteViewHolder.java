@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.adapters;
+package com.tommybart.chicagotraintracker.ui.activities.main.arrivals;
 
 import android.view.View;
 import android.widget.ImageView;

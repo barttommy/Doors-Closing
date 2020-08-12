@@ -1,6 +1,7 @@
 package com.tommybart.chicagotraintracker.data.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Station implements Comparable<Station>, Serializable {
 
@@ -37,6 +38,19 @@ public class Station implements Comparable<Station>, Serializable {
 
     public Location getLocation() {
         return location;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Station station = (Station) o;
+        return mapId == station.mapId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapId);
     }
 
     @Override

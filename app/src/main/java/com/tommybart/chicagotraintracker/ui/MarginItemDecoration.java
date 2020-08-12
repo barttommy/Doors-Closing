@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.adapters;
+package com.tommybart.chicagotraintracker.ui;
 
 import android.graphics.Rect;
 import android.view.View;

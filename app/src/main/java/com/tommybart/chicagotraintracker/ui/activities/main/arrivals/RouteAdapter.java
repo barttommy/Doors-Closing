@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.adapters;
+package com.tommybart.chicagotraintracker.ui.activities.main.arrivals;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tommybart.chicagotraintracker.R;
-import com.tommybart.chicagotraintracker.activities.ArrivalsActivity;
 import com.tommybart.chicagotraintracker.data.models.Route;
 import com.tommybart.chicagotraintracker.data.models.Train;
 

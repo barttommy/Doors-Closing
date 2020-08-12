@@ -14,22 +14,22 @@ public class Train {
     private int mapId;
     private int runNumber;
     private TrainLine trainLine;
-    private String predictionTime;
-    private String arrivalTime;
+    private LocalDateTime predictionDateTime;
+    private LocalDateTime arrivalDateTime;
     private Boolean isApproaching;
     private Boolean isDelayed;
     private Double bearing;
     private Location location;
 
     public Train(long routeId, int mapId, int runNumber, TrainLine trainLine,
-                 String predictionTime, String arrivalTime, Boolean isApproaching,
+                 LocalDateTime predictionDateTime, LocalDateTime arrivalDateTime, Boolean isApproaching,
                  Boolean isDelayed, Double bearing, Location location) {
         this.routeId = routeId;
         this.mapId = mapId;
         this.runNumber = runNumber;
         this.trainLine = trainLine;
-        this.predictionTime = predictionTime;
-        this.arrivalTime = arrivalTime;
+        this.predictionDateTime = predictionDateTime;
+        this.arrivalDateTime = arrivalDateTime;
         this.isApproaching = isApproaching;
         this.isDelayed = isDelayed;
         this.bearing = bearing;
@@ -52,12 +52,12 @@ public class Train {
         return trainLine;
     }
 
-    public String getPredictionTime() {
-        return predictionTime;
+    public LocalDateTime getPredictionDateTime() {
+        return predictionDateTime;
     }
 
-    public String getArrivalTime() {
-        return arrivalTime;
+    public LocalDateTime getArrivalDateTime() {
+        return arrivalDateTime;
     }
 
     public Boolean isApproaching() {
@@ -78,14 +78,11 @@ public class Train {
     }
 
     public int getArrivalTimeMinutes() {
-        return (int) Duration.between(
-                LocalDateTime.parse(predictionTime),
-                LocalDateTime.parse(arrivalTime)
-        ).toMinutes();
+        return (int) Duration.between(predictionDateTime, arrivalDateTime).toMinutes();
     }
 
     public String getArrivalTimeDetail() {
-        LocalDateTime parsedArrivalTime = LocalDateTime.parse(arrivalTime);
+        LocalDateTime parsedArrivalTime = arrivalDateTime;
         int hour = parsedArrivalTime.getHour();
         int minutes = parsedArrivalTime.getMinute();
 
@@ -110,8 +107,8 @@ public class Train {
                 "routeId=" + routeId +
                 ", runNumber=" + runNumber +
                 ", trainLine=" + trainLine +
-                ", predictionTime='" + predictionTime + '\'' +
-                ", arrivalTime='" + arrivalTime + '\'' +
+                ", predictionDateTime='" + predictionDateTime + '\'' +
+                ", arrivalDateTime='" + arrivalDateTime + '\'' +
                 ", isApproaching=" + isApproaching +
                 ", isDelayed=" + isDelayed +
                 ", bearing=" + bearing +

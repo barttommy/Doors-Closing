@@ -9,7 +9,6 @@ import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -59,6 +58,8 @@ interface SodaApiService {
                         .newBuilder()
                         .addQueryParameter("\$\$app_token", context.getString(R.string.cdp_app_token))
                         .build()
+
+                Log.d(TAG, url.toString())
 
                 val request = chain.request()
                         .newBuilder()

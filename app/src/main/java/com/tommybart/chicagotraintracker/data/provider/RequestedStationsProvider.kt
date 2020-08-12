@@ -1,5 +1,6 @@
 package com.tommybart.chicagotraintracker.data.provider
 
 interface RequestedStationsProvider {
-    fun getRequestedStationMapIds(): List<Int>
+    suspend fun hasRequestedStationsChanged(requestedStationMapIds: List<Int>): Boolean
+    suspend fun getNewRequestMapIds(): List<Int>
 }

@@ -13,6 +13,7 @@ import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.activities.search.SEARCH_ACTIVITY_REQUEST_CODE
 import com.tommybart.chicagotraintracker.ui.activities.search.STATION_RESULT_EXTRA
 
+// TODO on location pref changed: request location again and if denied set to false
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private var defaultStationPref: Preference? = null

@@ -1,7 +1,9 @@
 package com.tommybart.chicagotraintracker
 
 import android.app.Application
+import android.content.Context
 import androidx.preference.PreferenceManager
+import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.tommybart.chicagotraintracker.data.db.DoorsClosingDatabase
 import com.tommybart.chicagotraintracker.data.network.*
@@ -11,8 +13,7 @@ import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationN
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
-import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProvider
-import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProviderImpl
+import com.tommybart.chicagotraintracker.data.provider.*
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepositoryImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
@@ -39,11 +40,20 @@ class DoorsClosingApplication : Application(), KodeinAware {
         bind() from singleton { instance<DoorsClosingDatabase>().stationInfoDao() }
         bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsDao() }
         bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsInfoDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsRequestDao()}
 
         // API Services
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
         bind() from singleton { SodaApiService(instance(), instance()) }
         bind() from singleton { CtaApiService(instance(), instance())}
+
+        // Location
+        bind() from provider { LocationServices.getFusedLocationProviderClient( instance<Context>()) }
+
+        // Providers
+        bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
+        bind<NearbyStationsProvider>() with singleton { NearbyStationsProviderImpl(instance()) }
+        bind<RequestedStationsProvider>() with singleton { RequestedStationsProviderImpl(instance(), instance(), instance(), instance()) }
 
         // Station
         bind<StationNetworkDataSource>() with singleton { StationNetworkDataSourceImpl(instance()) }
@@ -51,13 +61,12 @@ class DoorsClosingApplication : Application(), KodeinAware {
 
         // RouteArrivals
         bind<RouteArrivalsNetworkDataSource>() with singleton { RouteArrivalsNetworkDataSourceImpl(instance()) }
-        bind<RouteArrivalsRepository>() with singleton { RouteArrivalsRepositoryImpl(instance(), instance(), instance()) }
+        bind<RouteArrivalsRepository>() with singleton { RouteArrivalsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
 
-        // Arrivals ViewModelFactory
-        bind<RequestedStationsProvider>() with singleton { RequestedStationsProviderImpl(instance()) }
+        // Arrivals Fragment ViewModelFactory
         bind() from provider { ArrivalsViewModelFactory(instance(), instance()) }
 
-        // Search ViewModelFactory
+        // Search Activity ViewModelFactory
         bind() from provider { SearchViewModelFactory(instance())}
     }
 

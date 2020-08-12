@@ -11,12 +11,10 @@ import android.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.activities.ArrivalsActivity
-import com.tommybart.chicagotraintracker.adapters.MarginItemDecoration
+import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
 import com.tommybart.chicagotraintracker.data.models.Station
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.activities.main.MainActivity
-import com.tommybart.chicagotraintracker.ui.activities.main.settings.SettingsFragment
 import com.tommybart.chicagotraintracker.ui.base.ScopedActivity
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.launch
@@ -24,7 +22,6 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
-import java.util.*
 
 const val SEARCH_ACTIVITY_REQUEST_CODE  = 123
 const val STATION_RESULT_EXTRA = "STATION"
@@ -58,8 +55,8 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
         title = ""
         launch {
             stationList = viewModel.stationData.await()
-            searchProgressBar.visibility = View.GONE
             stationSearchResults.addAll(stationList)
+            searchProgressBar.visibility = View.GONE
             searchRecyclerAdapter.notifyDataSetChanged()
         }
     }
@@ -69,7 +66,7 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
         val searchMenuItem = menu.findItem(R.id.app_bar_search)
         val searchView = searchMenuItem.actionView as SearchView
         searchView.queryHint = "Search stations"
-        searchView.maxWidth = Int.MAX_VALUE //TODO: Does this do anything?
+        searchView.maxWidth = Int.MAX_VALUE
         searchView.isIconifiedByDefault = false
         searchView.requestFocusFromTouch()
         searchView.setOnQueryTextListener(this)

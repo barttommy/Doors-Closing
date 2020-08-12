@@ -1,8 +1,12 @@
 package com.tommybart.chicagotraintracker.data.db.entity.routearrivals
 
-import androidx.room.*
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.internal.TrainLine
+import org.threeten.bp.LocalDateTime
 
 @Entity(tableName = "train_data", indices = [Index(value = ["id", "runNumber"], unique = true)])
 data class TrainEntry(
@@ -13,8 +17,8 @@ data class TrainEntry(
     val mapId: Int,
     val runNumber: Int,
     val trainLine: TrainLine,
-    val predictionTime: String,
-    val arrivalTime: String,
+    val predictionTime: LocalDateTime,
+    val arrivalTime: LocalDateTime,
     val isApproaching: Boolean,
     val isDelayed: Boolean,
     val bearing: Double?,
