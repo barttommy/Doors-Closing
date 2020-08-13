@@ -12,7 +12,15 @@ import org.threeten.bp.LocalDateTime
 @Dao
 abstract class RouteArrivalsDao {
 
-    fun upsertArrivalsForRoute(routeId: Long, arrivals: List<TrainEntry>) {
+    @Transaction
+    open fun upsertAllRouteArrivals(routeArrivalsList: List<RouteArrivals>) {
+        routeArrivalsList.forEach { routeArrival ->
+            val routeId = _upsertRoute(routeArrival.routeEntry)
+            upsertArrivalsForRoute(routeId, routeArrival.arrivals)
+        }
+    }
+
+    private fun upsertArrivalsForRoute(routeId: Long, arrivals: List<TrainEntry>) {
         arrivals.forEach { train ->
             train.routeId = routeId
         }
@@ -20,10 +28,10 @@ abstract class RouteArrivalsDao {
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun _upsertAllArrivals(arrivals: List<TrainEntry>)
+    abstract fun _upsertRoute(route: RouteEntry): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun upsertRoute(route: RouteEntry): Long
+    abstract fun _upsertAllArrivals(arrivals: List<TrainEntry>)
 
     @Transaction
     @Query("SELECT * FROM route_data")

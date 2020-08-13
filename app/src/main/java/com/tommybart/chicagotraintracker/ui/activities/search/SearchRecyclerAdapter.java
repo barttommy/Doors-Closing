@@ -32,7 +32,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = layoutInflater.inflate(R.layout.search_row_item, parent, false);
+        View itemView = layoutInflater.inflate(R.layout.row_search, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -73,23 +73,23 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
         this.onClickListener = onClickListener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView stationText;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            stationText = itemView.findViewById(R.id.search_station);
+            stationText = itemView.findViewById(R.id.search_row_tv_station);
 
-            itemView.findViewById(R.id.search_red_line).setTag(TrainLine.RED);
-            itemView.findViewById(R.id.search_blue_line).setTag(TrainLine.BLUE);
-            itemView.findViewById(R.id.search_brown_line).setTag(TrainLine.BROWN);
-            itemView.findViewById(R.id.search_green_line).setTag(TrainLine.GREEN);
-            itemView.findViewById(R.id.search_orange_line).setTag(TrainLine.ORANGE);
-            itemView.findViewById(R.id.search_pink_line).setTag(TrainLine.PINK);
-            itemView.findViewById(R.id.search_purple_line).setTag(TrainLine.PURPLE);
-            itemView.findViewById(R.id.search_yellow_line).setTag(TrainLine.YELLOW);
+            itemView.findViewById(R.id.search_row_iv_red).setTag(TrainLine.RED);
+            itemView.findViewById(R.id.search_row_iv_blue).setTag(TrainLine.BLUE);
+            itemView.findViewById(R.id.search_row_iv_brown).setTag(TrainLine.BROWN);
+            itemView.findViewById(R.id.search_row_iv_green).setTag(TrainLine.GREEN);
+            itemView.findViewById(R.id.search_row_iv_orange).setTag(TrainLine.ORANGE);
+            itemView.findViewById(R.id.search_row_iv_pink).setTag(TrainLine.PINK);
+            itemView.findViewById(R.id.search_row_iv_purple).setTag(TrainLine.PURPLE);
+            itemView.findViewById(R.id.search_row_iv_yellow).setTag(TrainLine.YELLOW);
         }
 
         @Override

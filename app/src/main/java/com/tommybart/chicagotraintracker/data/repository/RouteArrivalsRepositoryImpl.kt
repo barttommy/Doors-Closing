@@ -46,15 +46,14 @@ class RouteArrivalsRepositoryImpl(
         }
     }
 
-    // TODO clean up deleteOldData? Move stuff into a refresh function?
     private suspend fun initRouteData(currentDateTime: LocalDateTime) {
         val lastRequest = routeArrivalsRequestDao.getLastRequestSync()
         if (lastRequest == null ||
             requestedStationsProvider.hasRequestedStationsChanged(lastRequest.lastRequest)) {
             Log.d(TAG, "Getting new stations to request arrivals for")
             val requestMapIds = requestedStationsProvider.getNewRequestMapIds()
-            fetchRouteData(requestMapIds)
             deleteOldData(requestMapIds, currentDateTime)
+            fetchRouteData(requestMapIds)
         } else {
             Log.d(TAG, "Request has not changed")
             deleteOldData(lastRequest.lastRequest, currentDateTime)
@@ -87,10 +86,7 @@ class RouteArrivalsRepositoryImpl(
 
     private fun persistFetchedData(ctaApiResponse: CtaApiResponse) {
         GlobalScope.launch(Dispatchers.IO) {
-            ctaApiResponse.routeArrivalsList.forEach { routeWithArrivals ->
-                val routeId: Long = routeArrivalsDao.upsertRoute(routeWithArrivals.routeEntry)
-                routeArrivalsDao.upsertArrivalsForRoute(routeId, routeWithArrivals.arrivals)
-            }
+            routeArrivalsDao.upsertAllRouteArrivals(ctaApiResponse.routeArrivalsList)
             routeArrivalsInfoDao.upsert(ctaApiResponse.routeArrivalsInfo)
         }
     }

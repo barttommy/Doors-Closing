@@ -32,8 +32,8 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
     override val kodein: Kodein by closestKodein()
     private val viewModelFactory: SearchViewModelFactory by instance<SearchViewModelFactory>()
     private lateinit var viewModel: SearchViewModel
-    private lateinit var searchRecyclerAdapter: SearchRecyclerAdapter
 
+    private lateinit var searchRecyclerAdapter: SearchRecyclerAdapter
     private lateinit var stationList: List<Station>
     private val stationSearchResults = ArrayList<Station>()
 
@@ -43,20 +43,20 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(SearchViewModel::class.java)
-        bindUI()
+        bindUi()
     }
 
-    private fun bindUI() {
+    private fun bindUi() {
         searchRecyclerAdapter = SearchRecyclerAdapter(this, stationSearchResults)
         searchRecyclerAdapter.setOnClickListener(this)
-        search_recycler.adapter = searchRecyclerAdapter
-        search_recycler.layoutManager = LinearLayoutManager(this)
-        search_recycler.addItemDecoration(MarginItemDecoration(24))
+        search_activity_recycler.adapter = searchRecyclerAdapter
+        search_activity_recycler.layoutManager = LinearLayoutManager(this)
+        search_activity_recycler.addItemDecoration(MarginItemDecoration(24))
         title = ""
         launch {
             stationList = viewModel.stationData.await()
             stationSearchResults.addAll(stationList)
-            searchProgressBar.visibility = View.GONE
+            search_activity_pb.visibility = View.GONE
             searchRecyclerAdapter.notifyDataSetChanged()
         }
     }
@@ -96,7 +96,7 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
     }
 
     override fun onClick(view: View) {
-        val position = search_recycler.getChildLayoutPosition(view)
+        val position = search_activity_recycler.getChildLayoutPosition(view)
         val selected = stationSearchResults[position]
         setResultAndFinish(selected)
     }
