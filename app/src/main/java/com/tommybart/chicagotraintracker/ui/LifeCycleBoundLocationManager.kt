@@ -10,10 +10,10 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
-private const val LOCATION_MIN_TIME: Long = 15 * 1000
-private const val LOCATION_MIN_DIST_METERS: Float = 1000f
+private const val LOCATION_MIN_TIME: Long = 10 * 1000
+private const val LOCATION_MIN_DIST_METERS: Float = 150f // Chicago blocks are typically 200m x 100m
 
-class LifecycleBoundLocationManager (
+class LifecycleBoundLocationManager(
     lifecycleOwner: LifecycleOwner,
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val locationCallback: LocationCallback
@@ -24,10 +24,10 @@ class LifecycleBoundLocationManager (
     }
 
     private val locationRequest: LocationRequest = LocationRequest().apply {
-            interval = LOCATION_MIN_TIME
-            fastestInterval = LOCATION_MIN_TIME
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            smallestDisplacement = LOCATION_MIN_DIST_METERS
+        interval = LOCATION_MIN_TIME
+        fastestInterval = LOCATION_MIN_TIME
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        smallestDisplacement = LOCATION_MIN_DIST_METERS
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)

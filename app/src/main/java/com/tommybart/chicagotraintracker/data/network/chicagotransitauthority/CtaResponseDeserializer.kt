@@ -26,7 +26,6 @@ class CtaResponseDeserializer : JsonDeserializer<CtaApiResponse> {
         context: JsonDeserializationContext?
     ): CtaApiResponse {
         val apiResponse = json?.asJsonObject
-
         val container = apiResponse?.get("ctatt")?.asJsonObject
 
         val routeArrivalsInfoEntry = RouteArrivalsInfoEntry(
@@ -96,7 +95,21 @@ class CtaResponseDeserializer : JsonDeserializer<CtaApiResponse> {
                 preExistingRoute.arrivals.add(trainEntry)
             }
         } else {
-            routeArrivalsList.add(routeArrivals)
+            addUniqueRoutes(routeArrivals, routeArrivalsList)
         }
+    }
+
+    private fun addUniqueRoutes(
+        routeArrivals: RouteArrivals,
+        routeArrivalsList: MutableList<RouteArrivals>
+    ) {
+        routeArrivalsList.forEach {
+            if (it.routeEntry.trainLine == routeArrivals.routeEntry.trainLine
+                && it.routeEntry.destinationName == routeArrivals.routeEntry.destinationName
+            ) {
+                return
+            }
+        }
+        routeArrivalsList.add(routeArrivals)
     }
 }

@@ -5,7 +5,7 @@
     <PreferenceCategory
         android:title="Location">
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:disableDependentsState="true"
             android:key="USE_DEVICE_LOCATION"
             android:summary="Allow Doors Closing to display arrivals near you"

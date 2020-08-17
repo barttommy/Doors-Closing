@@ -6,18 +6,20 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.tommybart.chicagotraintracker.data.db.DoorsClosingDatabase
-import com.tommybart.chicagotraintracker.data.network.*
+import com.tommybart.chicagotraintracker.data.network.ConnectivityInterceptor
+import com.tommybart.chicagotraintracker.data.network.ConnectivityInterceptorImpl
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaApiService
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSourceImpl
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
 import com.tommybart.chicagotraintracker.data.provider.*
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepositoryImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.data.repository.StationRepositoryImpl
+import com.tommybart.chicagotraintracker.ui.activities.main.MainViewModelFactory
 import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.ArrivalsViewModelFactory
 import com.tommybart.chicagotraintracker.ui.activities.search.SearchViewModelFactory
 import org.kodein.di.Kodein
@@ -40,34 +42,62 @@ class DoorsClosingApplication : Application(), KodeinAware {
         bind() from singleton { instance<DoorsClosingDatabase>().stationInfoDao() }
         bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsDao() }
         bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsInfoDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsRequestDao()}
+        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsRequestDao() }
 
         // API Services
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
         bind() from singleton { SodaApiService(instance(), instance()) }
-        bind() from singleton { CtaApiService(instance(), instance())}
+        bind() from singleton { CtaApiService(instance(), instance()) }
 
         // Location
-        bind() from provider { LocationServices.getFusedLocationProviderClient( instance<Context>()) }
+        bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
 
         // Providers
         bind<PreferenceProvider>() with singleton { PreferenceProviderImpl(instance()) }
         bind<NearbyStationsProvider>() with singleton { NearbyStationsProviderImpl(instance()) }
-        bind<RequestedStationsProvider>() with singleton { RequestedStationsProviderImpl(instance(), instance(), instance(), instance()) }
+        bind<RequestedStationsProvider>() with singleton {
+            RequestedStationsProviderImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
 
         // Station
         bind<StationNetworkDataSource>() with singleton { StationNetworkDataSourceImpl(instance()) }
-        bind<StationRepository>() with singleton { StationRepositoryImpl(instance(), instance(), instance()) }
+        bind<StationRepository>() with singleton {
+            StationRepositoryImpl(
+                instance(),
+                instance(),
+                instance()
+            )
+        }
 
         // RouteArrivals
-        bind<RouteArrivalsNetworkDataSource>() with singleton { RouteArrivalsNetworkDataSourceImpl(instance()) }
-        bind<RouteArrivalsRepository>() with singleton { RouteArrivalsRepositoryImpl(instance(), instance(), instance(), instance(), instance()) }
+        bind<RouteArrivalsNetworkDataSource>() with singleton {
+            RouteArrivalsNetworkDataSourceImpl(
+                instance()
+            )
+        }
+        bind<RouteArrivalsRepository>() with singleton {
+            RouteArrivalsRepositoryImpl(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
 
-        // Arrivals Fragment ViewModelFactory
+        // MainActivity ViewModelFactory
+        bind() from provider { MainViewModelFactory(instance()) }
+
+        // ArrivalsFragment ViewModelFactory
         bind() from provider { ArrivalsViewModelFactory(instance(), instance()) }
 
-        // Search Activity ViewModelFactory
-        bind() from provider { SearchViewModelFactory(instance())}
+        // SearchActivity ViewModelFactory
+        bind() from provider { SearchViewModelFactory(instance()) }
     }
 
     override fun onCreate() {

@@ -17,20 +17,20 @@ import retrofit2.http.Query
 //http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?outputType=JSON&key=API_KEY&mapid=40530
 
 const val BASE_URL = "http://lapi.transitchicago.com/api/1.0/"
-const val CTA_FETCH_DELAY_MINUTES: Long = 2
+const val CTA_FETCH_DELAY_MINUTES: Long = 1
 
 interface CtaApiService {
 
     @GET("ttarrivals.aspx?outputType=JSON")
     fun getArrivalsAsync(
         @Query("mapid") requestedStationMapIds: List<Int>
-    ) : Deferred<CtaApiResponse>
+    ): Deferred<CtaApiResponse>
 
     companion object {
         operator fun invoke(
             context: Context,
             interceptor: Interceptor
-        ) : CtaApiService {
+        ): CtaApiService {
 
             val requestInterceptor = Interceptor { chain ->
                 val url = chain.request()

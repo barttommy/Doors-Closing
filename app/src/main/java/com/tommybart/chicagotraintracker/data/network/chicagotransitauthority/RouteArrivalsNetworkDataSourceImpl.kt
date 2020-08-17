@@ -24,7 +24,7 @@ class RouteArrivalsNetworkDataSourceImpl(
                 .getArrivalsAsync(requestedStationMapIds.take(CTA_MAX_STATION_REQUEST))
                 .await()
             downloadRouteData.postValue(fetchArrivalData)
-        } catch(e: NoNetworkConnectionException) {
+        } catch (e: NoNetworkConnectionException) {
             Log.w(TAG, "No network connection", e)
         }
     }

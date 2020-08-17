@@ -13,7 +13,8 @@ class SodaResponseDeserializer : JsonDeserializer<SodaApiResponse> {
     override fun deserialize(
         json: JsonElement?,
         typeOfT: Type?,
-        context: JsonDeserializationContext?): SodaApiResponse {
+        context: JsonDeserializationContext?
+    ): SodaApiResponse {
 
         val stationList = mutableListOf<StationEntry>()
         json?.asJsonArray?.forEach {
@@ -39,7 +40,7 @@ class SodaResponseDeserializer : JsonDeserializer<SodaApiResponse> {
                     station.get("y").asBoolean
                 )
                 addStation(stationEntry, stationList)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 Log.e(TAG, "Failed to parse station", e)
             }
         }

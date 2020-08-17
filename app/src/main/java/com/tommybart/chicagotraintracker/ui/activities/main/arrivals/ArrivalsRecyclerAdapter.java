@@ -85,11 +85,11 @@ public class ArrivalsRecyclerAdapter
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            stationText = itemView.findViewById(R.id.arrivals_row_tv_station);
-            directionText = itemView.findViewById(R.id.arrivals_row_tv_direction);
-            arrivalsText = itemView.findViewById(R.id.route_arrivals_text);
-            timeText = itemView.findViewById(R.id.arrivals_row_tv_time);
-            trainImage = itemView.findViewById(R.id.arrivals_row_iv_train);
+            stationText = itemView.findViewById(R.id.row_arrivals_tv_station);
+            directionText = itemView.findViewById(R.id.row_arrivals_tv_direction);
+            arrivalsText = itemView.findViewById(R.id.row_arrivals_tv_route);
+            timeText = itemView.findViewById(R.id.row_arrivals_tv_time);
+            trainImage = itemView.findViewById(R.id.row_arrivals_iv_train);
         }
 
         @Override

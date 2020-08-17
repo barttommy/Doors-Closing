@@ -42,7 +42,8 @@ abstract class DoorsClosingDatabase : RoomDatabase() {
     abstract fun routeArrivalsRequestDao(): RouteArrivalsRequestDao
 
     companion object {
-        @Volatile private var instance: DoorsClosingDatabase? = null
+        @Volatile
+        private var instance: DoorsClosingDatabase? = null
         private val LOCK = Any()
 
         operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
@@ -50,8 +51,10 @@ abstract class DoorsClosingDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context.applicationContext,
-                DoorsClosingDatabase::class.java, "doorsClosing.db")
+            Room.databaseBuilder(
+                context.applicationContext,
+                DoorsClosingDatabase::class.java, "doorsClosing.db"
+            )
                 .build()
     }
 }

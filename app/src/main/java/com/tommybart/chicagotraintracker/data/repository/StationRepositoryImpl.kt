@@ -24,10 +24,10 @@ class StationRepositoryImpl(
 
     override suspend fun getStationData(): List<Station> {
         val currentDate = ZonedDateTime.now(ZoneId.of(Route.CHICAGO_ZONE_ID)).toLocalDate()
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             fetchStationData(currentDate)
-            return@withContext stationDao.getStationEntriesSync().map {
-                stationEntry -> stationEntry.toStation()
+            return@withContext stationDao.getStationEntriesSync().map { stationEntry ->
+                stationEntry.toStation()
             }
         }
     }

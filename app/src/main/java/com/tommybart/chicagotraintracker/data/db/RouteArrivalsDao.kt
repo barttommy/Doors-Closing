@@ -2,10 +2,8 @@ package com.tommybart.chicagotraintracker.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.tommybart.chicagotraintracker.data.db.entity.ROUTE_ARRIVALS_INFO_ID
-import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsInfoEntry
-import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteEntry
 import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteArrivals
+import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteEntry
 import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.TrainEntry
 import org.threeten.bp.LocalDateTime
 

@@ -10,8 +10,8 @@ import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsRequestEntr
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CTA_FETCH_DELAY_MINUTES
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiResponse
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
 import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProvider
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
@@ -40,26 +40,55 @@ class RouteArrivalsRepositoryImpl(
         val currentDateTime = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
         return withContext(Dispatchers.IO) {
             initRouteData(currentDateTime)
-            return@withContext Transformations.map(routeArrivalsDao.getRoutesWithArrivals()) {
-                routesWithArrivals -> routesWithArrivals.map { it.toRoute() }
-            }
+            return@withContext Transformations
+                .map(routeArrivalsDao.getRoutesWithArrivals()) { routesWithArrivals ->
+                    routesWithArrivals.map { it.toRoute() }
+                }
+        }
+    }
+
+    override suspend fun getRouteDataSearch(searchMapId: Int): LiveData<List<Route>> {
+        val currentDateTime = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
+        return withContext(Dispatchers.IO) {
+            initRouteDataSearch(currentDateTime, searchMapId)
+            return@withContext Transformations
+                .map(routeArrivalsDao.getRoutesWithArrivals()) { routesWithArrivals ->
+                    routesWithArrivals.map { it.toRoute() }
+                }
         }
     }
 
     private suspend fun initRouteData(currentDateTime: LocalDateTime) {
-        val lastRequest = routeArrivalsRequestDao.getLastRequestSync()
-        if (lastRequest == null ||
-            requestedStationsProvider.hasRequestedStationsChanged(lastRequest.lastRequest)) {
+        val lastRequestMapIds = routeArrivalsRequestDao.getLastRequestSync()?.lastRequestMapIds
+        if (lastRequestMapIds == null ||
+            requestedStationsProvider.hasRequestedStationsChanged(lastRequestMapIds)
+        ) {
             Log.d(TAG, "Getting new stations to request arrivals for")
             val requestMapIds = requestedStationsProvider.getNewRequestMapIds()
-            deleteOldData(requestMapIds, currentDateTime)
-            fetchRouteData(requestMapIds)
+            requestMapIds?.let { updateRouteData(it, currentDateTime, true) }
         } else {
             Log.d(TAG, "Request has not changed")
-            deleteOldData(lastRequest.lastRequest, currentDateTime)
-            if (isFetchRouteDataNeeded(currentDateTime)) {
-                fetchRouteData(lastRequest.lastRequest)
-            }
+            updateRouteData(
+                lastRequestMapIds,
+                currentDateTime,
+                isFetchRouteDataNeeded(currentDateTime)
+            )
+        }
+    }
+
+    private suspend fun initRouteDataSearch(currentDateTime: LocalDateTime, searchMapId: Int) {
+        val searchMapIdList = listOf(searchMapId)
+        val lastRequestMapIds = routeArrivalsRequestDao.getLastRequestSync()?.lastRequestMapIds
+        if (lastRequestMapIds == null || lastRequestMapIds != searchMapIdList) {
+            Log.d(TAG, "Search: Requesting data at new search station")
+            updateRouteData(searchMapIdList, currentDateTime, true)
+        } else {
+            Log.d(TAG, "Search: Request has not changed")
+            updateRouteData(
+                lastRequestMapIds,
+                currentDateTime,
+                isFetchRouteDataNeeded(currentDateTime)
+            )
         }
     }
 
@@ -71,6 +100,15 @@ class RouteArrivalsRepositoryImpl(
         return fetchDateTime.isBefore(delay)
     }
 
+    private suspend fun updateRouteData(
+        requestedStationMapIds: List<Int>,
+        currentDateTime: LocalDateTime,
+        isFetchNeeded: Boolean
+    ) {
+        deleteOldData(requestedStationMapIds, currentDateTime)
+        if (isFetchNeeded) fetchRouteData(requestedStationMapIds)
+    }
+
     private suspend fun fetchRouteData(requestedStationMapIds: List<Int>) {
         Log.d(TAG, "Fetching new route data")
         persistRequest(requestedStationMapIds)
@@ -78,10 +116,12 @@ class RouteArrivalsRepositoryImpl(
     }
 
     private fun deleteOldData(requestedStationMapIds: List<Int>, currentDateTime: LocalDateTime) {
-        var deletedArrivals = routeArrivalsDao.deleteArrivalsAtOldStations(requestedStationMapIds)
-        deletedArrivals += routeArrivalsDao.deleteOldArrivals(currentDateTime)
-        val deletedRoutes = routeArrivalsDao.deleteRoutesWithoutArrivals()
-        Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
+        GlobalScope.launch(Dispatchers.IO) {
+            var deletedArrivals = routeArrivalsDao.deleteArrivalsAtOldStations(requestedStationMapIds)
+            deletedArrivals += routeArrivalsDao.deleteOldArrivals(currentDateTime)
+            val deletedRoutes = routeArrivalsDao.deleteRoutesWithoutArrivals()
+            Log.d(TAG, "Deleted $deletedArrivals arrivals and $deletedRoutes routes.")
+        }
     }
 
     private fun persistFetchedData(ctaApiResponse: CtaApiResponse) {

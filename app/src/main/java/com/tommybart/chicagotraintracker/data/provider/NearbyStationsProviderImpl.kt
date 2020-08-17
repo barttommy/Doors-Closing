@@ -36,7 +36,8 @@ class NearbyStationsProviderImpl(
             val longitude = station.location.longitude
             val distance = getDistanceBetweenCoordinates(
                 location.latitude, latitude,
-                location.longitude, longitude)
+                location.longitude, longitude
+            )
             if (distance <= LOCATION_REQUEST_RANGE_KM) {
                 stationsInRangeMap[station] = distance
             }

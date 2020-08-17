@@ -7,7 +7,7 @@
     android:background="@drawable/rounded_border">
 
     <TextView
-        android:id="@+id/arrivals_row_tv_station"
+        android:id="@+id/row_arrivals_tv_station"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -17,11 +17,11 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toEndOf="@+id/arrivals_row_iv_train"
+        app:layout_constraintStart_toEndOf="@+id/row_arrivals_iv_train"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/arrivals_row_tv_direction"
+        android:id="@+id/row_arrivals_tv_direction"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/direction_label"
@@ -29,11 +29,11 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="@+id/arrivals_row_tv_station"
-        app:layout_constraintTop_toBottomOf="@+id/arrivals_row_tv_station" />
+        app:layout_constraintStart_toStartOf="@+id/row_arrivals_tv_station"
+        app:layout_constraintTop_toBottomOf="@+id/row_arrivals_tv_station" />
 
     <TextView
-        android:id="@+id/route_arrivals_text"
+        android:id="@+id/row_arrivals_tv_route"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -43,11 +43,11 @@
         android:textColorHint="@android:color/white"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="@+id/arrivals_row_tv_direction"
-        app:layout_constraintTop_toBottomOf="@+id/arrivals_row_tv_direction" />
+        app:layout_constraintStart_toStartOf="@+id/row_arrivals_tv_direction"
+        app:layout_constraintTop_toBottomOf="@+id/row_arrivals_tv_direction" />
 
     <TextView
-        android:id="@+id/arrivals_row_tv_time"
+        android:id="@+id/row_arrivals_tv_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -63,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/arrivals_row_tv_direction" />
+        app:layout_constraintTop_toBottomOf="@+id/row_arrivals_tv_direction" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -73,7 +73,7 @@
         app:layout_constraintGuide_percent="0.75" />
 
     <ImageView
-        android:id="@+id/arrivals_row_iv_train"
+        android:id="@+id/row_arrivals_iv_train"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

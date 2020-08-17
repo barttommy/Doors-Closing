@@ -24,18 +24,20 @@ data class RouteArrivals(
     private fun convertArrivals(): ArrayList<Train> {
         val conversionResult = arrayListOf<Train>()
         arrivals.forEach { trainEntry ->
-            conversionResult.add(Train(
-                trainEntry.routeId ?: -1,
-                trainEntry.runNumber,
-                trainEntry.mapId,
-                trainEntry.trainLine,
-                trainEntry.predictionTime,
-                trainEntry.arrivalTime,
-                trainEntry.isApproaching,
-                trainEntry.isDelayed,
-                trainEntry.bearing,
-                trainEntry.location
-            ))
+            conversionResult.add(
+                Train(
+                    trainEntry.routeId ?: -1,
+                    trainEntry.runNumber,
+                    trainEntry.mapId,
+                    trainEntry.trainLine,
+                    trainEntry.predictionTime,
+                    trainEntry.arrivalTime,
+                    trainEntry.isApproaching,
+                    trainEntry.isDelayed,
+                    trainEntry.bearing,
+                    trainEntry.location
+                )
+            )
         }
         return conversionResult
     }

@@ -11,7 +11,8 @@ class PreferenceProviderImpl(
 ) : PreferenceProvider {
 
     private val appContext: Context = context.applicationContext
-    private val preferences: SharedPreferences
+
+    override val preferences: SharedPreferences
         get() = PreferenceManager.getDefaultSharedPreferences(appContext)
 
     override fun isAllowingDeviceLocation(): Boolean {

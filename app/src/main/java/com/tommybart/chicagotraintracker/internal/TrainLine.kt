@@ -22,14 +22,14 @@ enum class TrainLine(val value: String) {
     YELLOW("y");
 
     companion object {
-        private val values : Array<TrainLine> = values()
+        private val values: Array<TrainLine> = values()
 
         @SuppressLint("DefaultLocale")
         fun fromValue(value: String) = values.firstOrNull { it.value == value.toLowerCase() }
     }
 
     fun getColor(resources: Resources): Int {
-        return when(this) {
+        return when (this) {
             RED -> resources.getColor(R.color.redLine, null)
             BLUE -> resources.getColor(R.color.blueLine, null)
             BROWN -> resources.getColor(R.color.brownLine, null)

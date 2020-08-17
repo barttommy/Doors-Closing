@@ -6,7 +6,7 @@ import com.tommybart.chicagotraintracker.internal.lazyDeferred
 
 class SearchViewModel(
     stationRepository: StationRepository
-): ViewModel() {
+) : ViewModel() {
     val stationData by lazyDeferred {
         stationRepository.getStationData()
     }

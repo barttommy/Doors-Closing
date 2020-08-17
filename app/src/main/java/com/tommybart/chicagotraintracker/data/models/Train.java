@@ -7,6 +7,10 @@ import com.tommybart.chicagotraintracker.internal.TrainLine;
 
 import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
+
+import static com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID;
 
 public class Train {
 
@@ -77,14 +81,18 @@ public class Train {
         return location;
     }
 
+    /*
+     * Given the ability to update more frequently, comparing prediction time to arrival time
+     * would give the most accurate time until arrival.
+     */
     public int getArrivalTimeMinutes() {
-        return (int) Duration.between(predictionDateTime, arrivalDateTime).toMinutes();
+        LocalDateTime current = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime();
+        return (int) Duration.between(current, arrivalDateTime).toMinutes();
     }
 
     public String getArrivalTimeDetail() {
-        LocalDateTime parsedArrivalTime = arrivalDateTime;
-        int hour = parsedArrivalTime.getHour();
-        int minutes = parsedArrivalTime.getMinute();
+        int hour = arrivalDateTime.getHour();
+        int minutes = arrivalDateTime.getMinute();
 
         String meridiem = "am";
         if (hour > 12) {

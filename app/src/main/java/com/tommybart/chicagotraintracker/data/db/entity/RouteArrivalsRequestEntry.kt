@@ -7,7 +7,7 @@ const val ROUTE_ARRIVALS_REQUEST_ID = 0
 
 @Entity(tableName = "route_arrivals_request")
 data class RouteArrivalsRequestEntry(
-    val lastRequest: List<Int>
+    val lastRequestMapIds: List<Int>
 ) {
     @PrimaryKey(autoGenerate = false)
     var id: Int = ROUTE_ARRIVALS_REQUEST_ID

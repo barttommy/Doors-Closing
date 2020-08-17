@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
-abstract class ScopedActivity: AppCompatActivity(), CoroutineScope {
+abstract class ScopedActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var job: Job
 
     override val coroutineContext: CoroutineContext

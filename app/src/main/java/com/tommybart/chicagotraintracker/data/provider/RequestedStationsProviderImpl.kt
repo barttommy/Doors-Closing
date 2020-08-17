@@ -26,26 +26,29 @@ class RequestedStationsProviderImpl(
             false
         }
         val defaultPreferenceChanged =
-            if (!isUsingDeviceLocation() && requestedStationMapIds.isNotEmpty()) {
-                if (requestedStationMapIds.size > 1) true
-                else hasDefaultPreferenceChanged(requestedStationMapIds[0])
+            if (!isUsingDeviceLocation()) {
+                when {
+                    // First two cases cover when location is initially disabled
+                    requestedStationMapIds.isEmpty() -> true
+                    requestedStationMapIds.size > 1 -> true
+                    else -> hasDefaultPreferenceChanged(requestedStationMapIds[0])
+                }
             } else {
                 false
             }
+
         return nearbyStationsChanged || defaultPreferenceChanged
     }
 
-    // TODO: can we avoid doing a lot of these things twice with hasRequestedStationsChanged?
-    // TODO: do we want to return default station when location isn't working?
-    //  or show no trains and indicate an error to the user?
-    override suspend fun getNewRequestMapIds(): List<Int> {
+    // TODO: can we avoid doing things twice between this and hasRequestedStationsChanged?
+    override suspend fun getNewRequestMapIds(): List<Int>? {
         if (isUsingDeviceLocation()) {
             try {
                 val deviceLocation: Location = getLastDeviceLocationAsync().await()
-                    ?: return listOf(getCustomDefaultStation())
+                    ?: return null
                 return nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
             } catch (e: LocationPermissionNotGrantedException) {
-                return listOf(getCustomDefaultStation())
+                return null
             }
         } else {
             return listOf(getCustomDefaultStation())
@@ -55,8 +58,9 @@ class RequestedStationsProviderImpl(
     private suspend fun hasNearbyStationsChanged(requestedStationMapIds: List<Int>): Boolean {
         if (!isUsingDeviceLocation()) return false
         val deviceLocation: Location = getLastDeviceLocationAsync().await() ?: return false
-        return requestedStationMapIds !=
-            nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+        return requestedStationMapIds != nearbyStationsProvider.getNearbyStationMapIds(
+            deviceLocation
+        )
     }
 
     private fun getLastDeviceLocationAsync(): Deferred<Location?> {
@@ -81,6 +85,7 @@ class RequestedStationsProviderImpl(
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             appContext,
-            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

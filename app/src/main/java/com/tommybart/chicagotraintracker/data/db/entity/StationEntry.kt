@@ -4,7 +4,6 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 import com.tommybart.chicagotraintracker.data.models.AvailableTrainLines
 import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.data.models.Station

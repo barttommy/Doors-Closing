@@ -50,21 +50,21 @@ interface SodaApiService {
         operator fun invoke(
             context: Context,
             interceptor: Interceptor
-        ) : SodaApiService {
+        ): SodaApiService {
 
             val requestInterceptor = Interceptor { chain ->
                 val url = chain.request()
-                        .url()
-                        .newBuilder()
-                        .addQueryParameter("\$\$app_token", context.getString(R.string.cdp_app_token))
-                        .build()
+                    .url()
+                    .newBuilder()
+                    .addQueryParameter("\$\$app_token", context.getString(R.string.cdp_app_token))
+                    .build()
 
                 Log.d(TAG, url.toString())
 
                 val request = chain.request()
-                        .newBuilder()
-                        .url(url)
-                        .build()
+                    .newBuilder()
+                    .url(url)
+                    .build()
                 return@Interceptor chain.proceed(request)
             }
 

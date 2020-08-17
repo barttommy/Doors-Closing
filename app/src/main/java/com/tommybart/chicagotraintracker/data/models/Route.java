@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * A Route stores a collection of incoming Trains at a station that share the same line and
  * destination
  */
-public class Route implements Comparable<Route>{
+public class Route implements Comparable<Route> {
 
     public static final int TRAIN_LIMIT = 3;
     public static final String CHICAGO_ZONE_ID = "America/Chicago";
@@ -22,8 +22,8 @@ public class Route implements Comparable<Route>{
     private TrainLine trainLine;
     private ArrayList<Train> arrivals;
 
-    public Route (int mapId, String stationName, String destinationName,
-                  TrainLine trainLine, ArrayList<Train> arrivals) {
+    public Route(int mapId, String stationName, String destinationName,
+                 TrainLine trainLine, ArrayList<Train> arrivals) {
         this.mapId = mapId;
         this.stationName = stationName;
         this.destinationName = destinationName;
@@ -62,6 +62,7 @@ public class Route implements Comparable<Route>{
     }
 
     private int hashCode;
+
     @Override
     public int hashCode() {
         if (hashCode == 0) {
