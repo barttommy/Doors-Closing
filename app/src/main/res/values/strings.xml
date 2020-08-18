@@ -29,5 +29,6 @@
     <string name="blue_line_is_available_at_this_station">Blue line is available at this station</string>
     <string name="green_line_is_available_at_this_station">Green line is available at this station</string>
     <string name="brown_line_is_available_at_this_station">Brown line is available at this station</string>
+    <string name="return_from_search">Return from search</string>
 
 </resources>

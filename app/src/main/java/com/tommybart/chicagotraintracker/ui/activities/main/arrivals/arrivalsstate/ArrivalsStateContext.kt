@@ -3,6 +3,7 @@ package com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsst
 import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.ArrivalsViewModel
 
 class ArrivalsStateContext(
-    var arrivalsState: ArrivalsState,
     val arrivalsViewModel: ArrivalsViewModel
-)
+) {
+    var arrivalsState: ArrivalsState? = null
+}

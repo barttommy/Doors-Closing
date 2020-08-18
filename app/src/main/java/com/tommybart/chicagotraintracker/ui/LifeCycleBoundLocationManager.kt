@@ -16,7 +16,8 @@ private const val LOCATION_MIN_DIST_METERS: Float = 150f // Chicago blocks are t
 class LifecycleBoundLocationManager(
     lifecycleOwner: LifecycleOwner,
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val locationCallback: LocationCallback
+    private val locationCallback: LocationCallback,
+    var isEnabled: Boolean
 ) : LifecycleObserver {
 
     init {
@@ -32,8 +33,14 @@ class LifecycleBoundLocationManager(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun startLocationUpdates() {
-        Log.d(TAG, "Starting location updates")
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        if (isEnabled) {
+            Log.d(TAG, "Starting location updates")
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                null
+            )
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

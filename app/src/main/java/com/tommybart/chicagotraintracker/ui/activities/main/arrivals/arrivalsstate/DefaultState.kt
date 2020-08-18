@@ -10,6 +10,9 @@ import kotlinx.coroutines.Deferred
  * (however, default stations do fall under this umbrella).
  */
 class DefaultState: ArrivalsState {
+
+    override val title: String = "Doors Closing"
+
     override suspend fun getRouteDataAsync(
         arrivalsStateContext: ArrivalsStateContext
     ): Deferred<LiveData<List<Route>>> {
