@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:iconSpaceReserved="false">
 
     <PreferenceCategory
-        android:title="Location">
+        android:title="Location"
+        app:iconSpaceReserved="false">
         <SwitchPreference
             android:defaultValue="false"
             android:disableDependentsState="true"
             android:key="USE_DEVICE_LOCATION"
             android:summary="Allow Doors Closing to display arrivals near you"
             android:title="Use Device Location"
-            android:icon="@drawable/baseline_train_black_36"/>
+            app:iconSpaceReserved="false" />
 
         <Preference
-            android:key="DEFAULT_STATION"
-            android:title="Default Station"
-            android:summary="The default station for which arrivals are displayed"
             android:defaultValue="40380"
             android:dependency="USE_DEVICE_LOCATION"
-            android:icon="@drawable/baseline_train_black_36">
+            android:key="DEFAULT_STATION"
+            android:summary="The default station for which arrivals are displayed"
+            android:title="Default Station"
+            app:iconSpaceReserved="false">
 
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetPackage="com.tommybart.chicagotraintracker"
-                android:targetClass="com.tommybart.chicagotraintracker.ui.activities.search.SearchActivity" />
+                android:targetClass="com.tommybart.chicagotraintracker.ui.activities.search.SearchActivity"
+                android:targetPackage="com.tommybart.chicagotraintracker" />
         </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Theme">
+        android:title="Theme"
+        app:iconSpaceReserved="false">
         <SwitchPreference
             android:defaultValue="true"
             android:disableDependentsState="true"
             android:key="DARK_THEME"
             android:title="Dark Theme"
-            android:icon="@drawable/baseline_train_black_36"/>
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>

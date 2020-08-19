@@ -7,16 +7,13 @@
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.tommybart.chicagotraintracker.ui.activities.main.settings.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:name="com.tommybart.chicagotraintracker.ui.activities.main.settings.SettingsFragment" />
     <fragment
         android:id="@+id/nav_arrivals"
         android:name="com.tommybart.chicagotraintracker.ui.activities.main.arrivals.ArrivalsFragment"
-        android:label="arrivals_fragment"
         tools:layout="@layout/fragment_arrivals" />
     <fragment
         android:id="@+id/nav_about"
         android:name="com.tommybart.chicagotraintracker.ui.activities.main.about.AboutFragment"
-        android:label="about_fragment"
         tools:layout="@layout/fragment_about" />
 </navigation>

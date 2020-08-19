@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="?attr/colorPrimary"
         tools:context=".ui.activities.main.arrivals.ArrivalsFragment">
 
         <TextView
@@ -21,7 +21,7 @@
             android:layout_marginEnd="24dp"
             android:text="@string/error_no_trains_found_message"
             android:textAlignment="center"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/textColor"
             android:textSize="16sp"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +37,7 @@
             android:layout_marginEnd="24dp"
             android:text="@string/error_no_trains_found_title"
             android:textAlignment="center"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/textColor"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="visible"
@@ -52,7 +52,7 @@
             android:id="@+id/fragment_arrivals_recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/colorPrimaryDark"
+            android:background="?attr/colorPrimaryDark"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -17,7 +17,7 @@ import retrofit2.http.Query
 //http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?outputType=JSON&key=API_KEY&mapid=40530
 
 const val BASE_URL = "http://lapi.transitchicago.com/api/1.0/"
-const val CTA_FETCH_DELAY_MINUTES: Long = 1
+const val CTA_FETCH_DELAY_MINUTES: Long = 2 // TODO: one minute? maybe 1.5?
 
 interface CtaApiService {
 

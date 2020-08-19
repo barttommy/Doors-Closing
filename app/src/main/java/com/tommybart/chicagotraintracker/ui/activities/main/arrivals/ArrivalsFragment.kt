@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -15,11 +14,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
-import com.google.android.material.snackbar.Snackbar
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
-import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.LifecycleBoundLocationManager
 import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
 import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsstate.ArrivalsState
@@ -157,7 +154,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
     }
 
     private fun updateTitle() {
-        activity?.actionBar?.title = arrivalsStateContext.arrivalsState?.title
+        requireActivity().title = arrivalsStateContext.arrivalsState?.title
     }
 
     private fun updateOptionsMenu() {

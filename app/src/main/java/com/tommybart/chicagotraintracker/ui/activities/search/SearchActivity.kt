@@ -8,10 +8,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.SearchView
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Station
+import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
 import com.tommybart.chicagotraintracker.ui.activities.main.MainActivity
@@ -38,6 +41,15 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
     private val stationSearchResults = ArrayList<Station>()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+
+        val isNightMode = PreferenceManager.getDefaultSharedPreferences(this)
+            .getBoolean(THEME_PREFERENCE, true)
+        if (isNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 

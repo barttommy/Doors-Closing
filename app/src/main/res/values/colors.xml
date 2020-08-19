@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Colors -->
-    <color name="colorPrimary">#292929</color>
-    <color name="colorPrimaryDark">#121212</color>
+    <!-- App Colors: Day -->
+    <color name="colorPrimary">#fafafa</color>
+    <color name="colorPrimaryDark">#e1e1e1</color>
     <color name="colorAccent">#2196F3</color>
-    <color name="colorFont">#FFFFFF</color>
-    <color name="colorFontHint">#c4c4c4</color>
+    <color name="colorText">#000000</color>
+    <color name="colorTextHint">#A3A3A3</color>
 
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
+    <!-- App Colors: Night -->
+    <color name="colorPrimaryNight">#292929</color>
+    <color name="colorPrimaryDarkNight">#121212</color>
+    <color name="colorAccentNight">#2196F3</color>
+    <color name="colorTextNight">#FFFFFF</color>
+    <color name="colorTextHintNight">#c4c4c4</color>
 
-    <!-- Train Colors   -->
+    <!-- Train Colors -->
     <color name="brownLine">#b38054</color>
     <color name="purpleLine">#a148e0</color>
     <color name="redLine">#e34242</color>
@@ -18,5 +22,9 @@
     <color name="greenLine">#34B13C</color>
     <color name="orangeLine">#FFA200</color>
     <color name="pinkLine">#F19CF5</color>
-    <color name="yellowLine">#F1EE17</color>
+    <color name="yellowLine">#f9e300</color>
+
+    <!--  Other  -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

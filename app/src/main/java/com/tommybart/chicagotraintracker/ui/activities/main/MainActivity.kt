@@ -1,40 +1,48 @@
 package com.tommybart.chicagotraintracker.ui.activities.main
 
 import android.Manifest
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.tommybart.chicagotraintracker.R
+import com.tommybart.chicagotraintracker.data.provider.MAIN_SHOULD_REQUEST_LOCATION_PERMISSION
+import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.data.provider.USE_DEVICE_LOCATION_PREFERENCE
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 100
 
 class MainActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by closestKodein()
-    private val viewModelFactory: MainViewModelFactory by instance<MainViewModelFactory>()
-    private lateinit var viewModel: MainViewModel
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val isNightMode = sharedPreferences.getBoolean(THEME_PREFERENCE, true)
+        if (isNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -49,7 +57,14 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        requestLocationPermission()
+        // Only ask for location on first install. Permission can be requested again in the settings
+        // fragment.
+        if (sharedPreferences.getBoolean(MAIN_SHOULD_REQUEST_LOCATION_PERMISSION, true)) {
+            requestLocationPermission()
+        }
+        sharedPreferences.edit()
+            .putBoolean(MAIN_SHOULD_REQUEST_LOCATION_PERMISSION, false)
+            .apply()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -73,8 +88,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                viewModel.preferences
-                    .edit()
+                sharedPreferences.edit()
                     .putBoolean(USE_DEVICE_LOCATION_PREFERENCE, false)
                     .apply()
             }

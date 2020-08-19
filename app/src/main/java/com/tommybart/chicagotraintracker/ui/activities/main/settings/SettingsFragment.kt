@@ -7,6 +7,8 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -34,6 +36,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
+        requireActivity().title = "Settings"
 
         defaultStationPref = findPreference(DEFAULT_STATION_PREFERENCE) as? Preference
         useLocationPref = findPreference(USE_DEVICE_LOCATION_PREFERENCE) as? SwitchPreference
@@ -81,21 +84,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
         return true
     }
 
-    // Might need this for theme switching
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            USE_DEVICE_LOCATION_PREFERENCE -> {
-                Log.d(TAG, "Use device location changed")
-            }
-            DEFAULT_STATION_PREFERENCE -> {
-                Log.d(TAG, "Default station changed")
-            }
-            THEME_PREFERENCE -> {
-                Log.d(TAG, "Theme changed")
-            }
-        }
-    }
-
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         if (preference != null
             && preference is SwitchPreference
@@ -109,6 +97,25 @@ class SettingsFragment : PreferenceFragmentCompat(),
             }
         }
         return true
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            USE_DEVICE_LOCATION_PREFERENCE -> {
+                Log.d(TAG, "Use device location changed")
+            }
+            DEFAULT_STATION_PREFERENCE -> {
+                Log.d(TAG, "Default station changed")
+            }
+            THEME_PREFERENCE -> {
+                Log.d(TAG, "Theme changed")
+//                val isNightMode = preferenceManager.sharedPreferences.getBoolean(key, true)
+//                (activity as? AppCompatActivity)?.delegate?.localNightMode =
+//                    if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES
+//                    else AppCompatDelegate.MODE_NIGHT_NO
+                activity?.recreate()
+            }
+        }
     }
 
     private fun hasLocationPermission(): Boolean {

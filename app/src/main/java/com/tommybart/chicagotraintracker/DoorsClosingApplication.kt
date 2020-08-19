@@ -19,7 +19,6 @@ import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
 import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepositoryImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.data.repository.StationRepositoryImpl
-import com.tommybart.chicagotraintracker.ui.activities.main.MainViewModelFactory
 import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.ArrivalsViewModelFactory
 import com.tommybart.chicagotraintracker.ui.activities.search.SearchViewModelFactory
 import org.kodein.di.Kodein
@@ -89,9 +88,6 @@ class DoorsClosingApplication : Application(), KodeinAware {
                 instance()
             )
         }
-
-        // MainActivity ViewModelFactory
-        bind() from provider { MainViewModelFactory(instance()) }
 
         // ArrivalsFragment ViewModelFactory
         bind() from provider { ArrivalsViewModelFactory(instance(), instance()) }

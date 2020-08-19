@@ -27,6 +27,8 @@ class AboutFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(AboutViewModel::class.java)
         // TODO: Use the ViewModel
+
+        requireActivity().title = "About"
     }
 
 }
