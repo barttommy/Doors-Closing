@@ -1,7 +1,7 @@
 package com.tommybart.chicagotraintracker.data.network.chicagotransitauthority
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
@@ -12,20 +12,18 @@ import com.tommybart.chicagotraintracker.internal.extensions.TAG
  */
 private const val CTA_MAX_STATION_REQUEST = 4
 
-class RouteArrivalsNetworkDataSourceImpl(
+class CtaNetworkDataSourceImpl(
     private val ctaApiService: CtaApiService
-) : RouteArrivalsNetworkDataSource {
+) : CtaNetworkDataSource {
 
-    override val downloadRouteData: MutableLiveData<CtaApiResponse> = MutableLiveData()
-
-    override suspend fun fetchRouteData(requestedStationMapIds: List<Int>) {
-        try {
-            val fetchArrivalData = ctaApiService
+    override suspend fun fetchRouteData(requestedStationMapIds: List<Int>): CtaApiResponse? {
+        return try {
+            ctaApiService
                 .getArrivalsAsync(requestedStationMapIds.take(CTA_MAX_STATION_REQUEST))
                 .await()
-            downloadRouteData.postValue(fetchArrivalData)
         } catch (e: NoNetworkConnectionException) {
             Log.w(TAG, "No network connection", e)
+            null
         }
     }
 }

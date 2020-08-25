@@ -5,12 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsInfoEntry
-import com.tommybart.chicagotraintracker.data.db.entity.RouteArrivalsRequestEntry
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.data.db.entity.StationInfoEntry
-import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.RouteEntry
-import com.tommybart.chicagotraintracker.data.db.entity.routearrivals.TrainEntry
+import com.tommybart.chicagotraintracker.data.db.entity.statearrivals.ArrivalEntry
+import com.tommybart.chicagotraintracker.data.db.entity.statearrivals.StateInfoEntry
 import com.tommybart.chicagotraintracker.data.db.typeconverters.IntListConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateTimeConverter
@@ -20,10 +18,8 @@ import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConvert
     entities = [
         StationEntry::class,
         StationInfoEntry::class,
-        RouteArrivalsInfoEntry::class,
-        RouteArrivalsRequestEntry::class,
-        RouteEntry::class,
-        TrainEntry::class
+        StateInfoEntry::class,
+        ArrivalEntry::class
     ],
     version = 1
 )
@@ -37,9 +33,7 @@ abstract class DoorsClosingDatabase : RoomDatabase() {
 
     abstract fun stationDao(): StationDao
     abstract fun stationInfoDao(): StationInfoDao
-    abstract fun routeArrivalsDao(): RouteArrivalsDao
-    abstract fun routeArrivalsInfoDao(): RouteArrivalsInfoDao
-    abstract fun routeArrivalsRequestDao(): RouteArrivalsRequestDao
+    abstract fun stateArrivalsDao(): StateArrivalsDao
 
     companion object {
         @Volatile
@@ -54,7 +48,6 @@ abstract class DoorsClosingDatabase : RoomDatabase() {
             Room.databaseBuilder(
                 context.applicationContext,
                 DoorsClosingDatabase::class.java, "doorsClosing.db"
-            )
-                .build()
+            ).build()
     }
 }

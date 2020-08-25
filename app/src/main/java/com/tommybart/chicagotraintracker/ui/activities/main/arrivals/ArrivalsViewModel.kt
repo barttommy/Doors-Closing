@@ -1,28 +1,29 @@
 package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.provider.PreferenceProvider
-import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import com.tommybart.chicagotraintracker.data.repository.RouteRepository
+import com.tommybart.chicagotraintracker.internal.arrivalsstate.ArrivalsState
 
 class ArrivalsViewModel(
-    private val routeArrivalsRepository: RouteArrivalsRepository,
+    private val routeRepository: RouteRepository,
     preferenceProvider: PreferenceProvider
 ) : ViewModel() {
 
     val isAllowingDeviceLocation: Boolean = preferenceProvider.isAllowingDeviceLocation()
 
-    suspend fun getRouteDataAsync(): Deferred<LiveData<List<Route>>> =
-        GlobalScope.async {
-            routeArrivalsRepository.getRouteData()
+    private val arrivalStateLiveData: MutableLiveData<ArrivalsState> = MutableLiveData()
+
+    val routeListLiveData: LiveData<List<Route>?> =
+        Transformations.switchMap(arrivalStateLiveData) { state ->
+            routeRepository.getRouteData(state)
         }
 
-    suspend fun getRouteDataSearchAsync(searchMapId: Int): Deferred<LiveData<List<Route>>> =
-        GlobalScope.async {
-            routeArrivalsRepository.getRouteDataSearch(searchMapId)
-        }
+    fun setArrivalState(arrivalState: ArrivalsState) {
+        arrivalStateLiveData.value = arrivalState
+    }
 }

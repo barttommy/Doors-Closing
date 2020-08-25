@@ -17,7 +17,6 @@ import com.tommybart.chicagotraintracker.data.models.Train;
 
 import java.util.ArrayList;
 
-// TODO clean up?
 public class ArrivalsRecyclerAdapter
         extends RecyclerView.Adapter<ArrivalsRecyclerAdapter.ViewHolder> {
 

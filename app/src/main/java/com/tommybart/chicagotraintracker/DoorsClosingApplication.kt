@@ -12,11 +12,11 @@ import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaApiS
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSource
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.RouteArrivalsNetworkDataSourceImpl
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.provider.*
-import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepository
-import com.tommybart.chicagotraintracker.data.repository.RouteArrivalsRepositoryImpl
+import com.tommybart.chicagotraintracker.data.repository.RouteRepository
+import com.tommybart.chicagotraintracker.data.repository.RouteRepositoryImpl
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.data.repository.StationRepositoryImpl
 import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.ArrivalsViewModelFactory
@@ -39,16 +39,14 @@ class DoorsClosingApplication : Application(), KodeinAware {
         bind() from singleton { DoorsClosingDatabase(instance()) }
         bind() from singleton { instance<DoorsClosingDatabase>().stationDao() }
         bind() from singleton { instance<DoorsClosingDatabase>().stationInfoDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsInfoDao() }
-        bind() from singleton { instance<DoorsClosingDatabase>().routeArrivalsRequestDao() }
+        bind() from singleton { instance<DoorsClosingDatabase>().stateArrivalsDao() }
 
-        // API Services
+        // Retrofit API Services
         bind<ConnectivityInterceptor>() with singleton { ConnectivityInterceptorImpl(instance()) }
         bind() from singleton { SodaApiService(instance(), instance()) }
         bind() from singleton { CtaApiService(instance(), instance()) }
 
-        // Location
+        // Fused Location Provider
         bind() from provider { LocationServices.getFusedLocationProviderClient(instance<Context>()) }
 
         // Providers
@@ -73,16 +71,14 @@ class DoorsClosingApplication : Application(), KodeinAware {
             )
         }
 
-        // RouteArrivals
-        bind<RouteArrivalsNetworkDataSource>() with singleton {
-            RouteArrivalsNetworkDataSourceImpl(
+        // StateArrivals
+        bind<CtaNetworkDataSource>() with singleton {
+            CtaNetworkDataSourceImpl(
                 instance()
             )
         }
-        bind<RouteArrivalsRepository>() with singleton {
-            RouteArrivalsRepositoryImpl(
-                instance(),
-                instance(),
+        bind<RouteRepository>() with singleton {
+            RouteRepositoryImpl(
                 instance(),
                 instance(),
                 instance()

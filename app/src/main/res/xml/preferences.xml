@@ -15,7 +15,6 @@
             app:iconSpaceReserved="false" />
 
         <Preference
-            android:defaultValue="40380"
             android:dependency="USE_DEVICE_LOCATION"
             android:key="DEFAULT_STATION"
             android:summary="The default station for which arrivals are displayed"

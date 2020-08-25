@@ -17,25 +17,21 @@ import com.google.android.gms.location.LocationResult
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
+import com.tommybart.chicagotraintracker.internal.arrivalsstate.*
 import com.tommybart.chicagotraintracker.ui.LifecycleBoundLocationManager
 import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
-import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsstate.ArrivalsState
-import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsstate.ArrivalsStateContext
-import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsstate.DefaultState
-import com.tommybart.chicagotraintracker.ui.activities.main.arrivals.arrivalsstate.SearchState
 import com.tommybart.chicagotraintracker.ui.activities.search.SEARCH_ACTIVITY_REQUEST_CODE
 import com.tommybart.chicagotraintracker.ui.activities.search.STATION_RESULT_EXTRA
 import com.tommybart.chicagotraintracker.ui.activities.search.SearchActivity
 import com.tommybart.chicagotraintracker.ui.base.ScopedFragment
 import kotlinx.android.synthetic.main.fragment_arrivals.*
-import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 // TODO snackbar to indicate state switches
-// TODO do we want to restore state or go back to default when returning to fragment
+
 class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
     override val kodein: Kodein by closestKodein()
@@ -77,16 +73,23 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
         arrivalsStateContext = ArrivalsStateContext(viewModel)
         // TODO restore state from bundle
-        updateState(DefaultState())
-
-        if (viewModel.isAllowingDeviceLocation && hasLocationPermission()) {
-            bindLocationManager()
+        if (viewModel.isAllowingDeviceLocation) {
+            updateState(LocationState())
+        } else {
+            updateState(DefaultState())
         }
         bindUi()
     }
 
     override fun onResume() {
         super.onResume()
+        if (locationManager == null
+            && viewModel.isAllowingDeviceLocation
+            && hasLocationPermission()
+        ) {
+            updateState(LocationState())
+            bindLocationManager()
+        }
         refresh()
     }
 
@@ -109,8 +112,10 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
             R.id.fragment_arrivals_mnu_returnToDefaultState -> {
                 if (viewModel.isAllowingDeviceLocation && hasLocationPermission()) {
                     restartLocationUpdates()
+                    updateState(LocationState())
+                } else {
+                    updateState(DefaultState())
                 }
-                updateState(DefaultState())
                 refresh()
             }
         }
@@ -125,13 +130,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         fragment_arrivals_recycler.adapter = arrivalsRecyclerAdapter
         fragment_arrivals_recycler.layoutManager = LinearLayoutManager(activity)
         fragment_arrivals_recycler.addItemDecoration(MarginItemDecoration(24))
-    }
-
-    private fun refresh() = launch {
-        val arrivalsState = arrivalsStateContext.arrivalsState ?: return@launch
-        swiper.isRefreshing = true
-        val routeData = arrivalsState.getRouteDataAsync(arrivalsStateContext).await()
-        routeData.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.routeListLiveData.observe(viewLifecycleOwner, Observer { result ->
             when {
                 result == null -> return@Observer
                 result.isEmpty() -> {
@@ -147,6 +146,12 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         })
     }
 
+    private fun refresh() {
+        val arrivalsState = arrivalsStateContext.arrivalsState ?: return
+        viewModel.setArrivalState(arrivalsState)
+        swiper.isRefreshing = true
+    }
+
     private fun updateState(arrivalsState: ArrivalsState) {
         arrivalsStateContext.arrivalsState = arrivalsState
         updateTitle()
@@ -159,7 +164,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
     private fun updateOptionsMenu() {
         when (arrivalsStateContext.arrivalsState) {
-            is DefaultState -> {
+            is DefaultState, is LocationState -> {
                 searchMenuItem?.isVisible = true
                 returnToDefaultMenuItem?.isVisible = false
             }
@@ -171,9 +176,11 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
     }
 
     private fun updateRecycler(result: List<Route>) {
+        result.map { route -> route.arrivals.sort() }
         arrivalsRecyclerList.clear()
         arrivalsRecyclerList.addAll(result)
         arrivalsRecyclerList.sort()
+
         arrivalsRecyclerAdapter.notifyDataSetChanged()
     }
 
@@ -203,6 +210,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         )
     }
 
+    // Called before onResume() in lifecycle
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE
@@ -214,7 +222,6 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
                 if (station != null) {
                     removeLocationUpdates()
                     updateState(SearchState(station))
-                    refresh()
                 }
             }
         }

@@ -17,7 +17,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.tommybart.chicagotraintracker.R
-import com.tommybart.chicagotraintracker.data.provider.MAIN_SHOULD_REQUEST_LOCATION_PERMISSION
+import com.tommybart.chicagotraintracker.data.provider.SHOULD_REQUEST_LOCATION_PERMISSION
 import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.data.provider.USE_DEVICE_LOCATION_PREFERENCE
 import org.kodein.di.KodeinAware
@@ -59,11 +59,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         // Only ask for location on first install. Permission can be requested again in the settings
         // fragment.
-        if (sharedPreferences.getBoolean(MAIN_SHOULD_REQUEST_LOCATION_PERMISSION, true)) {
+        if (sharedPreferences.getBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, true)) {
             requestLocationPermission()
         }
         sharedPreferences.edit()
-            .putBoolean(MAIN_SHOULD_REQUEST_LOCATION_PERMISSION, false)
+            .putBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, false)
             .apply()
     }
 
@@ -87,9 +87,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 sharedPreferences.edit()
-                    .putBoolean(USE_DEVICE_LOCATION_PREFERENCE, false)
+                    .putBoolean(USE_DEVICE_LOCATION_PREFERENCE, true)
                     .apply()
             }
         }

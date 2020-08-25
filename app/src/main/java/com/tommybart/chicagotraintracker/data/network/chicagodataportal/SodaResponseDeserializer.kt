@@ -5,7 +5,6 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
-import com.tommybart.chicagotraintracker.data.models.Location
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import java.lang.reflect.Type
 
@@ -15,31 +14,12 @@ class SodaResponseDeserializer : JsonDeserializer<SodaApiResponse> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): SodaApiResponse {
-
         val stationList = mutableListOf<StationEntry>()
-        json?.asJsonArray?.forEach {
+        json?.asJsonArray?.forEach { jsonElement ->
             try {
-                val station = it.asJsonObject
-                val location = station.get("location").asJsonObject
-                val stationEntry = StationEntry(
-                    station.get("map_id").asInt,
-                    station.get("station_name").asString,
-                    station.get("station_descriptive_name").asString,
-                    station.get("stop_name").asString,
-                    station.get("direction_id").asString,
-                    Location(location.get("latitude").asDouble, location.get("longitude").asDouble),
-                    station.get("ada").asBoolean,
-                    station.get("red").asBoolean,
-                    station.get("blue").asBoolean,
-                    station.get("brn").asBoolean,
-                    station.get("g").asBoolean,
-                    station.get("o").asBoolean,
-                    station.get("pnk").asBoolean,
-                    station.get("p").asBoolean,
-                    station.get("pexp").asBoolean,
-                    station.get("y").asBoolean
-                )
-                addStation(stationEntry, stationList)
+                val stationEntry: StationEntry? =
+                    context?.deserialize(jsonElement, StationEntry::class.java)
+                stationEntry?.let { addStation(it, stationList) }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to parse station", e)
             }

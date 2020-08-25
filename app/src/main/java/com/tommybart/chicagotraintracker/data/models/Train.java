@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.tommybart.chicagotraintracker.internal.TrainLine;
 
+import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;
@@ -12,9 +13,8 @@ import org.threeten.bp.ZonedDateTime;
 
 import static com.tommybart.chicagotraintracker.data.models.Route.CHICAGO_ZONE_ID;
 
-public class Train {
+public class Train implements Comparable<Train> {
 
-    private long routeId;
     private int mapId;
     private int runNumber;
     private TrainLine trainLine;
@@ -25,10 +25,9 @@ public class Train {
     private Double bearing;
     private Location location;
 
-    public Train(long routeId, int mapId, int runNumber, TrainLine trainLine,
+    public Train(int mapId, int runNumber, TrainLine trainLine,
                  LocalDateTime predictionDateTime, LocalDateTime arrivalDateTime, Boolean isApproaching,
                  Boolean isDelayed, Double bearing, Location location) {
-        this.routeId = routeId;
         this.mapId = mapId;
         this.runNumber = runNumber;
         this.trainLine = trainLine;
@@ -38,10 +37,6 @@ public class Train {
         this.isDelayed = isDelayed;
         this.bearing = bearing;
         this.location = location;
-    }
-
-    public long getRouteId() {
-        return routeId;
     }
 
     public int getMapId() {
@@ -108,11 +103,11 @@ public class Train {
         return String.format("Arriving at %s:%s %s", hour, minutesString, meridiem);
     }
 
+
     @NonNull
     @Override
     public String toString() {
         return "Train{" +
-                "routeId=" + routeId +
                 ", runNumber=" + runNumber +
                 ", trainLine=" + trainLine +
                 ", predictionDateTime='" + predictionDateTime + '\'' +
@@ -122,5 +117,12 @@ public class Train {
                 ", bearing=" + bearing +
                 ", location=" + location +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Train train) {
+        int cmp = this.arrivalDateTime.compareTo(train.arrivalDateTime);
+        if (cmp == 0) cmp = Integer.compare(this.runNumber, train.runNumber);
+        return cmp;
     }
 }

@@ -19,46 +19,38 @@ class RequestedStationsProviderImpl(
 
     private val appContext: Context = context.applicationContext
 
-    override suspend fun hasRequestedStationsChanged(requestedStationMapIds: List<Int>): Boolean {
-        val nearbyStationsChanged = try {
-            hasNearbyStationsChanged(requestedStationMapIds)
+    override suspend fun hasLocationRequestChanged(lastLocationMapIds: List<Int>): Boolean {
+       return try {
+            hasNearbyStationsChanged(lastLocationMapIds)
         } catch (e: LocationPermissionNotGrantedException) {
             false
         }
-        val defaultPreferenceChanged =
-            if (!isUsingDeviceLocation()) {
-                when {
-                    // First two cases cover when location is initially disabled
-                    requestedStationMapIds.isEmpty() -> true
-                    requestedStationMapIds.size > 1 -> true
-                    else -> hasDefaultPreferenceChanged(requestedStationMapIds[0])
-                }
-            } else {
-                false
-            }
+    }
 
-        return nearbyStationsChanged || defaultPreferenceChanged
+    override fun hasDefaultRequestChanged(lastDefaultMapId: Int): Boolean {
+        return hasDefaultPreferenceChanged(lastDefaultMapId)
     }
 
     // TODO: can we avoid doing things twice between this and hasRequestedStationsChanged?
-    override suspend fun getNewRequestMapIds(): List<Int>? {
-        if (isUsingDeviceLocation()) {
-            try {
-                val deviceLocation: Location = getLastDeviceLocationAsync().await()
-                    ?: return null
-                return nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
-            } catch (e: LocationPermissionNotGrantedException) {
-                return null
-            }
-        } else {
-            return listOf(getCustomDefaultStation())
+    override suspend fun getNewLocationRequestMapIds(): List<Int>? {
+        try {
+            val deviceLocation: Location = getLastDeviceLocationAsync().await()
+                ?: return null
+            val result = nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+            return if (result.isEmpty()) null else result
+        } catch (e: LocationPermissionNotGrantedException) {
+            return null
         }
     }
 
-    private suspend fun hasNearbyStationsChanged(requestedStationMapIds: List<Int>): Boolean {
+    override fun getNewDefaultRequestMapId(): Int {
+        return getCustomDefaultStation()
+    }
+
+    private suspend fun hasNearbyStationsChanged(lastRequestedMapIds: List<Int>): Boolean {
         if (!isUsingDeviceLocation()) return false
         val deviceLocation: Location = getLastDeviceLocationAsync().await() ?: return false
-        return requestedStationMapIds != nearbyStationsProvider.getNearbyStationMapIds(
+        return lastRequestedMapIds != nearbyStationsProvider.getNearbyStationMapIds(
             deviceLocation
         )
     }
