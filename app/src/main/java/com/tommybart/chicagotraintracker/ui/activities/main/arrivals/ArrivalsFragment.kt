@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationResult
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
+import com.tommybart.chicagotraintracker.internal.Resource
 import com.tommybart.chicagotraintracker.internal.arrivalsstate.*
 import com.tommybart.chicagotraintracker.ui.LifecycleBoundLocationManager
 import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
@@ -132,13 +133,13 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         fragment_arrivals_recycler.addItemDecoration(MarginItemDecoration(24))
         viewModel.routeListLiveData.observe(viewLifecycleOwner, Observer { result ->
             when {
-                result == null -> return@Observer
-                result.isEmpty() -> {
+                result == null || result is Resource.Loading -> return@Observer
+                result is Resource.Error || result.data == null || result.data.isEmpty() -> {
                     swiper.isRefreshing = false
                     fragment_arrivals_recycler.visibility = View.GONE
                 }
                 else -> {
-                    updateRecycler(result)
+                    updateRecycler(result.data)
                     swiper.isRefreshing = false
                     fragment_arrivals_recycler.visibility = View.VISIBLE
                 }

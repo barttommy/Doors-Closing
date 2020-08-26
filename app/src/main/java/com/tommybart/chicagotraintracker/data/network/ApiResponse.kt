@@ -1,5 +1,3 @@
-package com.tommybart.chicagotraintracker.data.network
-
 /*
  * Copyright (C) 2017 The Android Open Source Project
  *
@@ -15,6 +13,8 @@ package com.tommybart.chicagotraintracker.data.network
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.tommybart.chicagotraintracker.data.network
 
 import retrofit2.Response
 import java.util.regex.Pattern

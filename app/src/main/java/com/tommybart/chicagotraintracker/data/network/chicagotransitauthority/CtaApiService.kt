@@ -2,11 +2,12 @@ package com.tommybart.chicagotraintracker.data.network.chicagotransitauthority
 
 import android.content.Context
 import android.util.Log
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.R
+import com.tommybart.chicagotraintracker.data.network.ApiResponse
+import com.tommybart.chicagotraintracker.data.network.LiveDataCallAdapterFactory
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
-import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -22,9 +23,9 @@ const val CTA_FETCH_DELAY_MINUTES: Long = 2 // TODO: one minute? maybe 1.5?
 interface CtaApiService {
 
     @GET("ttarrivals.aspx?outputType=JSON")
-    fun getArrivalsAsync(
+    fun getArrivals(
         @Query("mapid") requestedStationMapIds: List<Int>
-    ): Deferred<CtaApiResponse>
+    ): LiveData<ApiResponse<CtaApiResponse>>
 
     companion object {
         operator fun invoke(
@@ -56,7 +57,7 @@ interface CtaApiService {
             return Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(BASE_URL)
-                .addCallAdapterFactory(CoroutineCallAdapterFactory())
+                .addCallAdapterFactory(LiveDataCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(CtaApiService::class.java)

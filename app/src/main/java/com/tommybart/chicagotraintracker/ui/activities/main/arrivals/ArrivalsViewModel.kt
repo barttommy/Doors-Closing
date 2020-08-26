@@ -7,7 +7,11 @@ import androidx.lifecycle.ViewModel
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.provider.PreferenceProvider
 import com.tommybart.chicagotraintracker.data.repository.RouteRepository
+import com.tommybart.chicagotraintracker.internal.Resource
 import com.tommybart.chicagotraintracker.internal.arrivalsstate.ArrivalsState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ArrivalsViewModel(
     private val routeRepository: RouteRepository,
@@ -16,14 +20,34 @@ class ArrivalsViewModel(
 
     val isAllowingDeviceLocation: Boolean = preferenceProvider.isAllowingDeviceLocation()
 
-    private val arrivalStateLiveData: MutableLiveData<ArrivalsState> = MutableLiveData()
+    private val _arrivalStateLiveData: MutableLiveData<RouteRequest> = MutableLiveData()
 
-    val routeListLiveData: LiveData<List<Route>?> =
-        Transformations.switchMap(arrivalStateLiveData) { state ->
-            routeRepository.getRouteData(state)
+    val routeListLiveData: LiveData<Resource<List<Route>>> =
+        Transformations.switchMap(_arrivalStateLiveData) { request ->
+            routeRepository.getRouteData(
+                request.arrivalState,
+                request.requestedStationMapIds,
+                request.isFetchNeeded
+            )
         }
 
     fun setArrivalState(arrivalState: ArrivalsState) {
-        arrivalStateLiveData.value = arrivalState
+        CoroutineScope(Dispatchers.IO).launch {
+            val requestedStationMapIds = routeRepository.getRequestStationMapIds(arrivalState)
+            if (requestedStationMapIds != null) {
+                val isFetchNeeded = routeRepository.isFetchRouteDataNeeded(
+                    arrivalState,
+                    requestedStationMapIds
+                )
+                val routeRequest = RouteRequest(arrivalState, requestedStationMapIds, isFetchNeeded)
+                _arrivalStateLiveData.postValue(routeRequest)
+            }
+        }
     }
+
+    private data class RouteRequest(
+        val arrivalState: ArrivalsState,
+        val requestedStationMapIds: List<Int>,
+        val isFetchNeeded: Boolean
+    )
 }

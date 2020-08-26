@@ -12,8 +12,6 @@ import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaApiS
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaNetworkDataSource
-import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaNetworkDataSourceImpl
 import com.tommybart.chicagotraintracker.data.provider.*
 import com.tommybart.chicagotraintracker.data.repository.RouteRepository
 import com.tommybart.chicagotraintracker.data.repository.RouteRepositoryImpl
@@ -72,11 +70,11 @@ class DoorsClosingApplication : Application(), KodeinAware {
         }
 
         // StateArrivals
-        bind<CtaNetworkDataSource>() with singleton {
-            CtaNetworkDataSourceImpl(
-                instance()
-            )
-        }
+//        bind<CtaNetworkDataSource>() with singleton {
+//            CtaNetworkDataSourceImpl(
+//                instance()
+//            )
+//        }
         bind<RouteRepository>() with singleton {
             RouteRepositoryImpl(
                 instance(),

@@ -5,5 +5,5 @@ interface RequestedStationsProvider {
     fun hasDefaultRequestChanged(lastDefaultMapId: Int): Boolean
 
     suspend fun getNewLocationRequestMapIds(): List<Int>?
-    fun getNewDefaultRequestMapId(): Int?
+    fun getNewDefaultRequestMapId(): Int
 }
