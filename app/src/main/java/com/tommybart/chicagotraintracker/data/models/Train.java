@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 
 import com.tommybart.chicagotraintracker.internal.TrainLine;
 
-import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneId;

@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/fragment_arrivals_mnu_search"
-        android:icon="@drawable/baseline_search_white_36"
+        android:icon="@drawable/ic_search_black_48dp"
         android:title="@string/search"
         app:showAsAction="ifRoom"
         app:iconTint="?android:attr/textColor"/>
     <item
         android:id="@+id/fragment_arrivals_mnu_returnToDefaultState"
-        android:icon="@android:drawable/ic_menu_revert"
+        android:icon="@drawable/ic_undo_black_48dp"
         android:title="@string/return_from_search"
         app:showAsAction="ifRoom"
         app:iconTint="?android:attr/textColor"/>

@@ -18,7 +18,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.provider.SHOULD_REQUEST_LOCATION_PERMISSION
-import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
+import com.tommybart.chicagotraintracker.data.provider.USE_DARK_THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.data.provider.USE_DEVICE_LOCATION_PREFERENCE
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val isNightMode = sharedPreferences.getBoolean(THEME_PREFERENCE, true)
+        val isNightMode = sharedPreferences.getBoolean(USE_DARK_THEME_PREFERENCE, true)
         if (isNightMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {

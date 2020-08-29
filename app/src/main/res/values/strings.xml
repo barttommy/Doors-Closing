@@ -16,7 +16,7 @@
     <string name="email">doorsclosingapp@gmail.com</string>
 
     <string name="station_label">Station Label</string>
-    <string name="direction_label">Direction Label</string>
+    <string name="destination_label">Destination Label</string>
     <string name="arrivals">Arrivals</string>
     <string name="time">Time</string>
     <string name="search">Search</string>
@@ -30,5 +30,7 @@
     <string name="green_line_is_available_at_this_station">Green line is available at this station</string>
     <string name="brown_line_is_available_at_this_station">Brown line is available at this station</string>
     <string name="return_from_search">Return from search</string>
+    <string name="station_is_disability_accessible">Station is disability accessible</string>
+    <string name="route_is_experiencing_delays">Route is experiencing delays</string>
 
 </resources>

@@ -1,8 +1,11 @@
 package com.tommybart.chicagotraintracker.internal
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
+import android.content.Context
+import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.tommybart.chicagotraintracker.R
+import com.tommybart.chicagotraintracker.data.provider.USE_DARK_THEME_PREFERENCE
 
 /*
  * Note: purple express and purple lines both appear as "p" in the CTA api response. Pexp is needed
@@ -28,17 +31,22 @@ enum class TrainLine(val value: String) {
         fun fromValue(value: String) = values.firstOrNull { it.value == value.toLowerCase() }
     }
 
-    fun getColor(resources: Resources): Int {
+    fun getColor(context: Context): Int {
         return when (this) {
-            RED -> resources.getColor(R.color.redLine, null)
-            BLUE -> resources.getColor(R.color.blueLine, null)
-            BROWN -> resources.getColor(R.color.brownLine, null)
-            GREEN -> resources.getColor(R.color.greenLine, null)
-            ORANGE -> resources.getColor(R.color.orangeLine, null)
-            PINK -> resources.getColor(R.color.pinkLine, null)
-            PURPLE -> resources.getColor(R.color.purpleLine, null)
-            PURPLE_EXPRESS -> resources.getColor(R.color.purpleLine, null)
-            YELLOW -> resources.getColor(R.color.yellowLine, null)
+            RED -> ContextCompat.getColor(context, R.color.redLine)
+            BLUE -> ContextCompat.getColor(context, R.color.blueLine)
+            BROWN -> ContextCompat.getColor(context, R.color.brownLine)
+            GREEN -> ContextCompat.getColor(context, R.color.greenLine)
+            ORANGE -> ContextCompat.getColor(context, R.color.orangeLine)
+            PINK -> ContextCompat.getColor(context, R.color.pinkLine)
+            PURPLE -> ContextCompat.getColor(context, R.color.purpleLine)
+            PURPLE_EXPRESS -> ContextCompat.getColor(context, R.color.purpleLine)
+            YELLOW -> {
+                val usingDarkTheme = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean(USE_DARK_THEME_PREFERENCE, true)
+                if (usingDarkTheme) ContextCompat.getColor(context, R.color.yellowLine)
+                else ContextCompat.getColor(context, R.color.yellowLineAlt)
+            }
         }
     }
 }

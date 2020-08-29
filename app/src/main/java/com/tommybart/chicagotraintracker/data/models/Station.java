@@ -8,14 +8,16 @@ public class Station implements Comparable<Station>, Serializable {
     private int mapId;
     private String name;
     private String detailedName;
+    private Boolean isAccessible;
     private AvailableTrainLines availableTrainLines;
     private Location location;
 
-    public Station(int mapId, String name, String detailedName,
+    public Station(int mapId, String name, String detailedName, Boolean isAccessible,
                    AvailableTrainLines availableTrainLines, Location location) {
         this.mapId = mapId;
         this.name = name;
         this.detailedName = detailedName;
+        this.isAccessible = isAccessible;
         this.availableTrainLines = availableTrainLines;
         this.location = location;
     }
@@ -30,6 +32,10 @@ public class Station implements Comparable<Station>, Serializable {
 
     public String getDetailedName() {
         return detailedName;
+    }
+
+    public Boolean getIsAccessible() {
+        return isAccessible;
     }
 
     public AvailableTrainLines getAvailableTrainLines() {

@@ -29,6 +29,6 @@ class PreferenceProviderImpl(
     }
 
     override fun isUsingDarkTheme(): Boolean {
-        return preferences.getBoolean(THEME_PREFERENCE, true)
+        return preferences.getBoolean(USE_DARK_THEME_PREFERENCE, true)
     }
 }

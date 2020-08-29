@@ -41,18 +41,22 @@ public class ArrivalsRecyclerAdapter
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Route selection = routeList.get(position);
-        int color = selection.getTrainLine().getColor(context.getResources());
+        int color = selection.getTrainLine().getColor(context);
 
         holder.trainImage.setColorFilter(color);
-        holder.directionText.setTextColor(color);
+        holder.destinationText.setTextColor(color);
+        holder.destinationText.setText(selection.getDestinationName());
         holder.stationText.setText(selection.getStationName());
-        holder.directionText.setText(selection.getDestinationName());
         holder.arrivalsText.setText("");
         holder.timeText.setText("");
+        holder.delayedImage.setVisibility(View.GONE);
 
         ArrayList<Train> trains = selection.getArrivals();
         int size = trains.size();
         for (int i = 0; i < size; i++) {
+            if (trains.get(i).isDelayed()) {
+                holder.delayedImage.setVisibility(View.VISIBLE);
+            }
             int minutes = trains.get(i).getArrivalTimeMinutes();
             String timeRemaining = (minutes <= 1) ? "Due" : minutes + " min";
             if (i == (size - 1)) {
@@ -77,18 +81,20 @@ public class ArrivalsRecyclerAdapter
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView stationText;
-        TextView directionText;
+        TextView destinationText;
         TextView arrivalsText;
         TextView timeText;
         ImageView trainImage;
+        ImageView delayedImage;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             stationText = itemView.findViewById(R.id.row_arrivals_tv_station);
-            directionText = itemView.findViewById(R.id.row_arrivals_tv_direction);
+            destinationText = itemView.findViewById(R.id.row_arrivals_tv_direction);
             arrivalsText = itemView.findViewById(R.id.row_arrivals_tv_route);
             timeText = itemView.findViewById(R.id.row_arrivals_tv_time);
             trainImage = itemView.findViewById(R.id.row_arrivals_iv_train);
+            delayedImage = itemView.findViewById(R.id.row_arrivals_iv_delayed);
         }
 
         @Override

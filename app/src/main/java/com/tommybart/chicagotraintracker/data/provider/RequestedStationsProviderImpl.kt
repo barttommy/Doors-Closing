@@ -4,10 +4,13 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.tommybart.chicagotraintracker.internal.LocationPermissionNotGrantedException
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.internal.extensions.asDeferred
+import com.tommybart.chicagotraintracker.ui.LOCATION_MIN_DIST_METERS
 import kotlinx.coroutines.Deferred
 
 class RequestedStationsProviderImpl(
@@ -18,6 +21,7 @@ class RequestedStationsProviderImpl(
 ) : RequestedStationsProvider {
 
     private val appContext: Context = context.applicationContext
+    private var simpleLocationCache: Pair<Location, List<Int>>? = null
 
     override suspend fun hasLocationRequestChanged(lastLocationMapIds: List<Int>): Boolean {
        return try {
@@ -31,12 +35,20 @@ class RequestedStationsProviderImpl(
         return hasDefaultPreferenceChanged(lastDefaultMapId)
     }
 
-    // TODO: can we avoid doing things twice between this and hasRequestedStationsChanged?
     override suspend fun getNewLocationRequestMapIds(): List<Int>? {
         try {
             val deviceLocation: Location = getLastDeviceLocationAsync().await()
                 ?: return null
-            val result = nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+
+            val result =
+                if (deviceLocation == simpleLocationCache?.first) {
+                    Log.d(TAG, "Using cached requested stations")
+                    simpleLocationCache?.second
+                        ?: nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+                } else {
+                    nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+                }
+
             return if (result.isEmpty()) null else result
         } catch (e: LocationPermissionNotGrantedException) {
             return null
@@ -50,9 +62,9 @@ class RequestedStationsProviderImpl(
     private suspend fun hasNearbyStationsChanged(lastRequestedMapIds: List<Int>): Boolean {
         if (!isUsingDeviceLocation()) return false
         val deviceLocation: Location = getLastDeviceLocationAsync().await() ?: return false
-        return lastRequestedMapIds != nearbyStationsProvider.getNearbyStationMapIds(
-            deviceLocation
-        )
+        val nearbyStationMapIds = nearbyStationsProvider.getNearbyStationMapIds(deviceLocation)
+        simpleLocationCache = Pair(deviceLocation, nearbyStationMapIds)
+        return lastRequestedMapIds != nearbyStationMapIds
     }
 
     private fun getLastDeviceLocationAsync(): Deferred<Location?> {

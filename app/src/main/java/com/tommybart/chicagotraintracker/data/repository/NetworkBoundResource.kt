@@ -58,10 +58,18 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
 
     private fun fetchFromNetwork(dbSource: LiveData<ResultType>) {
         val apiResponse = createCall()
+
+        // Note: we could re-attach dbSource here, but because data in this context becomes
+        // out of date relatively fast, it makes the user experience a little awkward. For example,
+        // if the user opens the app after a couple minutes they may see the cached data appear on
+        // the screen for a second, with each train saying "Due". After a few hours, because old
+        // trains are deleted from the db, the user will get a "No trains error" while network
+        // fetch is happening, instead of indicating the swipe to refresh.
+
         // we re-attach dbSource as a new source, it will dispatch its latest value quickly
-        result.addSource(dbSource) { newData ->
-            setValue(Resource.Loading(newData))
-        }
+//        result.addSource(dbSource) { newData ->
+//            setValue(Resource.Loading(newData))
+//        }
         result.addSource(apiResponse) { response ->
             result.removeSource(apiResponse)
             result.removeSource(dbSource)
@@ -69,18 +77,22 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
                 is ApiSuccessResponse -> {
                     CoroutineScope(Dispatchers.IO).launch {
                         saveCallResult(processResponse(response))
-                    }
-                    // we specially request a new live data,
-                    // otherwise we will get immediately last cached value,
-                    // which may not be updated with latest results received from network.
-                    result.addSource(loadFromDb()) { newData ->
-                        setValue(Resource.Success(newData))
+                        CoroutineScope(Dispatchers.Main).launch {
+                            // we specially request a new live data,
+                            // otherwise we will get immediately last cached value,
+                            // which may not be updated with latest results received from network.
+                            result.addSource(loadFromDb()) { newData ->
+                                setValue(Resource.Success(newData))
+                            }
+                        }
                     }
                 }
                 is ApiEmptyResponse -> {
-                    // reload from disk whatever we had
-                    result.addSource(loadFromDb()) { newData ->
-                        setValue(Resource.Success(newData))
+                    CoroutineScope(Dispatchers.Main).launch {
+                        // reload from disk whatever we had
+                        result.addSource(loadFromDb()) { newData ->
+                            setValue(Resource.Success(newData))
+                        }
                     }
                 }
                 is ApiErrorResponse -> {
@@ -92,7 +104,6 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
             }
         }
     }
-
 
     // Called to save the result of the API response into the database
     @WorkerThread

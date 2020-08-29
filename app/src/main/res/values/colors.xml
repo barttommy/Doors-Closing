@@ -2,29 +2,35 @@
 <resources>
     <!-- App Colors: Day -->
     <color name="colorPrimary">#fafafa</color>
-    <color name="colorPrimaryDark">#e1e1e1</color>
+    <color name="colorPrimaryLight">#ffffff</color>
+    <color name="colorPrimaryDark">#c7c7c7</color>
     <color name="colorAccent">#2196F3</color>
     <color name="colorText">#000000</color>
-    <color name="colorTextHint">#A3A3A3</color>
+    <color name="colorTextHint">#BF000000</color>
 
     <!-- App Colors: Night -->
     <color name="colorPrimaryNight">#292929</color>
-    <color name="colorPrimaryDarkNight">#121212</color>
+    <color name="colorPrimaryLightNight">#515151</color>
+    <color name="colorPrimaryDarkNight">#000000</color>
     <color name="colorAccentNight">#2196F3</color>
     <color name="colorTextNight">#FFFFFF</color>
-    <color name="colorTextHintNight">#c4c4c4</color>
+    <color name="colorTextHintNight">#BFFFFFFF</color>
 
     <!-- Train Colors -->
-    <color name="brownLine">#b38054</color>
+    <color name="brownLine">#B38054</color>
     <color name="purpleLine">#a148e0</color>
     <color name="redLine">#e34242</color>
     <color name="blueLine">#3E86F5</color>
     <color name="greenLine">#34B13C</color>
     <color name="orangeLine">#FFA200</color>
     <color name="pinkLine">#F19CF5</color>
-    <color name="yellowLine">#f9e300</color>
+    <color name="yellowLine">#FFDC00</color>
+    <!-- Near orange color for light theme's white background -->
+    <color name="yellowLineAlt">#ffbf00</color>
 
     <!--  Other  -->
+    <color name="alert">#CC0202</color>
+    <color name="accessible">#0277BD</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>

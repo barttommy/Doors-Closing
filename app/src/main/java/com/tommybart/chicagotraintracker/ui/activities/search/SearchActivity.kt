@@ -14,7 +14,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Station
-import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
+import com.tommybart.chicagotraintracker.data.provider.USE_DARK_THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.MarginItemDecoration
 import com.tommybart.chicagotraintracker.ui.activities.main.MainActivity
@@ -43,7 +43,7 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
     public override fun onCreate(savedInstanceState: Bundle?) {
 
         val isNightMode = PreferenceManager.getDefaultSharedPreferences(this)
-            .getBoolean(THEME_PREFERENCE, true)
+            .getBoolean(USE_DARK_THEME_PREFERENCE, true)
         if (isNightMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
@@ -85,6 +85,20 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onQueryTextSubmit(query: String): Boolean {
+        Log.d(TAG, "onQueryTextSubmit: $query")
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String): Boolean {
+        if (this::stationList.isInitialized) {
+            doFilter(newText)
+        } else {
+            Log.d(TAG, "Cannot search: station data is not ready")
+        }
+        return false
+    }
+
     @SuppressLint("DefaultLocale")
     private fun doFilter(query: String) {
         stationSearchResults.clear()
@@ -95,16 +109,6 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
         }
         stationSearchResults.sort()
         searchRecyclerAdapter.notifyDataSetChanged()
-    }
-
-    override fun onQueryTextSubmit(query: String): Boolean {
-        Log.d(TAG, "onQueryTextSubmit: $query")
-        return false
-    }
-
-    override fun onQueryTextChange(newText: String): Boolean {
-        doFilter(newText)
-        return false
     }
 
     override fun onClick(view: View) {

@@ -10,5 +10,5 @@ const val DEFAULT_STATE_ID = 0
 class DefaultState : ArrivalsState {
 
     override val id: Int = DEFAULT_STATE_ID
-    override val title: String = "Default station"
+    override val title: String = "Default Station"
 }

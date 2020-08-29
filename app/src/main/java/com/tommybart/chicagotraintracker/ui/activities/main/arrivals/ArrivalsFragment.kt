@@ -132,16 +132,20 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         fragment_arrivals_recycler.layoutManager = LinearLayoutManager(activity)
         fragment_arrivals_recycler.addItemDecoration(MarginItemDecoration(24))
         viewModel.routeListLiveData.observe(viewLifecycleOwner, Observer { result ->
-            when {
-                result == null || result is Resource.Loading -> return@Observer
-                result is Resource.Error || result.data == null || result.data.isEmpty() -> {
+            when (result) {
+                is Resource.Loading, null -> return@Observer
+                is Resource.Error -> {
                     swiper.isRefreshing = false
                     fragment_arrivals_recycler.visibility = View.GONE
                 }
-                else -> {
-                    updateRecycler(result.data)
+                is Resource.Success -> {
+                    if (result.data == null || result.data.isEmpty()) {
+                        fragment_arrivals_recycler.visibility = View.GONE
+                    } else {
+                        updateRecycler(result.data)
+                        fragment_arrivals_recycler.visibility = View.VISIBLE
+                    }
                     swiper.isRefreshing = false
-                    fragment_arrivals_recycler.visibility = View.VISIBLE
                 }
             }
         })

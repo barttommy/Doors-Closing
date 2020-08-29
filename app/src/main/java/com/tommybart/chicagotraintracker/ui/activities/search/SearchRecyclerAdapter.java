@@ -80,6 +80,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+
             stationText = itemView.findViewById(R.id.row_search_tv_station);
 
             itemView.findViewById(R.id.row_search_iv_red).setTag(TrainLine.RED);

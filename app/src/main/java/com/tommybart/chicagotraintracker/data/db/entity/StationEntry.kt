@@ -21,14 +21,10 @@ data class StationEntry(
     val stationName: String,
     @SerializedName("station_descriptive_name")
     val stationDescriptiveName: String,
-    @SerializedName("stop_name")
-    val stopName: String,
-    @SerializedName("direction_id")
-    val cardinalDirection: String,
+    @SerializedName("ada")
+    val isDisabilityAccessible: Boolean,
     @Embedded
     val location: Location,
-    @SerializedName("ada")
-    val disabilityAccessible: Boolean,
     var red: Boolean,
     var blue: Boolean,
     @SerializedName("brn")
@@ -50,7 +46,12 @@ data class StationEntry(
     var id: Int? = null
 
     fun toStation() = Station(
-        mapId, stationName, stationDescriptiveName, convertAvailableTrainLines(), location
+        mapId,
+        stationName,
+        stationDescriptiveName,
+        isDisabilityAccessible,
+        convertAvailableTrainLines(),
+        location
     )
 
     private fun convertAvailableTrainLines() = AvailableTrainLines(

@@ -24,7 +24,7 @@
         android:id="@+id/row_arrivals_tv_direction"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/direction_label"
+        android:text="@string/destination_label"
         android:textColor="?android:attr/textColor"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -78,8 +78,23 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_train_black_48"
+        app:srcCompat="@drawable/ic_train_48dp"
         tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/row_arrivals_iv_delayed"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/route_is_experiencing_delays"
+        android:tint="@color/alert"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_info_black_48dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

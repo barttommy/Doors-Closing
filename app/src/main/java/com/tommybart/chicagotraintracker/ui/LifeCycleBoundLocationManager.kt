@@ -10,8 +10,8 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 
-private const val LOCATION_MIN_TIME: Long = 10 * 1000
-private const val LOCATION_MIN_DIST_METERS: Float = 100f // Chicago blocks are typically 200m x 100m
+private const val LOCATION_MIN_TIME: Long = 15 * 1000
+const val LOCATION_MIN_DIST_METERS: Float = 100f // Chicago blocks are typically 200m x 100m
 
 class LifecycleBoundLocationManager(
     lifecycleOwner: LifecycleOwner,

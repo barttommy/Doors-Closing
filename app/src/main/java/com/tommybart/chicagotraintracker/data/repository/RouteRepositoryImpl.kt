@@ -39,21 +39,27 @@ class RouteRepositoryImpl(
     ): LiveData<Resource<List<Route>>> {
 
         val requestDateTime = ZonedDateTime.now(ZoneId.of(CHICAGO_ZONE_ID)).toLocalDateTime()
+        deleteOldRouteData(arrivalsState.id, requestedStationMapIds, requestDateTime)
 
         return object : NetworkBoundResource<List<Route>, CtaApiResponse>() {
             override fun saveCallResult(item: CtaApiResponse) {
-                persistFetchedRouteData(arrivalsState.id, requestedStationMapIds, item)
+                val arrivalsContainer = item.arrivalsContainer
+                val stateInfoEntry = StateInfoEntry(
+                    arrivalsState.id,
+                    requestedStationMapIds,
+                    LocalDateTime.parse(arrivalsContainer.transmissionTime)
+                )
+                val stateArrivals = StateArrivals(stateInfoEntry, arrivalsContainer.arrivalEntries)
+                stateArrivalsDao.updateStateArrivals(stateArrivals)
             }
 
             override fun shouldFetch(data: List<Route>?): Boolean {
-                if (!isFetchNeeded)
-                    deleteOldRouteData(arrivalsState.id, requestedStationMapIds, requestDateTime)
                 return isFetchNeeded
             }
 
             override fun loadFromDb(): LiveData<List<Route>> {
                 return Transformations
-                    .map(stateArrivalsDao.getStateArrivals(arrivalsState.id)) { it.toRouteList() }
+                    .map(stateArrivalsDao.getStateArrivals(arrivalsState.id)) { it?.toRouteList() }
             }
 
             override fun createCall(): LiveData<ApiResponse<CtaApiResponse>> {
@@ -139,23 +145,6 @@ class RouteRepositoryImpl(
                 requestDateTime
             )
             Log.d(TAG, "Deleted $deleteCount old arrivals.")
-        }
-    }
-
-    private fun persistFetchedRouteData(
-        arrivalsStateId: Int,
-        requestedStationMapIds: List<Int>,
-        ctaApiResponse: CtaApiResponse
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val arrivalsContainer = ctaApiResponse.arrivalsContainer
-            val stateInfoEntry = StateInfoEntry(
-                arrivalsStateId,
-                requestedStationMapIds,
-                LocalDateTime.parse(arrivalsContainer.transmissionTime)
-            )
-            val stateArrivals = StateArrivals(stateInfoEntry, arrivalsContainer.arrivalEntries)
-            stateArrivalsDao.updateStateArrivals(stateArrivals)
         }
     }
 }

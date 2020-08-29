@@ -15,7 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Station
 import com.tommybart.chicagotraintracker.data.provider.DEFAULT_STATION_PREFERENCE
-import com.tommybart.chicagotraintracker.data.provider.THEME_PREFERENCE
+import com.tommybart.chicagotraintracker.data.provider.USE_DARK_THEME_PREFERENCE
 import com.tommybart.chicagotraintracker.data.provider.USE_DEVICE_LOCATION_PREFERENCE
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.ui.activities.search.SEARCH_ACTIVITY_REQUEST_CODE
@@ -23,7 +23,6 @@ import com.tommybart.chicagotraintracker.ui.activities.search.STATION_RESULT_EXT
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 100
 
-// TODO snackbar theme / styling?
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener,
@@ -105,12 +104,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
             DEFAULT_STATION_PREFERENCE -> {
                 Log.d(TAG, "Default station changed")
             }
-            THEME_PREFERENCE -> {
+            USE_DARK_THEME_PREFERENCE -> {
                 Log.d(TAG, "Theme changed")
-//                val isNightMode = preferenceManager.sharedPreferences.getBoolean(key, true)
-//                (activity as? AppCompatActivity)?.delegate?.localNightMode =
-//                    if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES
-//                    else AppCompatDelegate.MODE_NIGHT_NO
                 activity?.recreate()
             }
         }
