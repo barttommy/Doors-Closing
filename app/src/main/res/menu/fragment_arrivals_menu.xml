@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom"
         app:iconTint="?android:attr/textColor"/>
     <item
-        android:id="@+id/fragment_arrivals_mnu_returnToDefaultState"
+        android:id="@+id/fragment_arrivals_mnu_returnFromSearchState"
         android:icon="@drawable/ic_undo_black_48dp"
         android:title="@string/return_from_search"
         app:showAsAction="ifRoom"

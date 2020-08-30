@@ -31,8 +31,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-// TODO snackbar to indicate state switches
-
 class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
     override val kodein: Kodein by closestKodein()
@@ -98,7 +96,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.fragment_arrivals_menu, menu)
         searchMenuItem = menu.findItem(R.id.fragment_arrivals_mnu_search)
-        returnToDefaultMenuItem = menu.findItem(R.id.fragment_arrivals_mnu_returnToDefaultState)
+        returnToDefaultMenuItem = menu.findItem(R.id.fragment_arrivals_mnu_returnFromSearchState)
         updateOptionsMenu()
     }
 
@@ -110,7 +108,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
                     SEARCH_ACTIVITY_REQUEST_CODE
                 )
             }
-            R.id.fragment_arrivals_mnu_returnToDefaultState -> {
+            R.id.fragment_arrivals_mnu_returnFromSearchState -> {
                 if (viewModel.isAllowingDeviceLocation && hasLocationPermission()) {
                     restartLocationUpdates()
                     updateState(LocationState())
@@ -153,7 +151,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
     private fun refresh() {
         val arrivalsState = arrivalsStateContext.arrivalsState ?: return
-        viewModel.setArrivalState(arrivalsState)
+        viewModel.getRouteData(arrivalsState)
         swiper.isRefreshing = true
     }
 

@@ -31,7 +31,7 @@ class ArrivalsViewModel(
             )
         }
 
-    fun setArrivalState(arrivalState: ArrivalsState) {
+    fun getRouteData(arrivalState: ArrivalsState) {
         CoroutineScope(Dispatchers.IO).launch {
             val requestedStationMapIds = routeRepository.getRequestStationMapIds(arrivalState)
             if (requestedStationMapIds != null) {
