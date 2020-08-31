@@ -1,5 +1,6 @@
 package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -9,16 +10,17 @@ import com.tommybart.chicagotraintracker.data.provider.PreferenceProvider
 import com.tommybart.chicagotraintracker.data.repository.RouteRepository
 import com.tommybart.chicagotraintracker.internal.Resource
 import com.tommybart.chicagotraintracker.internal.arrivalsstate.ArrivalsState
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ArrivalsViewModel(
     private val routeRepository: RouteRepository,
-    preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider
 ) : ViewModel() {
 
-    val isAllowingDeviceLocation: Boolean = preferenceProvider.isAllowingDeviceLocation()
+    fun isAllowingDeviceLocation(): Boolean = preferenceProvider.isAllowingDeviceLocation()
 
     private val _arrivalStateLiveData: MutableLiveData<RouteRequest> = MutableLiveData()
 

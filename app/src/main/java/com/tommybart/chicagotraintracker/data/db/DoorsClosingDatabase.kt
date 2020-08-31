@@ -6,11 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.reflect.TypeToken
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 import com.tommybart.chicagotraintracker.data.db.entity.StationInfoEntry
 import com.tommybart.chicagotraintracker.data.db.entity.statearrivals.ArrivalEntry
@@ -24,7 +20,6 @@ import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaResp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import org.threeten.bp.LocalDate
 
 @Database(
@@ -90,7 +85,7 @@ abstract class DoorsClosingDatabase : RoomDatabase() {
                 ?.upsert(StationInfoEntry(PREPOPULATE_DATA_DATE, PREPOPULATE_DATA_DATE))
         }
 
-        // Date prepopulate data was downloaded to check against for updates
+        // The date prepopulate data was downloaded to check against for updates
         private val PREPOPULATE_DATA_DATE: LocalDate = LocalDate.parse("2020-08-29")
     }
 }

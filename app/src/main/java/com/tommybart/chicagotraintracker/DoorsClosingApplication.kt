@@ -69,12 +69,7 @@ class DoorsClosingApplication : Application(), KodeinAware {
             )
         }
 
-        // StateArrivals
-//        bind<CtaNetworkDataSource>() with singleton {
-//            CtaNetworkDataSourceImpl(
-//                instance()
-//            )
-//        }
+        // Route
         bind<RouteRepository>() with singleton {
             RouteRepositoryImpl(
                 instance(),

@@ -42,7 +42,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            refresh()
+            if (!swiper.isRefreshing) refresh()
         }
     }
     private var locationManager: LifecycleBoundLocationManager? = null
@@ -71,25 +71,46 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
             .get(ArrivalsViewModel::class.java)
 
         arrivalsStateContext = ArrivalsStateContext(viewModel)
+
         // TODO restore state from bundle
-        if (viewModel.isAllowingDeviceLocation) {
+
+        if (viewModel.isAllowingDeviceLocation() && hasLocationPermission()) {
             updateState(LocationState())
+            getLocationUpdates()
         } else {
             updateState(DefaultState())
         }
         bindUi()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE
+            && resultCode == Activity.RESULT_OK
+            && data != null
+        ) {
+            if (data.hasExtra(STATION_RESULT_EXTRA)) {
+                val station = data.getSerializableExtra(STATION_RESULT_EXTRA) as? Station
+                if (station != null) {
+                    removeLocationUpdates()
+                    updateState(SearchState(station))
+                }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        if (locationManager == null
-            && viewModel.isAllowingDeviceLocation
+        if (viewModel.isAllowingDeviceLocation()
             && hasLocationPermission()
+            && arrivalsStateContext.arrivalsState is DefaultState
         ) {
             updateState(LocationState())
-            bindLocationManager()
+            getLocationUpdates()
+            refresh()
+        } else if (!swiper.isRefreshing) {
+            refresh()
         }
-        refresh()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -109,9 +130,9 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
                 )
             }
             R.id.fragment_arrivals_mnu_returnFromSearchState -> {
-                if (viewModel.isAllowingDeviceLocation && hasLocationPermission()) {
-                    restartLocationUpdates()
+                if (viewModel.isAllowingDeviceLocation() && hasLocationPermission()) {
                     updateState(LocationState())
+                    getLocationUpdates()
                 } else {
                     updateState(DefaultState())
                 }
@@ -187,6 +208,13 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         arrivalsRecyclerAdapter.notifyDataSetChanged()
     }
 
+    private fun getLocationUpdates() {
+        if (locationManager == null)
+            bindLocationManager()
+        if (locationManager?.isEnabled == false)
+            restartLocationUpdates()
+    }
+
     private fun bindLocationManager() {
         locationManager = LifecycleBoundLocationManager(
             this,
@@ -211,23 +239,6 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
             this.requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION
         )
-    }
-
-    // Called before onResume() in lifecycle
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE
-            && resultCode == Activity.RESULT_OK
-            && data != null
-        ) {
-            if (data.hasExtra(STATION_RESULT_EXTRA)) {
-                val station = data.getSerializableExtra(STATION_RESULT_EXTRA) as? Station
-                if (station != null) {
-                    removeLocationUpdates()
-                    updateState(SearchState(station))
-                }
-            }
-        }
     }
 
     override fun onClick(v: View?) {

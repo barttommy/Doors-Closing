@@ -1,9 +1,11 @@
 package com.tommybart.chicagotraintracker.data.provider
 
 import android.location.Location
+import android.util.Log
 import com.tommybart.chicagotraintracker.data.models.Station
 import com.tommybart.chicagotraintracker.data.repository.StationRepository
 import com.tommybart.chicagotraintracker.internal.TrainLine
+import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import com.tommybart.chicagotraintracker.internal.getDistanceBetweenCoordinates
 import java.util.*
 
@@ -14,6 +16,7 @@ class NearbyStationsProviderImpl(
 ) : NearbyStationsProvider {
 
     override suspend fun getNearbyStationMapIds(location: Location): List<Int> {
+        Log.d(TAG, "Finding stations in range of user location")
         var trainLinesInRange = newTrainLinesInRange()
         val stationsInRange = getStationsInRange(location)
         stationsInRange.forEach { station ->
