@@ -13,13 +13,12 @@ import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CT
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.CtaApiService
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.response.CtaApiResponse
 import com.tommybart.chicagotraintracker.data.provider.RequestedStationsProvider
+import com.tommybart.chicagotraintracker.internal.ArrivalState
 import com.tommybart.chicagotraintracker.internal.Resource
-import com.tommybart.chicagotraintracker.internal.arrivalsstate.*
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -33,7 +32,7 @@ class RouteRepositoryImpl(
 ) : RouteRepository {
 
     override fun getRouteData(
-        arrivalsState: ArrivalsState,
+        arrivalsState: ArrivalState,
         requestedStationMapIds: List<Int>,
         isFetchNeeded: Boolean
     ): LiveData<Resource<List<Route>>> {
@@ -74,7 +73,7 @@ class RouteRepositoryImpl(
         }.asLiveData()
     }
 
-    override suspend fun getRequestStationMapIds(arrivalsState: ArrivalsState): List<Int>? {
+    override suspend fun getRequestStationMapIds(arrivalsState: ArrivalState): List<Int>? {
         val lastRequestMapIds = stateArrivalsDao.getStateArrivalsSync(arrivalsState.id)
             ?.stateInfoEntry
             ?.lastRequestMapIds
@@ -88,7 +87,7 @@ class RouteRepositoryImpl(
     }
 
     override fun isFetchRouteDataNeeded(
-        arrivalsState: ArrivalsState,
+        arrivalsState: ArrivalState,
         requestedStationMapIds: List<Int>
     ): Boolean {
         val stateInfoEntry = stateArrivalsDao.getStateArrivalsSync(arrivalsState.id)?.stateInfoEntry
@@ -105,31 +104,29 @@ class RouteRepositoryImpl(
     }
 
     private suspend fun hasRequestChanged(
-        arrivalsState: ArrivalsState,
+        arrivalsState: ArrivalState,
         lastRequestMapIds: List<Int>
     ): Boolean {
-        return when (arrivalsState.id) {
-            LOCATION_STATE_ID -> requestedStationsProvider.hasLocationRequestChanged(
-                lastRequestMapIds
-            )
-            DEFAULT_STATE_ID -> {
+        return when (arrivalsState) {
+            is ArrivalState.Location -> {
+                requestedStationsProvider.hasLocationRequestChanged(lastRequestMapIds)
+            }
+            is ArrivalState.Default -> {
                 return if (lastRequestMapIds.isEmpty() || lastRequestMapIds.size != 1) true
                 else requestedStationsProvider.hasDefaultRequestChanged(lastRequestMapIds[0])
             }
-            SEARCH_STATE_ID -> {
+            is ArrivalState.Search -> {
                 return if (lastRequestMapIds.isEmpty() || lastRequestMapIds.size != 1) true
-                else lastRequestMapIds[0] != (arrivalsState as SearchState).searchStation.mapId
+                else lastRequestMapIds[0] != arrivalsState.station.mapId
             }
-            else -> throw IllegalArgumentException()
         }
     }
 
-    private suspend fun getNewRequestStationMapIds(arrivalsState: ArrivalsState): List<Int>? {
-        return when (arrivalsState.id) {
-            LOCATION_STATE_ID -> requestedStationsProvider.getNewLocationRequestMapIds()
-            DEFAULT_STATE_ID -> listOf(requestedStationsProvider.getNewDefaultRequestMapId())
-            SEARCH_STATE_ID -> listOf((arrivalsState as SearchState).searchStation.mapId)
-            else -> throw IllegalArgumentException()
+    private suspend fun getNewRequestStationMapIds(arrivalsState: ArrivalState): List<Int>? {
+        return when (arrivalsState) {
+            is ArrivalState.Location -> requestedStationsProvider.getNewLocationRequestMapIds()
+            is ArrivalState.Default -> listOf(requestedStationsProvider.getNewDefaultRequestMapId())
+            is ArrivalState.Search -> listOf(arrivalsState.station.mapId)
         }
     }
 

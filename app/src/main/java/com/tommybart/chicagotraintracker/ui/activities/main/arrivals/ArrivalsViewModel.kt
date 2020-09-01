@@ -1,6 +1,5 @@
 package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -8,9 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.provider.PreferenceProvider
 import com.tommybart.chicagotraintracker.data.repository.RouteRepository
+import com.tommybart.chicagotraintracker.internal.ArrivalState
 import com.tommybart.chicagotraintracker.internal.Resource
-import com.tommybart.chicagotraintracker.internal.arrivalsstate.ArrivalsState
-import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +31,7 @@ class ArrivalsViewModel(
             )
         }
 
-    fun getRouteData(arrivalState: ArrivalsState) {
+    fun getRouteData(arrivalState: ArrivalState) {
         CoroutineScope(Dispatchers.IO).launch {
             val requestedStationMapIds = routeRepository.getRequestStationMapIds(arrivalState)
             if (requestedStationMapIds != null) {
@@ -48,7 +46,7 @@ class ArrivalsViewModel(
     }
 
     private data class RouteRequest(
-        val arrivalState: ArrivalsState,
+        val arrivalState: ArrivalState,
         val requestedStationMapIds: List<Int>,
         val isFetchNeeded: Boolean
     )

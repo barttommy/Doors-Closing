@@ -25,7 +25,9 @@ import com.tommybart.chicagotraintracker.data.network.ApiErrorResponse
 import com.tommybart.chicagotraintracker.data.network.ApiResponse
 import com.tommybart.chicagotraintracker.data.network.ApiSuccessResponse
 import com.tommybart.chicagotraintracker.internal.Resource
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // ResultType: Type for the Resource data.
 // RequestType: Type for the API response.
@@ -59,17 +61,17 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
     private fun fetchFromNetwork(dbSource: LiveData<ResultType>) {
         val apiResponse = createCall()
 
-        // Note: we could re-attach dbSource here, but because data in this context becomes
-        // out of date relatively fast, it makes the user experience a little awkward. For example,
-        // if the user opens the app after a couple minutes they may see the cached data appear on
-        // the screen for a second, with each train saying "Due". After a few hours, because old
-        // trains are deleted from the db, the user will get a "No trains error" while network
-        // fetch is happening, instead of indicating the swipe to refresh.
+        /*
+         * Note: we could re-attach dbSource here to display content to the user faster. For this
+         * app, however, if information is old and a network fetch is required, we don't want to
+         * show the user the cached information.
+         */
 
-        // we re-attach dbSource as a new source, it will dispatch its latest value quickly
+//        //we re-attach dbSource as a new source, it will dispatch its latest value quickly
 //        result.addSource(dbSource) { newData ->
 //            setValue(Resource.Loading(newData))
 //        }
+
         result.addSource(apiResponse) { response ->
             result.removeSource(apiResponse)
             result.removeSource(dbSource)
