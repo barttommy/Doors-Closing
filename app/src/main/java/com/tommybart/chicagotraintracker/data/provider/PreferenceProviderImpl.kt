@@ -19,13 +19,12 @@ class PreferenceProviderImpl(
         return preferences.getBoolean(USE_DEVICE_LOCATION_PREFERENCE, true)
     }
 
-    override fun getDefaultStation(): Int {
-        return preferences.getInt(DEFAULT_STATION_PREFERENCE, CLARK_LAKE_MAP_ID)
-//        return if (preferences.contains(DEFAULT_STATION_PREFERENCE)){
-//            preferences.getInt(DEFAULT_STATION_PREFERENCE, CLARK_LAKE_MAP_ID)
-//        } else {
-//            null
-//        }
+    override fun getDefaultStation(): Int? {
+        return if (preferences.contains(DEFAULT_STATION_PREFERENCE)){
+            preferences.getInt(DEFAULT_STATION_PREFERENCE, CLARK_LAKE_MAP_ID)
+        } else {
+            null
+        }
     }
 
     override fun isUsingDarkTheme(): Boolean {

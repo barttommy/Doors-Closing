@@ -35,8 +35,8 @@ class NearbyStationsProviderImpl(
         val stationList = stationRepository.getStationData()
         val stationsInRangeMap = hashMapOf<Station, Double>()
         stationList.forEach { station ->
-            val latitude = station.location.latitude
-            val longitude = station.location.longitude
+            val latitude = station.latLng.latitude
+            val longitude = station.latLng.longitude
             val distance = getDistanceBetweenCoordinates(
                 location.latitude, latitude,
                 location.longitude, longitude

@@ -10,16 +10,16 @@ public class Station implements Comparable<Station>, Serializable {
     private String detailedName;
     private Boolean isAccessible;
     private AvailableTrainLines availableTrainLines;
-    private Location location;
+    private LatLng latLng;
 
     public Station(int mapId, String name, String detailedName, Boolean isAccessible,
-                   AvailableTrainLines availableTrainLines, Location location) {
+                   AvailableTrainLines availableTrainLines, LatLng latLng) {
         this.mapId = mapId;
         this.name = name;
         this.detailedName = detailedName;
         this.isAccessible = isAccessible;
         this.availableTrainLines = availableTrainLines;
-        this.location = location;
+        this.latLng = latLng;
     }
 
     public int getMapId() {
@@ -42,8 +42,8 @@ public class Station implements Comparable<Station>, Serializable {
         return availableTrainLines;
     }
 
-    public Location getLocation() {
-        return location;
+    public LatLng getLatLng() {
+        return latLng;
     }
 
     @Override

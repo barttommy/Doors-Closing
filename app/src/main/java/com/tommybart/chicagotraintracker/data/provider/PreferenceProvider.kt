@@ -10,6 +10,6 @@ const val USE_DARK_THEME_PREFERENCE = "DARK_THEME"
 interface PreferenceProvider {
     val preferences: SharedPreferences
     fun isAllowingDeviceLocation(): Boolean
-    fun getDefaultStation(): Int
+    fun getDefaultStation(): Int?
     fun isUsingDarkTheme(): Boolean
 }

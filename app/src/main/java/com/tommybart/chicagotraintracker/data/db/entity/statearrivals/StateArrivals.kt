@@ -2,7 +2,7 @@ package com.tommybart.chicagotraintracker.data.db.entity.statearrivals
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.tommybart.chicagotraintracker.data.models.Location
+import com.tommybart.chicagotraintracker.data.models.LatLng
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Train
 import com.tommybart.chicagotraintracker.internal.TrainLine
@@ -29,7 +29,7 @@ data class StateArrivals(
             val trainLine = TrainLine.fromValue(arrival.trainLine)
             val location =
                 if (arrival.latitude == null || arrival.longitude == null) null
-                else Location(arrival.latitude, arrival.longitude)
+                else LatLng(arrival.latitude, arrival.longitude)
             val train = Train(
                 arrival.mapId,
                 arrival.runNumber,

@@ -48,7 +48,7 @@ class RequestedStationsProviderImpl(
         }
     }
 
-    override fun getNewDefaultRequestMapId(): Int {
+    override fun getNewDefaultRequestMapId(): Int? {
         return getCustomDefaultStation()
     }
 
@@ -104,7 +104,7 @@ class RequestedStationsProviderImpl(
         return getCustomDefaultStation() != mapId
     }
 
-    private fun getCustomDefaultStation(): Int {
+    private fun getCustomDefaultStation(): Int? {
         return preferenceProvider.getDefaultStation()
     }
 

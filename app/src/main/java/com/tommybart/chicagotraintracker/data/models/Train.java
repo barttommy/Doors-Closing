@@ -22,11 +22,11 @@ public class Train implements Comparable<Train> {
     private Boolean isApproaching;
     private Boolean isDelayed;
     private Double bearing;
-    private Location location;
+    private LatLng latLng;
 
     public Train(int mapId, int runNumber, TrainLine trainLine,
                  LocalDateTime predictionDateTime, LocalDateTime arrivalDateTime, Boolean isApproaching,
-                 Boolean isDelayed, Double bearing, Location location) {
+                 Boolean isDelayed, Double bearing, LatLng latLng) {
         this.mapId = mapId;
         this.runNumber = runNumber;
         this.trainLine = trainLine;
@@ -35,7 +35,7 @@ public class Train implements Comparable<Train> {
         this.isApproaching = isApproaching;
         this.isDelayed = isDelayed;
         this.bearing = bearing;
-        this.location = location;
+        this.latLng = latLng;
     }
 
     public int getMapId() {
@@ -71,8 +71,8 @@ public class Train implements Comparable<Train> {
     }
 
     @Nullable
-    public Location getLocation() {
-        return location;
+    public LatLng getLatLng() {
+        return latLng;
     }
 
     /*
@@ -114,7 +114,7 @@ public class Train implements Comparable<Train> {
                 ", isApproaching=" + isApproaching +
                 ", isDelayed=" + isDelayed +
                 ", bearing=" + bearing +
-                ", location=" + location +
+                ", location=" + latLng +
                 '}';
     }
 

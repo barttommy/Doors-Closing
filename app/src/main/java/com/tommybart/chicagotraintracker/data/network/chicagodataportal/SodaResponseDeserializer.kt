@@ -5,6 +5,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import java.lang.reflect.Type
 
@@ -24,7 +25,9 @@ class SodaResponseDeserializer : JsonDeserializer<SodaApiResponse> {
                 Log.e(TAG, "Failed to parse station", e)
             }
         }
-        return SodaApiResponse(stationList.toList())
+        return SodaApiResponse(
+            stationList.toList()
+        )
     }
 
     private fun addStation(stationEntry: StationEntry, stationList: MutableList<StationEntry>) {

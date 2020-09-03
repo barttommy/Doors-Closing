@@ -1,6 +1,7 @@
 package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 
 import android.util.Log
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import com.tommybart.chicagotraintracker.internal.NoNetworkConnectionException
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import org.threeten.bp.LocalDate
@@ -14,7 +15,9 @@ class StationNetworkDataSourceImpl(
             sodaApiService.getStationDataAsync().await()
         } catch (e: NoNetworkConnectionException) {
             Log.w(TAG, "No network connection", e)
-            SodaApiResponse(listOf())
+            SodaApiResponse(
+                listOf()
+            )
         }
     }
 

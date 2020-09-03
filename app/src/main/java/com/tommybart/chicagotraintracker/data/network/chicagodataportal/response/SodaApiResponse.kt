@@ -1,4 +1,4 @@
-package com.tommybart.chicagotraintracker.data.network.chicagodataportal
+package com.tommybart.chicagotraintracker.data.network.chicagodataportal.response
 
 import com.tommybart.chicagotraintracker.data.db.entity.StationEntry
 

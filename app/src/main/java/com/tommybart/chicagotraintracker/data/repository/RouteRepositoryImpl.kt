@@ -117,7 +117,7 @@ class RouteRepositoryImpl(
             }
             is ArrivalState.Search -> {
                 return if (lastRequestMapIds.isEmpty() || lastRequestMapIds.size != 1) true
-                else lastRequestMapIds[0] != arrivalsState.station.mapId
+                else lastRequestMapIds[0] != arrivalsState.mapId
             }
         }
     }
@@ -125,8 +125,10 @@ class RouteRepositoryImpl(
     private suspend fun getNewRequestStationMapIds(arrivalsState: ArrivalState): List<Int>? {
         return when (arrivalsState) {
             is ArrivalState.Location -> requestedStationsProvider.getNewLocationRequestMapIds()
-            is ArrivalState.Default -> listOf(requestedStationsProvider.getNewDefaultRequestMapId())
-            is ArrivalState.Search -> listOf(arrivalsState.station.mapId)
+            is ArrivalState.Default -> listOf(
+                requestedStationsProvider.getNewDefaultRequestMapId() ?: return null
+            )
+            is ArrivalState.Search -> listOf(arrivalsState.mapId)
         }
     }
 

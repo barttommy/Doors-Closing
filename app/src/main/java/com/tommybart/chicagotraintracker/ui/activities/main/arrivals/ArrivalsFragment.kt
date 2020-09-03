@@ -54,8 +54,6 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
     private lateinit var arrivalsRecyclerAdapter: ArrivalsRecyclerAdapter
     private val arrivalsRecyclerList = ArrayList<Route>()
 
-    private lateinit var state: ArrivalState
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,16 +65,22 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ArrivalsViewModel::class.java)
 
-        // TODO restore state from bundle
-
-        if (viewModel.isAllowingDeviceLocation() && hasLocationPermission()) {
-            updateState(ArrivalState.Location())
+        // Only restore search state. See ArrivalsViewModel.kt
+        val arrivalsState = if (viewModel.isStateInitialized()
+            && viewModel.state is ArrivalState.Search
+        ) {
+            viewModel.state
+        } else if (viewModel.isAllowingDeviceLocation() && hasLocationPermission()) {
+            ArrivalState.Location()
         } else {
-            updateState(ArrivalState.Default())
+            ArrivalState.Default()
         }
+
+        updateState(arrivalsState)
         bindUi()
     }
 
@@ -88,9 +92,7 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         ) {
             if (data.hasExtra(STATION_RESULT_EXTRA)) {
                 val station = data.getSerializableExtra(STATION_RESULT_EXTRA) as? Station
-                if (station != null) {
-                    updateState(ArrivalState.Search(station))
-                }
+                station?.let { updateState(ArrivalState.Search(it.mapId)) }
             }
         }
     }
@@ -99,12 +101,18 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         super.onResume()
         if (viewModel.isAllowingDeviceLocation()
             && hasLocationPermission()
-            && state is ArrivalState.Default
+            && viewModel.state is ArrivalState.Default
         ) {
             // Case: State transition when user accepts location permission on first run
             updateState(ArrivalState.Location())
             refresh()
+        } else if (viewModel.state is ArrivalState.Location && !hasLocationPermission()) {
+            // Case: Location permission turned off while in location state
+            viewModel.useDeviceLocation(false)
+            updateState(ArrivalState.Default())
+            refresh()
         } else if (!swiper.isRefreshing) {
+            // Case: Everything is normal, refresh if we aren't already
             refresh()
         }
     }
@@ -147,8 +155,8 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         fragment_arrivals_recycler.addItemDecoration(MarginItemDecoration(24))
         viewModel.routeListLiveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
-                is Resource.Loading, null -> return@Observer
-                is Resource.Error -> {
+                is Resource.Loading -> return@Observer
+                is Resource.Error, null -> {
                     swiper.isRefreshing = false
                     fragment_arrivals_recycler.visibility = View.GONE
                 }
@@ -166,31 +174,30 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
     }
 
     private fun refresh() {
-        viewModel.getRouteData(state)
+        viewModel.getRouteData()
         swiper.isRefreshing = true
     }
 
     private fun updateState(arrivalsState: ArrivalState) {
-        if (this::state.isInitialized && state == arrivalsState) return
-        state = arrivalsState
+        viewModel.updateState(arrivalsState)
         updateLocationUsage()
         updateTitle()
         updateOptionsMenu()
     }
 
     private fun updateLocationUsage() {
-        when (state) {
+        when (viewModel.state) {
             is ArrivalState.Location -> getLocationUpdates()
             else -> removeLocationUpdates()
         }
     }
 
     private fun updateTitle() {
-        requireActivity().title = state.title
+        requireActivity().title = viewModel.state.title
     }
 
     private fun updateOptionsMenu() {
-        when (state) {
+        when (viewModel.state) {
             is ArrivalState.Search -> {
                 searchMenuItem?.isVisible = false
                 returnToDefaultMenuItem?.isVisible = true

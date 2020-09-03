@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -40,13 +39,27 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        setupNav()
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        // Only ask for location on first install. Permission can be requested again in the settings
+        // fragment.
+        if (sharedPreferences.getBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, true)) {
+            requestLocationPermission()
+            sharedPreferences.edit()
+                .putBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, false)
+                .apply()
+        }
+    }
 
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    private fun setupNav() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -56,20 +69,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        // Only ask for location on first install. Permission can be requested again in the settings
-        // fragment.
-        if (sharedPreferences.getBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, true)) {
-            requestLocationPermission()
-        }
-        sharedPreferences.edit()
-            .putBoolean(SHOULD_REQUEST_LOCATION_PERMISSION, false)
-            .apply()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     private fun requestLocationPermission() {
