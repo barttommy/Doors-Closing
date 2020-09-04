@@ -68,7 +68,7 @@ class SearchActivity : ScopedActivity(), KodeinAware, SearchView.OnQueryTextList
         launch {
             stationList = viewModel.stationData.await()
             stationSearchResults.addAll(stationList)
-            search_activity_pb.visibility = View.GONE
+            search_activity_grp_refresh.visibility = View.GONE
             searchRecyclerAdapter.notifyDataSetChanged()
         }
     }

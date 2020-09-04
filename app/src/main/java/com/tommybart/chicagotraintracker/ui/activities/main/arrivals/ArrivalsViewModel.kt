@@ -1,10 +1,7 @@
 package com.tommybart.chicagotraintracker.ui.activities.main.arrivals
 
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.provider.PreferenceProvider
 import com.tommybart.chicagotraintracker.data.provider.USE_DEVICE_LOCATION_PREFERENCE
@@ -29,6 +26,7 @@ class ArrivalsViewModel(
     private val preferences: SharedPreferences = preferenceProvider.preferences
 
     private val _arrivalStateLiveData: MutableLiveData<RouteRequest?> = MutableLiveData()
+
     val routeListLiveData: LiveData<Resource<List<Route>>> =
         Transformations.switchMap(_arrivalStateLiveData) { request ->
             if (request == null) {

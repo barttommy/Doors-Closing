@@ -4,6 +4,8 @@
         <item name="colorPrimary">@color/colorPrimaryNight</item>
         <item name="colorPrimaryLight">@color/colorPrimaryLightNight</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkNight</item>
+        <item name="colorLayoutBackground">@color/colorLayoutBackgroundNight</item>
+        <item name="colorRowBackground">@color/colorRowBackgroundNight</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/colorTextNight</item>
         <item name="android:textColorHint">@color/colorTextHintNight</item>

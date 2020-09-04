@@ -4,6 +4,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorLayoutBackground">@color/colorLayoutBackground</item>
+        <item name="colorRowBackground">@color/colorRowBackground</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorHint">@color/colorTextHint</item>
@@ -24,9 +26,5 @@
     <style name="snackbar_style" parent="Widget.MaterialComponents.Snackbar">
         <item name="android:backgroundTint">@color/colorPrimaryLight</item>
     </style>
-
-<!--    <style name="bottomNav_style">-->
-<!--        <item name="android:background">@color/white</item>-->
-<!--    </style>-->
 
 </resources>

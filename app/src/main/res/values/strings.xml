@@ -32,5 +32,6 @@
     <string name="return_from_search">Return from search</string>
     <string name="station_is_disability_accessible">Station is disability accessible</string>
     <string name="route_is_experiencing_delays">Route is experiencing delays</string>
+    <string name="checking_for_updates">Checking for updates...</string>
 
 </resources>

@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Colors: Day -->
-    <color name="colorPrimary">#fafafa</color>
-    <color name="colorPrimaryLight">#ffffff</color>
-    <color name="colorPrimaryDark">#c7c7c7</color>
+    <!-- App Theme: Day -->
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryLight">#FFFFFF</color>
+    <color name="colorPrimaryDark">#CCCCCC</color>
+    <color name="colorLayoutBackground">#E4E4E4</color>
+    <color name="colorRowBackground">#FFFFFF</color>
     <color name="colorAccent">#2196F3</color>
     <color name="colorText">#000000</color>
     <color name="colorTextHint">#BF000000</color>
 
-    <!-- App Colors: Night -->
-    <color name="colorPrimaryNight">#292929</color>
-    <color name="colorPrimaryLightNight">#515151</color>
+    <!-- App Theme: Night -->
+    <color name="colorPrimaryNight">#222222</color>
+    <color name="colorPrimaryLightNight">#494949</color>
     <color name="colorPrimaryDarkNight">#000000</color>
+
+    <color name="colorLayoutBackgroundNight">#1C1E20</color>
+    <color name="colorRowBackgroundNight">#292929</color>
+
     <color name="colorAccentNight">#2196F3</color>
     <color name="colorTextNight">#FFFFFF</color>
     <color name="colorTextHintNight">#BFFFFFFF</color>
