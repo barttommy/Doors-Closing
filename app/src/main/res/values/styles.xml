@@ -1,17 +1,30 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorLayoutBackground">@color/colorLayoutBackground</item>
+        <item name="colorRowBackground">@color/colorRowBackground</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColorHint">@color/colorTextHint</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="snackbarStyle">@style/snackbar_style</item>
+    </style>
 
-        <item name="md_color_title">@color/colorFont</item>
-        <item name="md_color_content">@color/colorFont</item>
-        <item name="md_color_hint">@color/colorFontHint</item>
-        <item name="md_color_button_text">@color/colorAccent</item>
-        <item name="md_background_color">@color/colorPrimary</item>
-        <item name="md_corner_radius">8dp</item>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
+
+    <style name="snackbar_style" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:backgroundTint">@color/colorPrimaryLight</item>
     </style>
 
 </resources>

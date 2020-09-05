@@ -1,0 +1,30 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+        <item name="colorPrimary">@color/colorPrimaryNight</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLightNight</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkNight</item>
+        <item name="colorLayoutBackground">@color/colorLayoutBackgroundNight</item>
+        <item name="colorRowBackground">@color/colorRowBackgroundNight</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorTextNight</item>
+        <item name="android:textColorHint">@color/colorTextHintNight</item>
+        <item name="android:statusBarColor">@color/colorPrimaryNight</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="snackbarStyle">@style/snackbar_style</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
+
+    <style name="snackbar_style" parent="@style/Widget.MaterialComponents.Snackbar">
+        <item name="android:backgroundTint">@color/colorPrimaryLightNight</item>
+    </style>
+
+</resources>

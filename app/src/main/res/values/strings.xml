@@ -3,27 +3,35 @@
     <string name="app_desc">A Chicago train tracking application</string>
     <string name="app_credit">Data provided by the Chicago Transit Authority</string>
 
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
+    <!-- Layout error message -->
+    <string name="error_no_trains_found_title">No Trains Found</string>
+    <string name="error_no_trains_found_message">
+        Please ensure that you have an internet connection. Use the search bar to select stations
+        manually, or set a default station in the settings.
+    </string>
+
+    <!--  Nav drawer  -->
+    <string name="drawer_icon">Drawer Icon</string>
+    <string name="navigation_header">Navigation header</string>
+    <string name="email">doorsclosingapp@gmail.com</string>
+
     <string name="station_label">Station Label</string>
-    <string name="direction_label">Direction Label</string>
+    <string name="destination_label">Destination Label</string>
     <string name="arrivals">Arrivals</string>
     <string name="time">Time</string>
     <string name="search">Search</string>
 
-    <!-- DialogManager -->
-    <string name="error_database_title">Unable to load station info</string>
-    <string name="error_database_message">
-        Fatal error occurred when parsing CTA station database
-    </string>
-    <string name="OK">OK</string>
-
-    <!-- Layout error message -->
-    <string name="error_no_trains_found_title">No Trains Found</string>
-    <string name="error_no_trains_found_message">
-        Ensure that you have an internet connection and location permissions enabled.
-        Use the search bar to select stations manually.
-    </string>
-    <string name="drawer_icon">Drawer Icon</string>
+    <string name="orange_line_is_available_at_this_station">Orange line is available at this station</string>
+    <string name="pink_line_is_available_at_this_station">Pink line is available at this station</string>
+    <string name="yellow_line_is_available_at_this_station">Yellow line is available at this station</string>
+    <string name="purple_line_is_available_at_this_station">Purple line is available at this station</string>
+    <string name="red_line_is_available_at_this_station">Red line is available at this station</string>
+    <string name="blue_line_is_available_at_this_station">Blue line is available at this station</string>
+    <string name="green_line_is_available_at_this_station">Green line is available at this station</string>
+    <string name="brown_line_is_available_at_this_station">Brown line is available at this station</string>
+    <string name="return_from_search">Return from search</string>
+    <string name="station_is_disability_accessible">Station is disability accessible</string>
+    <string name="route_is_experiencing_delays">Route is experiencing delays</string>
+    <string name="checking_for_updates">Checking for updates...</string>
 
 </resources>
