@@ -1,5 +1,9 @@
 # Doors Closing: A Chicago Train Tracker
 
+**Version 2.0.0 coming soon!**
+
+<hr>
+
 *Version 1.0.0 now available on the [Google Play Store!](https://play.google.com/store/apps/details?id=com.tommybart.chicagotraintracker&hl=en_US)*
 
 The Doors Closing app makes tracking incoming CTA trains easier than ever.
@@ -12,4 +16,4 @@ The project began when I continued my work from DemonHacks 2019 ([check out what
 
 Tommy Bart
 
-November 2019 - April 2020
+November 2019 - September 2020
