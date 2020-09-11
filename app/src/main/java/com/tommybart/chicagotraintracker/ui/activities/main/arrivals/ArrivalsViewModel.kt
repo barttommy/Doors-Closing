@@ -72,10 +72,12 @@ class ArrivalsViewModel(
 
     fun isStateInitialized(): Boolean = this::state.isInitialized
 
-    fun updateState(arrivalsState: ArrivalState) {
-        if (isStateInitialized() && state == arrivalsState) return
+    // Returns true if state changed
+    fun updateState(arrivalsState: ArrivalState): Boolean {
+        if (isStateInitialized() && state == arrivalsState) return false
         state = arrivalsState
         saveState()
+        return true
     }
 
     // Only restore search state - other states determined by settings that could have changed.

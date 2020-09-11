@@ -4,15 +4,17 @@
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryLight">#FFFFFF</color>
     <color name="colorPrimaryDark">#CCCCCC</color>
+
     <color name="colorLayoutBackground">#E4E4E4</color>
     <color name="colorRowBackground">#FFFFFF</color>
+
     <color name="colorAccent">#2196F3</color>
     <color name="colorText">#000000</color>
     <color name="colorTextHint">#BF000000</color>
 
     <!-- App Theme: Night -->
     <color name="colorPrimaryNight">#222222</color>
-    <color name="colorPrimaryLightNight">#494949</color>
+    <color name="colorPrimaryLightNight">#363636</color>
     <color name="colorPrimaryDarkNight">#000000</color>
 
     <color name="colorLayoutBackgroundNight">#1C1E20</color>

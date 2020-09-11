@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
+import com.google.android.material.snackbar.Snackbar
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
@@ -155,15 +156,18 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         fragment_arrivals_recycler.addItemDecoration(MarginItemDecoration(24))
         viewModel.routeListLiveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
-                is Resource.Loading -> return@Observer
-                is Resource.Error, null -> {
+                null -> {
                     swiper.isRefreshing = false
                     fragment_arrivals_recycler.visibility = View.GONE
                 }
-                is Resource.Success -> {
+                is Resource.Loading -> return@Observer
+                is Resource.Error, is Resource.Success  -> {
                     if (result.data == null || result.data.isEmpty()) {
                         fragment_arrivals_recycler.visibility = View.GONE
                     } else {
+                        if (result is Resource.Error) {
+                            makeSnackBar("Check network connection")
+                        }
                         updateRecycler(result.data)
                         fragment_arrivals_recycler.visibility = View.VISIBLE
                     }
@@ -214,7 +218,6 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
         arrivalsRecyclerList.clear()
         arrivalsRecyclerList.addAll(result)
         arrivalsRecyclerList.sort()
-
         arrivalsRecyclerAdapter.notifyDataSetChanged()
     }
 
@@ -249,6 +252,10 @@ class ArrivalsFragment : ScopedFragment(), KodeinAware, View.OnClickListener {
             this.requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION
         )
+    }
+
+    private fun makeSnackBar(message: String, length: Int = Snackbar.LENGTH_LONG) {
+        Snackbar.make(requireView(), message, length).show()
     }
 
     override fun onClick(v: View?) {
