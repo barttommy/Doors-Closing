@@ -6,15 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.tommybart.chicagotraintracker.BuildConfig
 import com.tommybart.chicagotraintracker.R
+import kotlinx.android.synthetic.main.fragment_about.*
 
 class AboutFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = AboutFragment()
-    }
-
-    private lateinit var viewModel: AboutViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,10 +21,14 @@ class AboutFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(AboutViewModel::class.java)
-        // TODO: Use the ViewModel
+        bindUi()
+    }
 
+    private fun bindUi() {
         requireActivity().title = "About"
+        about_tv_versionNumber.text = resources.getString(
+            R.string.about_version_text, BuildConfig.VERSION_NAME
+        )
     }
 
 }

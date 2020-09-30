@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Doors Closing</string>
-    <string name="app_desc">A Chicago train tracking application</string>
+    <string name="app_desc">A Chicago Train Tracking Application</string>
     <string name="app_credit">Data provided by the Chicago Transit Authority</string>
 
     <!-- Layout error message -->
@@ -33,5 +33,7 @@
     <string name="station_is_disability_accessible">Station is disability accessible</string>
     <string name="route_is_experiencing_delays">Route is experiencing delays</string>
     <string name="checking_for_updates">Checking for updates...</string>
+    <string name="about_version_text">Doors Closing, v%s</string>
+    <string name="doors_closing_app_icon">Doors Closing App Icon</string>
 
 </resources>

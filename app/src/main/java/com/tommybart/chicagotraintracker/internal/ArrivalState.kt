@@ -1,11 +1,6 @@
 package com.tommybart.chicagotraintracker.internal
 
-import java.io.Serializable
-
-sealed class ArrivalState(
-    val id: Int,
-    val title: String
-) : Serializable {
+sealed class ArrivalState(val id: Int, val title: String) {
 
     companion object {
         const val DEFAULT_STATE_ID = 0
