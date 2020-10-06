@@ -1,13 +1,11 @@
 package com.tommybart.chicagotraintracker.data.network.chicagotransitauthority
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.network.ApiResponse
 import com.tommybart.chicagotraintracker.data.network.LiveDataCallAdapterFactory
 import com.tommybart.chicagotraintracker.data.network.chicagotransitauthority.response.CtaApiResponse
-import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -39,8 +37,6 @@ interface CtaApiService {
                     .newBuilder()
                     .addQueryParameter("key", context.getString(R.string.cta_api_key))
                     .build()
-
-                Log.d(TAG, url.toString())
 
                 val request = chain.request()
                     .newBuilder()

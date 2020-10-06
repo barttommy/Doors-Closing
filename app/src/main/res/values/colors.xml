@@ -20,7 +20,6 @@
     <color name="colorLayoutBackgroundNight">#1C1E20</color>
     <color name="colorRowBackgroundNight">#292929</color>
 
-    <color name="colorAccentNight">#2196F3</color>
     <color name="colorTextNight">#FFFFFF</color>
     <color name="colorTextHintNight">#BFFFFFFF</color>
 
@@ -38,7 +37,4 @@
 
     <!--  Other  -->
     <color name="alert">#e34242</color>
-    <color name="accessible">#0277BD</color>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
 </resources>

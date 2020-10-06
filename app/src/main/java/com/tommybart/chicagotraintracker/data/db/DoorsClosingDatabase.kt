@@ -15,8 +15,8 @@ import com.tommybart.chicagotraintracker.data.db.typeconverters.IntListConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.LocalDateTimeConverter
 import com.tommybart.chicagotraintracker.data.db.typeconverters.TrainLineConverter
-import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.SodaResponseDeserializer
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

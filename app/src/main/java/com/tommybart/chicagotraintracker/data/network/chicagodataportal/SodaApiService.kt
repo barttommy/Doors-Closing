@@ -1,12 +1,10 @@
 package com.tommybart.chicagotraintracker.data.network.chicagodataportal
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tommybart.chicagotraintracker.R
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
-import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -59,8 +57,6 @@ interface SodaApiService {
                     .newBuilder()
                     .addQueryParameter("\$\$app_token", context.getString(R.string.cdp_app_token))
                     .build()
-
-                Log.d(TAG, url.toString())
 
                 val request = chain.request()
                     .newBuilder()

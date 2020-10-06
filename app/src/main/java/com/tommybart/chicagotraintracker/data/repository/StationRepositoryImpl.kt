@@ -7,8 +7,8 @@ import com.tommybart.chicagotraintracker.data.db.entity.StationInfoEntry
 import com.tommybart.chicagotraintracker.data.models.Route
 import com.tommybart.chicagotraintracker.data.models.Station
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.CHECK_FOR_UPDATES_DELAY_DAYS
-import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import com.tommybart.chicagotraintracker.data.network.chicagodataportal.StationNetworkDataSource
+import com.tommybart.chicagotraintracker.data.network.chicagodataportal.response.SodaApiResponse
 import com.tommybart.chicagotraintracker.internal.extensions.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
